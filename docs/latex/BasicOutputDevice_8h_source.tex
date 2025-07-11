@@ -1,0 +1,29 @@
+\doxysection{Basic\+Output\+Device.\+h}
+\hypertarget{BasicOutputDevice_8h_source}{}\label{BasicOutputDevice_8h_source}\index{lib/BasicOutputDevice/BasicOutputDevice.h@{lib/BasicOutputDevice/BasicOutputDevice.h}}
+\mbox{\hyperlink{BasicOutputDevice_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#ifndef\ BASICOUTPUTDEVICE\_H}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ BASICOUTPUTDEVICE\_H}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{AbstractPin_8h}{../AbstractPin/AbstractPin.h}}"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Subscriber_8h}{../Subscriber/Subscriber.h}}"{}}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{BasicOutputInterface_8h}{../BasicOutputInterface/BasicOutputInterface.h}}"{}}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{keyword}{class\ }BasicOutputDevice\ :\ \textcolor{keyword}{public}\ BasicOutputInterface,\ \textcolor{keyword}{public}\ Subscriber}
+\DoxyCodeLine{00013\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ BasicOutputDevice(\mbox{\hyperlink{classAbstractPin}{AbstractPin}}*\ pinNumber);}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ initialize()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ turnOn()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ turnOff()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ toggle()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ getState()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ callback()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00022\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classAbstractPin}{AbstractPin}}*\ pinNumber;}
+\DoxyCodeLine{00024\ \};}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//BASICOUTPUTDEVICE\_H}}
+
+\end{DoxyCode}

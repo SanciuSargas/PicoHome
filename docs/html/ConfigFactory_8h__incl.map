@@ -1,0 +1,5 @@
+<map id="lib/ConfigFactory/ConfigFactory.h" name="lib/ConfigFactory/ConfigFactory.h">
+<area shape="rect" id="Node000001" title="Declaration of ConfigFactory: factory design pattern for config assignment." alt="" coords="5,5,168,48"/>
+<area shape="rect" id="Node000002" href="$ConfigInterface_8h.html" title="Declaration of ConfigInterface: interface for configuration reading." alt="" coords="24,96,149,139"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,48,89,81,84,81,84,48"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="lib/SwitchSensor" name="lib/SwitchSensor">
+<area shape="rect" id="node1" href="dir_5c1375af2dea400863b140a12d727b5b.html" title="AbstractDigitalSensor" alt="" coords="27,128,176,155"/>
+<area shape="rect" id="node2" href="dir_b84fa2aaeb5cf1524270a5999598ff46.html" title="SwitchStrategyInterface" alt="" coords="199,128,361,155"/>
+<area shape="rect" id="node3" href="dir_2c1e5c0c2f2825e7dacf427ab4613023.html" title="SwitchSensor" alt="" coords="140,53,242,80"/>
+<area shape="poly" id="edge1" href="dir_000018_000000.html" alt="" coords="177,83,130,120,127,116,173,78"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000018_000000.html" title="1" alt="" coords="133,115,140,131"/>
+<area shape="poly" id="edge2" href="dir_000018_000019.html" alt="" coords="208,78,254,116,251,120,205,83"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000018_000019.html" title="1" alt="" coords="252,102,259,118"/>
+<area shape="rect" id="clust1" href="dir_97aefd0d527b934f1d99a682da8fe6a9.html" title="lib" alt="" coords="16,16,372,165"/>
+</map>

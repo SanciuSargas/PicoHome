@@ -1,0 +1,12 @@
+<map id="lib/BasicOutputInterface/BasicOutputInterface.h" name="lib/BasicOutputInterface/BasicOutputInterface.h">
+<area shape="rect" id="Node000001" title="Declaration of BasicOutputInterface: interface for basic (on/off) output devices such as lights,..." alt="" coords="160,5,321,48"/>
+<area shape="rect" id="Node000002" href="$BasicOutputDevice_8h.html" title="Declaration of BasicOutputDevice: class for basic (on/off) output devices such as lights,..." alt="" coords="51,96,203,139"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,60,155,98,152,93,201,55"/>
+<area shape="rect" id="Node000004" href="$main_8cpp.html" title="Main program for homo automation microcontrollers." alt="" coords="192,195,288,221"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="243,64,243,194,238,194,238,64"/>
+<area shape="rect" id="Node000005" href="$BasicOutputInterface_8cpp.html" title="Implementation of BasicOutputInterface." alt="" coords="278,96,451,139"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="283,55,337,93,334,98,280,59"/>
+<area shape="rect" id="Node000003" href="$BasicOutputDevice_8cpp.html" title="Implementation of BasicOutputDevice internals." alt="" coords="5,187,169,229"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,154,99,187,94,185,109,152"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="167,146,226,192,223,196,164,150"/>
+</map>

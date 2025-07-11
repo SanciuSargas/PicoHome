@@ -1,0 +1,7 @@
+<map id="lib/LocalPin/LocalPin.h" name="lib/LocalPin/LocalPin.h">
+<area shape="rect" id="Node000001" title="Declaration of LocalPin: specifies functions for interacting with on&#45;chip GPIO." alt="" coords="90,5,243,32"/>
+<area shape="rect" id="Node000002" href="$LocalPin_8cpp.html" title="Implementation of LocalPin." alt="" coords="5,80,173,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,45,104,82,100,78,140,41"/>
+<area shape="rect" id="Node000003" href="$main_8cpp.html" title="Main program for homo automation microcontrollers." alt="" coords="197,80,293,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="193,41,233,78,230,82,190,45"/>
+</map>

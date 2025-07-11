@@ -1,0 +1,100 @@
+\doxysection{Switch\+Sensor Class Reference}
+\hypertarget{classSwitchSensor}{}\label{classSwitchSensor}\index{SwitchSensor@{SwitchSensor}}
+
+
+Inheritance diagram for Switch\+Sensor\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{classSwitchSensor__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Switch\+Sensor\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{classSwitchSensor__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classSwitchSensor_ad676fa3122a6231dc38a84dacdbe683b}\label{classSwitchSensor_ad676fa3122a6231dc38a84dacdbe683b} 
+{\bfseries Switch\+Sensor} (\mbox{\hyperlink{classSwitchStrategyInterface}{Switch\+Strategy\+Interface}} \texorpdfstring{$\ast$}{*}switch\+Strat)
+\item 
+void \mbox{\hyperlink{classSwitchSensor_a8ac825dbd10f2b3d187937dec519ef3f}{initialize}} () override
+\item 
+void \mbox{\hyperlink{classSwitchSensor_acdf936e142bd81a69d8232a0c2290ddb}{update}} () override
+\item 
+void \mbox{\hyperlink{classSwitchSensor_adf964997481076c733ff2ec94e6010c1}{subscribe}} (\mbox{\hyperlink{classSubscriber}{Subscriber}} \texorpdfstring{$\ast$}{*}subscriber) override
+\item 
+void \mbox{\hyperlink{classSwitchSensor_a556d0aa4d9894bb8195827ccb7bdb65d}{unsubscribe}} (\mbox{\hyperlink{classSubscriber}{Subscriber}} \texorpdfstring{$\ast$}{*}subscriber) override
+\item 
+void \mbox{\hyperlink{classSwitchSensor_a2719b15443b79b02eda10a57bbb3f017}{notify\+Subscribers}} () override
+\item 
+\Hypertarget{classSwitchSensor_a91e31d00512b3e2e3b8083917b788585}\label{classSwitchSensor_a91e31d00512b3e2e3b8083917b788585} 
+void {\bfseries set\+Strategy} (\mbox{\hyperlink{classSwitchStrategyInterface}{Switch\+Strategy\+Interface}} \texorpdfstring{$\ast$}{*}switch\+Strat)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classSwitchSensor_a8ac825dbd10f2b3d187937dec519ef3f}\index{SwitchSensor@{SwitchSensor}!initialize@{initialize}}
+\index{initialize@{initialize}!SwitchSensor@{SwitchSensor}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily \label{classSwitchSensor_a8ac825dbd10f2b3d187937dec519ef3f} 
+void Switch\+Sensor\+::initialize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classAbstractDigitalSensor}{Abstract\+Digital\+Sensor}}.
+
+\Hypertarget{classSwitchSensor_a2719b15443b79b02eda10a57bbb3f017}\index{SwitchSensor@{SwitchSensor}!notifySubscribers@{notifySubscribers}}
+\index{notifySubscribers@{notifySubscribers}!SwitchSensor@{SwitchSensor}}
+\doxysubsubsection{\texorpdfstring{notifySubscribers()}{notifySubscribers()}}
+{\footnotesize\ttfamily \label{classSwitchSensor_a2719b15443b79b02eda10a57bbb3f017} 
+void Switch\+Sensor\+::notify\+Subscribers (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classPublisher}{Publisher}}.
+
+\Hypertarget{classSwitchSensor_adf964997481076c733ff2ec94e6010c1}\index{SwitchSensor@{SwitchSensor}!subscribe@{subscribe}}
+\index{subscribe@{subscribe}!SwitchSensor@{SwitchSensor}}
+\doxysubsubsection{\texorpdfstring{subscribe()}{subscribe()}}
+{\footnotesize\ttfamily \label{classSwitchSensor_adf964997481076c733ff2ec94e6010c1} 
+void Switch\+Sensor\+::subscribe (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classSubscriber}{Subscriber}} \texorpdfstring{$\ast$}{*}}]{subscriber}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classPublisher}{Publisher}}.
+
+\Hypertarget{classSwitchSensor_a556d0aa4d9894bb8195827ccb7bdb65d}\index{SwitchSensor@{SwitchSensor}!unsubscribe@{unsubscribe}}
+\index{unsubscribe@{unsubscribe}!SwitchSensor@{SwitchSensor}}
+\doxysubsubsection{\texorpdfstring{unsubscribe()}{unsubscribe()}}
+{\footnotesize\ttfamily \label{classSwitchSensor_a556d0aa4d9894bb8195827ccb7bdb65d} 
+void Switch\+Sensor\+::unsubscribe (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classSubscriber}{Subscriber}} \texorpdfstring{$\ast$}{*}}]{subscriber}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classPublisher}{Publisher}}.
+
+\Hypertarget{classSwitchSensor_acdf936e142bd81a69d8232a0c2290ddb}\index{SwitchSensor@{SwitchSensor}!update@{update}}
+\index{update@{update}!SwitchSensor@{SwitchSensor}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily \label{classSwitchSensor_acdf936e142bd81a69d8232a0c2290ddb} 
+void Switch\+Sensor\+::update (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classAbstractDigitalSensor}{Abstract\+Digital\+Sensor}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+lib/\+Switch\+Sensor/\mbox{\hyperlink{SwitchSensor_8h}{Switch\+Sensor.\+h}}\item 
+lib/\+Switch\+Sensor/\mbox{\hyperlink{SwitchSensor_8cpp}{Switch\+Sensor.\+cpp}}\end{DoxyCompactItemize}

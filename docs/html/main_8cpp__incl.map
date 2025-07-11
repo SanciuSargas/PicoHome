@@ -1,0 +1,35 @@
+<map id="src/main.cpp" name="src/main.cpp">
+<area shape="rect" id="Node000001" title="Main program for homo automation microcontrollers." alt="" coords="432,5,528,32"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="121,352,197,379"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="432,26,198,46,87,62,49,72,30,82,19,97,12,113,9,148,18,184,35,221,59,256,85,289,135,340,131,343,81,292,54,259,31,224,13,186,4,148,7,112,15,95,26,78,47,67,86,57,198,40,431,20"/>
+<area shape="rect" id="Node000003" href="$BasicOutputDevice_8h.html" title="Declaration of BasicOutputDevice: class for basic (on/off) output devices such as lights,..." alt="" coords="280,80,443,123"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="463,35,406,73,403,69,460,30"/>
+<area shape="rect" id="Node000004" href="$AbstractPin_8h.html" title="Declaration of AbstractPin: hardware abstraction layer for microcontroller pins." alt="" coords="103,179,287,205"/>
+<area shape="poly" id="edge17_Node000001_Node000004" title=" " alt="" coords="432,27,394,33,351,44,309,60,270,82,249,101,232,122,208,166,203,163,228,119,246,97,267,78,306,55,350,38,393,28,431,21"/>
+<area shape="rect" id="Node000006" href="$BasicOutputInterface_8h.html" title="Declaration of BasicOutputInterface: interface for basic (on/off) output devices such as lights,..." alt="" coords="362,171,521,213"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="480,33,452,156,447,155,475,32"/>
+<area shape="rect" id="Node000007" href="$AbstractDigitalSensor_8h.html" title="Declaration of AbstractDigitalSensor: abstract class for digital sensors such as switches,..." alt="" coords="545,171,722,213"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="490,31,519,72,558,121,598,159,594,162,554,124,515,76,486,34"/>
+<area shape="rect" id="Node000010" href="$SwitchStrategyInterface_8h.html" title="Declaration of SwitchStrategyInterface: interface for different strategies on switch input." alt="" coords="750,171,941,213"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="529,20,646,26,788,38,914,55,958,66,982,78,989,89,991,101,982,124,962,148,935,166,932,161,958,144,978,121,986,100,984,91,978,82,956,71,913,60,788,43,645,32,528,25"/>
+<area shape="rect" id="Node000011" href="$BasicToggleSwitchStrategy_8h.html" title="Declaration of the BasicToggleSwitchStrategy: strategy for a basic toggle (on/off) switch." alt="" coords="723,80,968,123"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="529,28,737,74,736,79,528,33"/>
+<area shape="rect" id="Node000012" href="$LocalPin_8h.html" title="Declaration of LocalPin: specifies functions for interacting with on&#45;chip GPIO." alt="" coords="40,88,205,115"/>
+<area shape="poly" id="edge15_Node000001_Node000012" title=" " alt="" coords="432,33,194,87,193,82,431,28"/>
+<area shape="rect" id="Node000013" href="$SwitchSensor_8h.html" title="Declaration of SwitchSensor: class for all switches with different strategies for each switch type." alt="" coords="568,80,699,123"/>
+<area shape="poly" id="edge18_Node000001_Node000013" title=" " alt="" coords="505,30,582,70,579,75,503,35"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="324,126,233,173,231,169,321,121"/>
+<area shape="rect" id="Node000005" href="$Subscriber_8h.html" title="Declaration of Subscriber: Observer design pattern, interface for subscribers (actuators)." alt="" coords="375,352,548,379"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="356,124,344,160,336,207,336,257,342,280,352,303,374,327,402,344,400,348,370,331,347,305,337,282,331,257,330,206,339,159,351,123"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="382,121,415,158,411,161,378,125"/>
+<area shape="rect" id="Node000008" href="$CommunicationInterface_8h.html" title="Declaration of CommunicationInterface: API for communication between microcontroller and server." alt="" coords="362,261,540,304"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="592,216,508,257,506,252,589,212"/>
+<area shape="rect" id="Node000009" href="$Publisher_8h.html" title="Declaration of Publisher: Observer design pattern, notify actuators on sensor change." alt="" coords="565,269,721,296"/>
+<area shape="poly" id="edge10_Node000007_Node000009" title=" " alt="" coords="638,213,643,254,637,254,633,214"/>
+<area shape="poly" id="edge9_Node000008_Node000002" title=" " alt="" coords="376,307,213,352,211,347,375,302"/>
+<area shape="poly" id="edge11_Node000009_Node000005" title=" " alt="" coords="616,299,504,348,502,343,613,294"/>
+<area shape="poly" id="edge14_Node000011_Node000010" title=" " alt="" coords="848,123,848,155,843,155,843,123"/>
+<area shape="poly" id="edge16_Node000012_Node000004" title=" " alt="" coords="135,114,177,165,173,168,131,117"/>
+<area shape="poly" id="edge20_Node000013_Node000007" title=" " alt="" coords="636,123,636,155,631,155,631,123"/>
+<area shape="poly" id="edge19_Node000013_Node000010" title=" " alt="" coords="684,121,783,162,781,167,682,126"/>
+</map>

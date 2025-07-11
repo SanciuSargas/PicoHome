@@ -1,0 +1,27 @@
+\doxysection{Switch\+Sensor.\+h}
+\hypertarget{SwitchSensor_8h_source}{}\label{SwitchSensor_8h_source}\index{lib/SwitchSensor/SwitchSensor.h@{lib/SwitchSensor/SwitchSensor.h}}
+\mbox{\hyperlink{SwitchSensor_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#ifndef\ SWITCHSENSOR\_H}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ SWITCHSENSOR\_H}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{SwitchStrategyInterface_8h}{../SwitchStrategyInterface/SwitchStrategyInterface.h}}"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{AbstractDigitalSensor_8h}{../AbstractDigitalSensor/AbstractDigitalSensor.h}}"{}}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{class\ }SwitchSensor\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classAbstractDigitalSensor}{AbstractDigitalSensor}}}
+\DoxyCodeLine{00012\ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ SwitchSensor(\mbox{\hyperlink{classSwitchStrategyInterface}{SwitchStrategyInterface}}*\ switchStrat);}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ initialize()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ update()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ subscribe(\mbox{\hyperlink{classSubscriber}{Subscriber}}*\ subscriber)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ unsubscribe(\mbox{\hyperlink{classSubscriber}{Subscriber}}*\ subscriber)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ notifySubscribers()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setStrategy(\mbox{\hyperlink{classSwitchStrategyInterface}{SwitchStrategyInterface}}*\ switchStrat);}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classSwitchStrategyInterface}{SwitchStrategyInterface}}*\ switchStrat;}
+\DoxyCodeLine{00023\ \};}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//SWITCHSENSOR\_H}}
+
+\end{DoxyCode}

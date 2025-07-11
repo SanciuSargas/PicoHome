@@ -1,0 +1,9 @@
+<map id="lib/CommunicationFactory/CommunicationFactory.h" name="lib/CommunicationFactory/CommunicationFactory.h">
+<area shape="rect" id="Node000001" title="Declaration of PinFactory: factory design pattern for communication assignment." alt="" coords="106,5,279,48"/>
+<area shape="rect" id="Node000002" href="$CommunicationFactory_8cpp.html" title="Implementation of CommunicationFactory." alt="" coords="5,96,190,139"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,61,121,98,118,94,157,57"/>
+<area shape="rect" id="Node000003" href="$DeviceConstructor_8h.html" title="Declaration of DeviceConstructor: class to build all sensors and actuators from json config." alt="" coords="213,96,360,139"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="227,57,267,94,263,98,223,61"/>
+<area shape="rect" id="Node000004" href="$DeviceConstructor_8cpp.html" title="Implementation of DeviceConstructor." alt="" coords="207,187,366,229"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="290,154,290,186,284,186,284,154"/>
+</map>

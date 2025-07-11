@@ -1,0 +1,9 @@
+<map id="AbstractPin" name="AbstractPin">
+<area shape="rect" id="Node000001" title=" " alt="" coords="116,5,206,32"/>
+<area shape="rect" id="Node000002" href="$classExpanderPin.html" title=" " alt="" coords="5,80,101,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,43,73,82,70,77,128,39"/>
+<area shape="rect" id="Node000003" href="$classLocalPin.html" title=" " alt="" coords="125,80,197,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,48,164,80,158,80,158,48"/>
+<area shape="rect" id="Node000004" href="$classTestPin.html" title=" " alt="" coords="220,80,286,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="190,40,239,78,236,82,187,44"/>
+</map>

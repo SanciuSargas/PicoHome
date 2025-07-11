@@ -1,0 +1,11 @@
+<map id="lib/AbstractDigitalSensor/AbstractDigitalSensor.h" name="lib/AbstractDigitalSensor/AbstractDigitalSensor.h">
+<area shape="rect" id="Node000001" title="Declaration of AbstractDigitalSensor: abstract class for digital sensors such as switches,..." alt="" coords="108,5,273,48"/>
+<area shape="rect" id="Node000002" href="$CommunicationInterface_8h.html" title="Declaration of CommunicationInterface: API for communication between microcontroller and server." alt="" coords="5,96,184,139"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,50,130,87,126,83,166,46"/>
+<area shape="rect" id="Node000004" href="$Publisher_8h.html" title="Declaration of Publisher: Observer design pattern, notify actuators on sensor change." alt="" coords="208,104,365,131"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="215,46,264,91,260,95,211,50"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="56,187,133,213"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="97,139,97,171,92,171,92,139"/>
+<area shape="rect" id="Node000005" href="$Subscriber_8h.html" title="Declaration of Subscriber: Observer design pattern, interface for subscribers (actuators)." alt="" coords="200,187,373,213"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="289,131,289,171,284,171,284,131"/>
+</map>

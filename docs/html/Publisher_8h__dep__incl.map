@@ -1,0 +1,16 @@
+<map id="lib/Publisher/Publisher.h" name="lib/Publisher/Publisher.h">
+<area shape="rect" id="Node000001" title="Declaration of Publisher: Observer design pattern, notify actuators on sensor change." alt="" coords="331,5,492,32"/>
+<area shape="rect" id="Node000002" href="$AbstractDigitalSensor_8h.html" title="Declaration of AbstractDigitalSensor: abstract class for digital sensors such as switches,..." alt="" coords="231,80,397,123"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="386,44,341,82,337,77,383,40"/>
+<area shape="rect" id="Node000007" href="$Publisher_8cpp.html" title="Implementation of Publisher." alt="" coords="421,88,596,115"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="440,40,496,86,492,90,436,44"/>
+<area shape="rect" id="Node000003" href="$AbstractDigitalSensor_8cpp.html" title="Implementation of AbstractDigitalSensor." alt="" coords="5,171,183,213"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="249,131,147,172,145,168,247,126"/>
+<area shape="rect" id="Node000004" href="$SwitchSensor_8h.html" title="Declaration of SwitchSensor: class for all switches with different strategies for each switch type." alt="" coords="206,179,422,205"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="317,138,317,178,311,178,311,138"/>
+<area shape="rect" id="Node000006" href="$main_8cpp.html" title="Main program for homo automation microcontrollers." alt="" coords="411,261,508,288"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="386,128,413,146,436,169,449,192,457,218,462,261,457,262,452,219,444,195,432,172,410,150,383,132"/>
+<area shape="rect" id="Node000005" href="$SwitchSensor_8cpp.html" title="Implementation of SwitchSensor." alt="" coords="158,261,387,288"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="303,220,281,262,277,260,298,218"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="351,211,438,259,435,263,349,215"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="lib/BasicToggleSwitchStrategy/BasicToggleSwitchStrategy.h" name="lib/BasicToggleSwitchStrategy/BasicToggleSwitchStrategy.h">
+<area shape="rect" id="Node000001" title="Declaration of the BasicToggleSwitchStrategy: strategy for a basic toggle (on/off) switch." alt="" coords="99,5,297,48"/>
+<area shape="rect" id="Node000002" href="$BasicToggleSwitchStrategy_8cpp.html" title="Implementation of the BasicToggleSwitchStrategy." alt="" coords="5,96,215,139"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,61,132,98,128,94,165,57"/>
+<area shape="rect" id="Node000003" href="$main_8cpp.html" title="Main program for homo automation microcontrollers." alt="" coords="239,104,336,131"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="231,57,277,102,273,105,228,61"/>
+</map>

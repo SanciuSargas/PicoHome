@@ -1,0 +1,5 @@
+<map id="lib/Publisher/Publisher.h" name="lib/Publisher/Publisher.h">
+<area shape="rect" id="Node000001" title="Declaration of Publisher: Observer design pattern, notify actuators on sensor change." alt="" coords="11,5,171,32"/>
+<area shape="rect" id="Node000002" href="$Subscriber_8h.html" title="Declaration of Subscriber: Observer design pattern, interface for subscribers (actuators)." alt="" coords="5,80,177,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,33,94,64,88,64,88,33"/>
+</map>

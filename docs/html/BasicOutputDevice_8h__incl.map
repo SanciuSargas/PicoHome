@@ -1,0 +1,9 @@
+<map id="lib/BasicOutputDevice/BasicOutputDevice.h" name="lib/BasicOutputDevice/BasicOutputDevice.h">
+<area shape="rect" id="Node000001" title="Declaration of BasicOutputDevice: class for basic (on/off) output devices such as lights,..." alt="" coords="224,5,376,48"/>
+<area shape="rect" id="Node000002" href="$AbstractPin_8h.html" title="Declaration of AbstractPin: hardware abstraction layer for microcontroller pins." alt="" coords="5,104,190,131"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="254,51,141,100,139,95,252,46"/>
+<area shape="rect" id="Node000003" href="$Subscriber_8h.html" title="Declaration of Subscriber: Observer design pattern, interface for subscribers (actuators)." alt="" coords="214,104,386,131"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="303,48,303,88,298,88,298,48"/>
+<area shape="rect" id="Node000004" href="$BasicOutputInterface_8h.html" title="Declaration of BasicOutputInterface: interface for basic (on/off) output devices such as lights,..." alt="" coords="410,96,569,139"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="346,46,433,87,431,92,343,51"/>
+</map>

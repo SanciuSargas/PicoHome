@@ -1,0 +1,7 @@
+<map id="lib/CommunicationInterface/CommunicationInterface.cpp" name="lib/CommunicationInterface/CommunicationInterface.cpp">
+<area shape="rect" id="Node000001" title="Implementation of CommunicationInterface." alt="" coords="5,5,198,48"/>
+<area shape="rect" id="Node000002" href="$CommunicationInterface_8h.html" title="Declaration of CommunicationInterface: API for communication between microcontroller and server." alt="" coords="14,96,189,123"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,49,104,80,99,80,99,49"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="63,171,140,197"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="104,123,104,155,99,155,99,123"/>
+</map>

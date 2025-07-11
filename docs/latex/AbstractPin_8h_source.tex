@@ -1,0 +1,23 @@
+\doxysection{Abstract\+Pin.\+h}
+\hypertarget{AbstractPin_8h_source}{}\label{AbstractPin_8h_source}\index{lib/AbstractPin/AbstractPin.h@{lib/AbstractPin/AbstractPin.h}}
+\mbox{\hyperlink{AbstractPin_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#ifndef\ ABSTRACTPIN\_H}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ ABSTRACTPIN\_H}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{keyword}{class\ }AbstractPin}
+\DoxyCodeLine{00013\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ AbstractPin();}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ setPinMode(\textcolor{keywordtype}{int}\ pin,\ \textcolor{keywordtype}{int}\ mode)\ =\ 0;}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ digitalWrite(\textcolor{keywordtype}{int}\ pin,\ \textcolor{keywordtype}{int}\ value)\ =\ 0;}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ digitalRead(\textcolor{keywordtype}{int}\ pin)\ =\ 0;}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ analogWrite(\textcolor{keywordtype}{int}\ pin,\ \textcolor{keywordtype}{int}\ value)\ =\ 0;}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ analogRead(\textcolor{keywordtype}{int}\ pin)\ =\ 0;}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \string~AbstractPin()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{00022\ \};}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//ABSTRACTPIN\_H}}
+
+\end{DoxyCode}

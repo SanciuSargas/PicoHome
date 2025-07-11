@@ -1,0 +1,23 @@
+\doxysection{Position\+Control\+Interface.\+h}
+\hypertarget{PositionControlInterface_8h_source}{}\label{PositionControlInterface_8h_source}\index{lib/PositionControlInterface/PositionControlInterface.h@{lib/PositionControlInterface/PositionControlInterface.h}}
+\mbox{\hyperlink{PositionControlInterface_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#ifndef\ POSITIONCONTROLINTERFACE\_H}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ POSITIONCONTROLINTERFACE\_H}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{class\ }PositionControlInterface}
+\DoxyCodeLine{00010\ \{}
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ PositionControlInterface();}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ initialize()\ =\ 0;}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ update()\ =\ 0;}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ stop()\ =\ 0;}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ setPosition(\textcolor{keywordtype}{int}\ position)\ =\ 0;}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ getPosition()\ =\ 0;}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \string~PositionControlInterface()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{00019\ \};}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//POSITIONCONTROLINTERFACE\_H}}
+
+\end{DoxyCode}

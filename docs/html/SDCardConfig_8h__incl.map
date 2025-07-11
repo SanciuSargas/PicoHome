@@ -1,0 +1,5 @@
+<map id="lib/SDCardConfig/SDCardConfig.h" name="lib/SDCardConfig/SDCardConfig.h">
+<area shape="rect" id="Node000001" title="Declaration of SDCardConfig: class for reading config from SD card." alt="" coords="5,5,229,32"/>
+<area shape="rect" id="Node000002" href="$ConfigInterface_8h.html" title="Declaration of ConfigInterface: interface for configuration reading." alt="" coords="54,80,180,123"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,32,120,65,114,65,114,32"/>
+</map>

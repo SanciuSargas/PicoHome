@@ -1,0 +1,20 @@
+<map id="lib/DeviceConstructor/DeviceConstructor.cpp" name="lib/DeviceConstructor/DeviceConstructor.cpp">
+<area shape="rect" id="Node000001" title="Implementation of DeviceConstructor." alt="" coords="226,5,385,48"/>
+<area shape="rect" id="Node000002" href="$DeviceConstructor_8h.html" title="Declaration of DeviceConstructor: class to build all sensors and actuators from json config." alt="" coords="234,96,376,123"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="308,49,308,80,302,80,302,49"/>
+<area shape="rect" id="Node000003" href="$CommunicationFactory_8h.html" title="Declaration of PinFactory: factory design pattern for communication assignment." alt="" coords="5,171,176,213"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="273,126,161,167,159,162,271,121"/>
+<area shape="rect" id="Node000006" href="$ConfigFactory_8h.html" title="Declaration of ConfigFactory: factory design pattern for config assignment." alt="" coords="200,179,411,205"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="308,123,308,163,302,163,302,123"/>
+<area shape="rect" id="Node000008" href="$PinFactory_8h.html" title="Declaration of PinFactory: factory design pattern for pin assignment." alt="" coords="434,179,608,205"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="340,121,474,170,472,175,338,126"/>
+<area shape="rect" id="Node000004" href="$CommunicationInterface_8h.html" title="Declaration of CommunicationInterface: API for communication between microcontroller and server." alt="" coords="21,261,200,304"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="98,213,105,246,100,247,93,214"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="250,352,326,379"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="157,302,247,343,245,348,155,307"/>
+<area shape="rect" id="Node000007" href="$ConfigInterface_8h.html" title="Declaration of ConfigInterface: interface for configuration reading." alt="" coords="242,261,368,304"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="308,206,308,246,302,246,302,206"/>
+<area shape="rect" id="Node000009" href="$AbstractPin_8h.html" title="Declaration of AbstractPin: hardware abstraction layer for microcontroller pins." alt="" coords="410,269,595,296"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="521,206,511,255,506,254,516,205"/>
+<area shape="poly" id="edge9_Node000009_Node000005" title=" " alt="" coords="470,299,337,349,335,344,468,294"/>
+</map>

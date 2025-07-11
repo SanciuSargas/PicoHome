@@ -1,0 +1,24 @@
+<map id="lib/CommunicationInterface/CommunicationInterface.h" name="lib/CommunicationInterface/CommunicationInterface.h">
+<area shape="rect" id="Node000001" title="Declaration of CommunicationInterface: API for communication between microcontroller and server." alt="" coords="528,5,708,48"/>
+<area shape="rect" id="Node000002" href="$AbstractDigitalSensor_8h.html" title="Declaration of AbstractDigitalSensor: abstract class for digital sensors such as switches,..." alt="" coords="231,96,397,139"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="533,55,386,98,385,93,531,50"/>
+<area shape="rect" id="Node000007" href="$CommunicationInterface_8cpp.html" title="Implementation of CommunicationInterface." alt="" coords="420,96,613,139"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="585,60,542,97,539,93,581,56"/>
+<area shape="rect" id="Node000008" href="$MQTTCommunication_8h.html" title="Declaration of MQTTCommunication: MQTT communication between microcontroller and server." alt="" coords="638,96,804,139"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="655,56,698,93,695,97,652,60"/>
+<area shape="rect" id="Node000010" href="$TestCommunication_8h.html" title="Declaration of TestCommunication: Test communication between microcontroller and server." alt="" coords="833,96,987,139"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="702,50,842,93,841,98,700,56"/>
+<area shape="rect" id="Node000003" href="$AbstractDigitalSensor_8cpp.html" title="Implementation of AbstractDigitalSensor." alt="" coords="5,187,183,229"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="249,147,147,188,145,184,247,142"/>
+<area shape="rect" id="Node000004" href="$SwitchSensor_8h.html" title="Declaration of SwitchSensor: class for all switches with different strategies for each switch type." alt="" coords="206,195,422,221"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="317,154,317,194,311,194,311,154"/>
+<area shape="rect" id="Node000006" href="$main_8cpp.html" title="Main program for homo automation microcontrollers." alt="" coords="411,277,508,304"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="386,144,413,162,436,185,449,208,457,234,462,277,457,278,452,235,444,211,432,188,410,166,383,148"/>
+<area shape="rect" id="Node000005" href="$SwitchSensor_8cpp.html" title="Implementation of SwitchSensor." alt="" coords="158,277,387,304"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="303,236,281,278,277,276,298,234"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="351,227,438,275,435,279,349,231"/>
+<area shape="rect" id="Node000009" href="$MQTTCommunication_8cpp.html" title="Implementation of MQTTCommunication." alt="" coords="629,187,807,229"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="722,154,721,186,716,186,717,154"/>
+<area shape="rect" id="Node000011" href="$TestCommunication_8cpp.html" title="Implementation of TestCommunication." alt="" coords="831,187,997,229"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="914,154,916,186,910,186,909,154"/>
+</map>

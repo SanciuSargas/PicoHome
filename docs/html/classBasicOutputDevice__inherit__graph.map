@@ -1,0 +1,7 @@
+<map id="BasicOutputDevice" name="BasicOutputDevice">
+<area shape="rect" id="Node000001" title=" " alt="" coords="78,80,213,107"/>
+<area shape="rect" id="Node000002" href="$classBasicOutputInterface.html" title=" " alt="" coords="5,5,150,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,42,136,78,132,81,98,45"/>
+<area shape="rect" id="Node000003" href="$classSubscriber.html" title=" " alt="" coords="173,5,256,32"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,45,159,81,156,78,191,41"/>
+</map>
