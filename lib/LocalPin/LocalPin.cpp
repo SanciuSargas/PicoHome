@@ -5,28 +5,35 @@
 
 #include "LocalPin.h"
 
-LocalPin::LocalPin() : AbstractPin()
+LocalPin::LocalPin(int pinNumber) : AbstractPin()
 {
-
+    // TODO: check if pinNumber is in range
+    this->pinNumber = pinNumber;
 }
 
-void LocalPin::setPinMode(int pin, int mode)
+void LocalPin::pinMode(int mode)
 {
-
+    ArduinoPinMode arduinoMode = static_cast<ArduinoPinMode>(mode);
+    ::pinMode(pinNumber, arduinoMode);
 }
-void LocalPin::digitalWrite(int pin, int value)
+void LocalPin::digitalWrite(int value)
 {
-
+    // TODO: check if pin mode is OUTPUT
+    PinStatus arduinoValue = static_cast<PinStatus>(value);
+    ::digitalWrite(pinNumber, arduinoValue);
 }
-int LocalPin::digitalRead(int pin)
+int LocalPin::digitalRead()
 {
-    return 0;
+    // TODO: check if pin mode is INPUT
+    return ::digitalRead(pinNumber);
 }
-void LocalPin::analogWrite(int pin, int value)
+void LocalPin::analogWrite(int value)
 {
-
+    // TODO: check if pin mode is OUTPUT
+    ::analogWrite(pinNumber, value);
 }
-int LocalPin::analogRead(int pin)
+int LocalPin::analogRead()
 {
-    return 0;
+    // TODO: check if pin mode is INPUT
+    return ::analogRead(pinNumber);
 }
