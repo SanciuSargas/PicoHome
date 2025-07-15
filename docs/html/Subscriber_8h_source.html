@@ -109,12 +109,13 @@ $(function(){initNavTree('Subscriber_8h_source.html',''); initResizable(true); }
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="classSubscriber.html">    9</a></span><span class="keyword">class </span>Subscriber</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>{</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>        Subscriber();</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> callback() = 0;</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>        <span class="keyword">virtual</span> ~Subscriber() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>};</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>        Subscriber() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="classSubscriber.html#afeed4920f3978d52980de85068d303c7">   16</a></span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classSubscriber.html#afeed4920f3978d52980de85068d303c7">callback</a>() = 0;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keyword">virtual</span> ~Subscriber() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>};</div>
 </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#endif </span><span class="comment">//SUBSCRIBER_H</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#endif </span><span class="comment">//SUBSCRIBER_H</span></div>
+<div class="ttc" id="aclassSubscriber_html_afeed4920f3978d52980de85068d303c7"><div class="ttname"><a href="classSubscriber.html#afeed4920f3978d52980de85068d303c7">Subscriber::callback</a></div><div class="ttdeci">virtual void callback()=0</div><div class="ttdoc">Function for Publisher (sensors) to call once an action happens.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

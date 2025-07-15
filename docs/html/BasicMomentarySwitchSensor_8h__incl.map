@@ -1,0 +1,11 @@
+<map id="lib/BasicMomentarySwitchSensor/BasicMomentarySwitchSensor.h" name="lib/BasicMomentarySwitchSensor/BasicMomentarySwitchSensor.h">
+<area shape="rect" id="Node000001" title="Declaration of BasicMomentarySwitchSensor: class for momentary switches." alt="" coords="5,5,262,48"/>
+<area shape="rect" id="Node000002" href="$AbstractPin_8h.html" title="Declaration of AbstractPin: hardware abstraction layer for microcontroller pins." alt="" coords="6,104,106,131"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,50,79,94,75,90,114,47"/>
+<area shape="rect" id="Node000003" href="$AbstractDigitalSensor_8h_source.html" title=" " alt="" coords="130,96,294,139"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="154,47,186,83,182,86,150,50"/>
+<area shape="rect" id="Node000004" href="$CommunicationInterface_8h.html" title="Declaration of CommunicationInterface: API for communication between microcontroller and server." alt="" coords="123,187,301,229"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="215,139,215,171,210,171,210,139"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="174,277,250,304"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="215,230,215,261,210,261,210,230"/>
+</map>

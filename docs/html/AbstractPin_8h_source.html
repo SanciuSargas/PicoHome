@@ -108,17 +108,27 @@ $(function(){initNavTree('AbstractPin_8h_source.html',''); initResizable(true); 
 <div class="foldopen" id="foldopen00012" data-start="{" data-end="};">
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="classAbstractPin.html">   12</a></span><span class="keyword">class </span>AbstractPin</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>{</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        AbstractPin();</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> setPinMode(<span class="keywordtype">int</span> pin, <span class="keywordtype">int</span> mode) = 0;</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> digitalWrite(<span class="keywordtype">int</span> pin, <span class="keywordtype">int</span> value) = 0;</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <span class="keyword">virtual</span> <span class="keywordtype">int</span> digitalRead(<span class="keywordtype">int</span> pin) = 0;</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> analogWrite(<span class="keywordtype">int</span> pin, <span class="keywordtype">int</span> value) = 0;</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        <span class="keyword">virtual</span> <span class="keywordtype">int</span> analogRead(<span class="keywordtype">int</span> pin) = 0;</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        <span class="keyword">virtual</span> ~AbstractPin() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>};</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    AbstractPin() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="classAbstractPin.html#a117db7ad986902f14b2e350fde8ead10">   22</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classAbstractPin.html#a117db7ad986902f14b2e350fde8ead10">pinMode</a>(<span class="keywordtype">int</span> mode) = 0;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classAbstractPin.html#a6f6144712cd926ad3be16738b7e17c8e">   29</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classAbstractPin.html#a6f6144712cd926ad3be16738b7e17c8e">digitalWrite</a>(<span class="keywordtype">int</span> value) = 0;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classAbstractPin.html#afe7682918876b4dd6a88bd0311033810">   36</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classAbstractPin.html#afe7682918876b4dd6a88bd0311033810">digitalRead</a>() = 0;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="classAbstractPin.html#a27e32d079fade4de44c1f64dc9e4e48f">   43</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classAbstractPin.html#a27e32d079fade4de44c1f64dc9e4e48f">analogWrite</a>(<span class="keywordtype">int</span> value) = 0;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classAbstractPin.html#adcf80af3db2ff1f10d4996ef1220fbfc">   50</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classAbstractPin.html#adcf80af3db2ff1f10d4996ef1220fbfc">analogRead</a>() = 0;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keyword">virtual</span> ~AbstractPin() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>};</div>
 </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#endif </span><span class="comment">//ABSTRACTPIN_H</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#endif </span><span class="comment">//ABSTRACTPIN_H</span></div>
+<div class="ttc" id="aclassAbstractPin_html_a117db7ad986902f14b2e350fde8ead10"><div class="ttname"><a href="classAbstractPin.html#a117db7ad986902f14b2e350fde8ead10">AbstractPin::pinMode</a></div><div class="ttdeci">virtual void pinMode(int mode)=0</div><div class="ttdoc">Sets pin mode for the object.</div></div>
+<div class="ttc" id="aclassAbstractPin_html_a27e32d079fade4de44c1f64dc9e4e48f"><div class="ttname"><a href="classAbstractPin.html#a27e32d079fade4de44c1f64dc9e4e48f">AbstractPin::analogWrite</a></div><div class="ttdeci">virtual void analogWrite(int value)=0</div><div class="ttdoc">Writes a value for an analog functionality (or PWM) of the pin.</div></div>
+<div class="ttc" id="aclassAbstractPin_html_a6f6144712cd926ad3be16738b7e17c8e"><div class="ttname"><a href="classAbstractPin.html#a6f6144712cd926ad3be16738b7e17c8e">AbstractPin::digitalWrite</a></div><div class="ttdeci">virtual void digitalWrite(int value)=0</div><div class="ttdoc">Sets the pin to HIGH or LOW.</div></div>
+<div class="ttc" id="aclassAbstractPin_html_adcf80af3db2ff1f10d4996ef1220fbfc"><div class="ttname"><a href="classAbstractPin.html#adcf80af3db2ff1f10d4996ef1220fbfc">AbstractPin::analogRead</a></div><div class="ttdeci">virtual int analogRead()=0</div><div class="ttdoc">Analog reading of the pin.</div></div>
+<div class="ttc" id="aclassAbstractPin_html_afe7682918876b4dd6a88bd0311033810"><div class="ttname"><a href="classAbstractPin.html#afe7682918876b4dd6a88bd0311033810">AbstractPin::digitalRead</a></div><div class="ttdeci">virtual int digitalRead()=0</div><div class="ttdoc">Reads the digital value of the pin.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

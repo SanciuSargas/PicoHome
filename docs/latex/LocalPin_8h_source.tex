@@ -7,17 +7,20 @@
 \DoxyCodeLine{00006\ \textcolor{preprocessor}{\#ifndef\ LOCALPIN\_H}}
 \DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ LOCALPIN\_H}}
 \DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{AbstractPin_8h}{../AbstractPin/AbstractPin.h}}"{}}}
-\DoxyCodeLine{00009\ }
-\DoxyCodeLine{00010\ \textcolor{keyword}{class\ }LocalPin\ :\ \textcolor{keyword}{public}\ AbstractPin}
-\DoxyCodeLine{00011\ \{}
-\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{public}:}
-\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ LocalPin();}
-\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setPinMode(\textcolor{keywordtype}{int}\ pin,\ \textcolor{keywordtype}{int}\ mode)\ \textcolor{keyword}{override};}
-\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ digitalWrite(\textcolor{keywordtype}{int}\ pin,\ \textcolor{keywordtype}{int}\ value)\ \textcolor{keyword}{override};}
-\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ digitalRead(\textcolor{keywordtype}{int}\ pin)\ \textcolor{keyword}{override};}
-\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ analogWrite(\textcolor{keywordtype}{int}\ pin,\ \textcolor{keywordtype}{int}\ value)\ \textcolor{keyword}{override};}
-\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ analogRead(\textcolor{keywordtype}{int}\ pin)\ \textcolor{keyword}{override};}
-\DoxyCodeLine{00019\ \};}
-\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//LOCALPIN\_H}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <Arduino.h>}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{class\ }LocalPin\ :\ \textcolor{keyword}{public}\ AbstractPin}
+\DoxyCodeLine{00012\ \{}
+\DoxyCodeLine{00013\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00014\ \ \ \ \ LocalPin(\textcolor{keywordtype}{int}\ pinNumber);}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classLocalPin_a6edebbd43f9702ea64e8871f46ba8dc9}{pinMode}}(\textcolor{keywordtype}{int}\ mode)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classLocalPin_acad340b81097373a5d47e9a803d7e6d1}{digitalWrite}}(\textcolor{keywordtype}{int}\ value)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classLocalPin_ae0f86386be73f7e32b0544d63b6e0033}{digitalRead}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classLocalPin_ae08dacafc27e55054b4b34e85caf59b0}{analogWrite}}(\textcolor{keywordtype}{int}\ value)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classLocalPin_adc2aae7613d130688b0eb4be42f4e0d9}{analogRead}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00020\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{int}\ pinNumber;}
+\DoxyCodeLine{00022\ \};}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//LOCALPIN\_H}}
 
 \end{DoxyCode}

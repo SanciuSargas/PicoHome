@@ -1,13 +1,9 @@
 <map id="lib/AbstractDigitalSensor/AbstractDigitalSensor.cpp" name="lib/AbstractDigitalSensor/AbstractDigitalSensor.cpp">
-<area shape="rect" id="Node000001" title="Implementation of AbstractDigitalSensor." alt="" coords="102,5,279,48"/>
-<area shape="rect" id="Node000002" href="$AbstractDigitalSensor_8h.html" title="Declaration of AbstractDigitalSensor: abstract class for digital sensors such as switches,..." alt="" coords="111,96,270,123"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,49,193,80,188,80,188,49"/>
+<area shape="rect" id="Node000001" title="Implementation of AbstractDigitalSensor." alt="" coords="6,5,183,48"/>
+<area shape="rect" id="Node000002" href="$AbstractDigitalSensor_8h_source.html" title=" " alt="" coords="15,96,174,123"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,49,97,80,92,80,92,49"/>
 <area shape="rect" id="Node000003" href="$CommunicationInterface_8h.html" title="Declaration of CommunicationInterface: API for communication between microcontroller and server." alt="" coords="5,171,184,213"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="177,125,132,163,129,159,174,121"/>
-<area shape="rect" id="Node000005" href="$Publisher_8h.html" title="Declaration of Publisher: Observer design pattern, notify actuators on sensor change." alt="" coords="208,179,365,205"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="207,121,262,167,258,171,204,125"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="97,123,97,155,92,155,92,123"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="56,261,133,288"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="97,214,97,245,92,245,92,214"/>
-<area shape="rect" id="Node000006" href="$Subscriber_8h.html" title="Declaration of Subscriber: Observer design pattern, interface for subscribers (actuators)." alt="" coords="200,261,373,288"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="289,206,289,246,284,246,284,206"/>
 </map>

@@ -104,31 +104,46 @@ $(function(){initNavTree('BasicOutputDevice_8h_source.html',''); initResizable(t
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#ifndef BASICOUTPUTDEVICE_H</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#define BASICOUTPUTDEVICE_H</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;<a class="code" href="AbstractPin_8h.html">../AbstractPin/AbstractPin.h</a>&quot;</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;<a class="code" href="Subscriber_8h.html">../Subscriber/Subscriber.h</a>&quot;</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;<a class="code" href="BasicOutputInterface_8h.html">../BasicOutputInterface/BasicOutputInterface.h</a>&quot;</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="foldopen" id="foldopen00012" data-start="{" data-end="};">
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="classBasicOutputDevice.html">   12</a></span><span class="keyword">class </span>BasicOutputDevice : <span class="keyword">public</span> BasicOutputInterface, <span class="keyword">public</span> Subscriber</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>{</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        BasicOutputDevice(<a class="code hl_class" href="classAbstractPin.html">AbstractPin</a>* pinNumber);</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        <span class="keywordtype">void</span> initialize() <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keywordtype">void</span> turnOn() <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <span class="keywordtype">void</span> turnOff() <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        <span class="keywordtype">void</span> toggle() <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        <span class="keywordtype">void</span> getState() <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        <span class="keywordtype">void</span> callback() <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        <a class="code hl_class" href="classAbstractPin.html">AbstractPin</a>* pinNumber;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>};</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;<a class="code" href="CommunicationInterface_8h.html">CommunicationInterface.h</a>&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;<a class="code" href="AbstractPin_8h.html">../AbstractPin/AbstractPin.h</a>&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;<a class="code" href="Subscriber_8h.html">../Subscriber/Subscriber.h</a>&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;<a class="code" href="BasicOutputInterface_8h.html">../BasicOutputInterface/BasicOutputInterface.h</a>&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="foldopen" id="foldopen00015" data-start="{" data-end="};">
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="classBasicOutputDevice.html">   15</a></span><span class="keyword">class </span>BasicOutputDevice : <span class="keyword">public</span> BasicOutputInterface, <span class="keyword">public</span> Subscriber</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>{</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    BasicOutputDevice(<a class="code hl_class" href="classAbstractPin.html">AbstractPin</a>* pinObject, <span class="keywordtype">bool</span> highTrigger, <span class="keywordtype">char</span>* chanelPathForMQTT, <a class="code hl_class" href="classCommunicationInterface.html">CommunicationInterface</a>* communicationClient);</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classBasicOutputDevice.html#a455eca8e09c7a2c07a428fae70e0b5c0">initialize</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classBasicOutputDevice.html#a5b0a4cab7b2349e0d4bcc30bd4d8c7ad">turnOn</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classBasicOutputDevice.html#abe69ddbda466b7af9a0c355cef045fcd">turnOff</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classBasicOutputDevice.html#a67a7e58262899f64f3b9ac20a844d4bf">toggle</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keywordtype">int</span> <a class="code hl_function" href="classBasicOutputDevice.html#ad565647f3946013de213d2ded9794f46">getState</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classBasicOutputDevice.html#abd27e29145c0c3eefacc9cbd0b8e5aad">callback</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <a class="code hl_class" href="classAbstractPin.html">AbstractPin</a>* pinObject;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <span class="keywordtype">bool</span> highTrigger;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <a class="code hl_class" href="classCommunicationInterface.html">CommunicationInterface</a>* communicationClient;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keywordtype">char</span>* chanelPathForMQTT = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <span class="keywordtype">int</span> currentState;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>};</div>
 </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#endif </span><span class="comment">//BASICOUTPUTDEVICE_H</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="preprocessor">#endif </span><span class="comment">//BASICOUTPUTDEVICE_H</span></div>
 <div class="ttc" id="aAbstractPin_8h_html"><div class="ttname"><a href="AbstractPin_8h.html">AbstractPin.h</a></div><div class="ttdoc">Declaration of AbstractPin: hardware abstraction layer for microcontroller pins.</div></div>
 <div class="ttc" id="aBasicOutputInterface_8h_html"><div class="ttname"><a href="BasicOutputInterface_8h.html">BasicOutputInterface.h</a></div><div class="ttdoc">Declaration of BasicOutputInterface: interface for basic (on/off) output devices such as lights,...</div></div>
+<div class="ttc" id="aCommunicationInterface_8h_html"><div class="ttname"><a href="CommunicationInterface_8h.html">CommunicationInterface.h</a></div><div class="ttdoc">Declaration of CommunicationInterface: API for communication between microcontroller and server.</div></div>
 <div class="ttc" id="aSubscriber_8h_html"><div class="ttname"><a href="Subscriber_8h.html">Subscriber.h</a></div><div class="ttdoc">Declaration of Subscriber: Observer design pattern, interface for subscribers (actuators).</div></div>
 <div class="ttc" id="aclassAbstractPin_html"><div class="ttname"><a href="classAbstractPin.html">AbstractPin</a></div><div class="ttdef"><b>Definition</b> AbstractPin.h:13</div></div>
+<div class="ttc" id="aclassBasicOutputDevice_html_a455eca8e09c7a2c07a428fae70e0b5c0"><div class="ttname"><a href="classBasicOutputDevice.html#a455eca8e09c7a2c07a428fae70e0b5c0">BasicOutputDevice::initialize</a></div><div class="ttdeci">void initialize() override</div><div class="ttdoc">Handles any code that needs to run at startup of the device.</div><div class="ttdef"><b>Definition</b> BasicOutputDevice.cpp:18</div></div>
+<div class="ttc" id="aclassBasicOutputDevice_html_a5b0a4cab7b2349e0d4bcc30bd4d8c7ad"><div class="ttname"><a href="classBasicOutputDevice.html#a5b0a4cab7b2349e0d4bcc30bd4d8c7ad">BasicOutputDevice::turnOn</a></div><div class="ttdeci">void turnOn() override</div><div class="ttdoc">Switches the device to the on state.</div><div class="ttdef"><b>Definition</b> BasicOutputDevice.cpp:24</div></div>
+<div class="ttc" id="aclassBasicOutputDevice_html_a67a7e58262899f64f3b9ac20a844d4bf"><div class="ttname"><a href="classBasicOutputDevice.html#a67a7e58262899f64f3b9ac20a844d4bf">BasicOutputDevice::toggle</a></div><div class="ttdeci">void toggle() override</div><div class="ttdoc">Toggles the device from on to off state and vice versa.</div><div class="ttdef"><b>Definition</b> BasicOutputDevice.cpp:36</div></div>
+<div class="ttc" id="aclassBasicOutputDevice_html_abd27e29145c0c3eefacc9cbd0b8e5aad"><div class="ttname"><a href="classBasicOutputDevice.html#abd27e29145c0c3eefacc9cbd0b8e5aad">BasicOutputDevice::callback</a></div><div class="ttdeci">void callback() override</div><div class="ttdoc">Function for Publisher (sensors) to call once an action happens.</div><div class="ttdef"><b>Definition</b> BasicOutputDevice.cpp:55</div></div>
+<div class="ttc" id="aclassBasicOutputDevice_html_abe69ddbda466b7af9a0c355cef045fcd"><div class="ttname"><a href="classBasicOutputDevice.html#abe69ddbda466b7af9a0c355cef045fcd">BasicOutputDevice::turnOff</a></div><div class="ttdeci">void turnOff() override</div><div class="ttdoc">Switches the device to the off state.</div><div class="ttdef"><b>Definition</b> BasicOutputDevice.cpp:30</div></div>
+<div class="ttc" id="aclassBasicOutputDevice_html_ad565647f3946013de213d2ded9794f46"><div class="ttname"><a href="classBasicOutputDevice.html#ad565647f3946013de213d2ded9794f46">BasicOutputDevice::getState</a></div><div class="ttdeci">int getState() override</div><div class="ttdoc">Gets current device state.</div><div class="ttdef"><b>Definition</b> BasicOutputDevice.cpp:50</div></div>
+<div class="ttc" id="aclassCommunicationInterface_html"><div class="ttname"><a href="classCommunicationInterface.html">CommunicationInterface</a></div><div class="ttdef"><b>Definition</b> CommunicationInterface.h:11</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

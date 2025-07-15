@@ -1,4 +1,4 @@
 var BasicOutputInterface_8h =
 [
-    [ "BasicOutputInterface", "classBasicOutputInterface.html", null ]
+    [ "BasicOutputInterface", "classBasicOutputInterface.html", "classBasicOutputInterface" ]
 ];

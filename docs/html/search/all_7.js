@@ -1,9 +1,6 @@
 var searchData=
 [
-  ['positioncontrolinterface_0',['PositionControlInterface',['../classPositionControlInterface.html',1,'']]],
-  ['positioncontrolinterface_2ecpp_1',['PositionControlInterface.cpp',['../PositionControlInterface_8cpp.html',1,'']]],
-  ['positioncontrolinterface_2eh_2',['PositionControlInterface.h',['../PositionControlInterface_8h.html',1,'']]],
-  ['publisher_3',['Publisher',['../classPublisher.html',1,'']]],
-  ['publisher_2ecpp_4',['Publisher.cpp',['../Publisher_8cpp.html',1,'']]],
-  ['publisher_2eh_5',['Publisher.h',['../Publisher_8h.html',1,'']]]
+  ['localpin_0',['LocalPin',['../classLocalPin.html',1,'']]],
+  ['localpin_2ecpp_1',['LocalPin.cpp',['../LocalPin_8cpp.html',1,'']]],
+  ['localpin_2eh_2',['LocalPin.h',['../LocalPin_8h.html',1,'']]]
 ];

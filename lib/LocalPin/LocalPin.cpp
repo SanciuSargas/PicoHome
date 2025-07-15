@@ -5,7 +5,7 @@
 
 #include "LocalPin.h"
 
-LocalPin::LocalPin(int pinNumber) : AbstractPin()
+LocalPin::LocalPin(int pinNumber)
 {
     // TODO: check if pinNumber is in range
     this->pinNumber = pinNumber;
@@ -14,7 +14,7 @@ LocalPin::LocalPin(int pinNumber) : AbstractPin()
 void LocalPin::pinMode(int mode)
 {
     ArduinoPinMode arduinoMode = static_cast<ArduinoPinMode>(mode);
-    ::pinMode(pinNumber, arduinoMode);
+    arduino::pinMode(pinNumber, arduinoMode);
 }
 void LocalPin::digitalWrite(int value)
 {

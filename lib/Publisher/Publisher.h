@@ -10,7 +10,7 @@
 class Publisher
 {
     public:
-        Publisher();
+        Publisher() = default;
         virtual void subscribe(Subscriber* subscriber) = 0;
         virtual void unsubscribe(Subscriber* subscriber) = 0;
         virtual void notifySubscribers() = 0;

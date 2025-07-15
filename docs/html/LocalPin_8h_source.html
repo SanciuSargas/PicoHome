@@ -105,21 +105,29 @@ $(function(){initNavTree('LocalPin_8h_source.html',''); initResizable(true); });
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#ifndef LOCALPIN_H</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#define LOCALPIN_H</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;<a class="code" href="AbstractPin_8h.html">../AbstractPin/AbstractPin.h</a>&quot;</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="foldopen" id="foldopen00010" data-start="{" data-end="};">
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="classLocalPin.html">   10</a></span><span class="keyword">class </span>LocalPin : <span class="keyword">public</span> AbstractPin</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>{</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        LocalPin();</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>        <span class="keywordtype">void</span> setPinMode(<span class="keywordtype">int</span> pin, <span class="keywordtype">int</span> mode) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        <span class="keywordtype">void</span> digitalWrite(<span class="keywordtype">int</span> pin, <span class="keywordtype">int</span> value) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        <span class="keywordtype">int</span> digitalRead(<span class="keywordtype">int</span> pin) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keywordtype">void</span> analogWrite(<span class="keywordtype">int</span> pin, <span class="keywordtype">int</span> value) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <span class="keywordtype">int</span> analogRead(<span class="keywordtype">int</span> pin) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>};</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="foldopen" id="foldopen00011" data-start="{" data-end="};">
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="classLocalPin.html">   11</a></span><span class="keyword">class </span>LocalPin : <span class="keyword">public</span> AbstractPin</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>{</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    LocalPin(<span class="keywordtype">int</span> pinNumber);</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classLocalPin.html#a6edebbd43f9702ea64e8871f46ba8dc9">pinMode</a>(<span class="keywordtype">int</span> mode) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classLocalPin.html#acad340b81097373a5d47e9a803d7e6d1">digitalWrite</a>(<span class="keywordtype">int</span> value) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    <span class="keywordtype">int</span> <a class="code hl_function" href="classLocalPin.html#ae0f86386be73f7e32b0544d63b6e0033">digitalRead</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classLocalPin.html#ae08dacafc27e55054b4b34e85caf59b0">analogWrite</a>(<span class="keywordtype">int</span> value) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <span class="keywordtype">int</span> <a class="code hl_function" href="classLocalPin.html#adc2aae7613d130688b0eb4be42f4e0d9">analogRead</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordtype">int</span> pinNumber;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>};</div>
 </div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#endif </span><span class="comment">//LOCALPIN_H</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#endif </span><span class="comment">//LOCALPIN_H</span></div>
 <div class="ttc" id="aAbstractPin_8h_html"><div class="ttname"><a href="AbstractPin_8h.html">AbstractPin.h</a></div><div class="ttdoc">Declaration of AbstractPin: hardware abstraction layer for microcontroller pins.</div></div>
+<div class="ttc" id="aclassLocalPin_html_a6edebbd43f9702ea64e8871f46ba8dc9"><div class="ttname"><a href="classLocalPin.html#a6edebbd43f9702ea64e8871f46ba8dc9">LocalPin::pinMode</a></div><div class="ttdeci">void pinMode(int mode) override</div><div class="ttdoc">Sets pin mode for the object.</div><div class="ttdef"><b>Definition</b> LocalPin.cpp:14</div></div>
+<div class="ttc" id="aclassLocalPin_html_acad340b81097373a5d47e9a803d7e6d1"><div class="ttname"><a href="classLocalPin.html#acad340b81097373a5d47e9a803d7e6d1">LocalPin::digitalWrite</a></div><div class="ttdeci">void digitalWrite(int value) override</div><div class="ttdoc">Sets the pin to HIGH or LOW.</div><div class="ttdef"><b>Definition</b> LocalPin.cpp:19</div></div>
+<div class="ttc" id="aclassLocalPin_html_adc2aae7613d130688b0eb4be42f4e0d9"><div class="ttname"><a href="classLocalPin.html#adc2aae7613d130688b0eb4be42f4e0d9">LocalPin::analogRead</a></div><div class="ttdeci">int analogRead() override</div><div class="ttdoc">Analog reading of the pin.</div><div class="ttdef"><b>Definition</b> LocalPin.cpp:35</div></div>
+<div class="ttc" id="aclassLocalPin_html_ae08dacafc27e55054b4b34e85caf59b0"><div class="ttname"><a href="classLocalPin.html#ae08dacafc27e55054b4b34e85caf59b0">LocalPin::analogWrite</a></div><div class="ttdeci">void analogWrite(int value) override</div><div class="ttdoc">Writes a value for an analog functionality (or PWM) of the pin.</div><div class="ttdef"><b>Definition</b> LocalPin.cpp:30</div></div>
+<div class="ttc" id="aclassLocalPin_html_ae0f86386be73f7e32b0544d63b6e0033"><div class="ttname"><a href="classLocalPin.html#ae0f86386be73f7e32b0544d63b6e0033">LocalPin::digitalRead</a></div><div class="ttdeci">int digitalRead() override</div><div class="ttdoc">Reads the digital value of the pin.</div><div class="ttdef"><b>Definition</b> LocalPin.cpp:25</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

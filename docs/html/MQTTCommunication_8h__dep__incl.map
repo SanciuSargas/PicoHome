@@ -1,5 +1,7 @@
 <map id="lib/MQTTCommunication/MQTTCommunication.h" name="lib/MQTTCommunication/MQTTCommunication.h">
-<area shape="rect" id="Node000001" title="Declaration of MQTTCommunication: MQTT communication between microcontroller and server." alt="" coords="11,5,178,48"/>
+<area shape="rect" id="Node000001" title="Declaration of MQTTCommunication: MQTT communication between microcontroller and server." alt="" coords="91,5,258,48"/>
 <area shape="rect" id="Node000002" href="$MQTTCommunication_8cpp.html" title="Implementation of MQTTCommunication." alt="" coords="5,96,184,139"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,64,97,96,92,96,92,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,61,115,97,111,94,144,58"/>
+<area shape="rect" id="Node000003" href="$main_8cpp.html" title="Main program for homo automation microcontrollers." alt="" coords="208,104,304,131"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,58,246,102,242,105,202,61"/>
 </map>

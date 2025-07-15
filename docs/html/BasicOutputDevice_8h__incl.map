@@ -1,9 +1,14 @@
 <map id="lib/BasicOutputDevice/BasicOutputDevice.h" name="lib/BasicOutputDevice/BasicOutputDevice.h">
-<area shape="rect" id="Node000001" title="Declaration of BasicOutputDevice: class for basic (on/off) output devices such as lights,..." alt="" coords="224,5,376,48"/>
-<area shape="rect" id="Node000002" href="$AbstractPin_8h.html" title="Declaration of AbstractPin: hardware abstraction layer for microcontroller pins." alt="" coords="5,104,190,131"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="254,51,141,100,139,95,252,46"/>
-<area shape="rect" id="Node000003" href="$Subscriber_8h.html" title="Declaration of Subscriber: Observer design pattern, interface for subscribers (actuators)." alt="" coords="214,104,386,131"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="303,48,303,88,298,88,298,48"/>
-<area shape="rect" id="Node000004" href="$BasicOutputInterface_8h.html" title="Declaration of BasicOutputInterface: interface for basic (on/off) output devices such as lights,..." alt="" coords="410,96,569,139"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="346,46,433,87,431,92,343,51"/>
+<area shape="rect" id="Node000001" title="Declaration of BasicOutputDevice: class for basic (on/off) output devices such as lights,..." alt="" coords="241,5,392,48"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="12,187,88,213"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,37,175,45,108,58,51,75,30,86,16,98,9,115,11,135,20,155,32,173,27,176,15,158,6,136,3,115,12,94,27,81,49,70,107,53,174,40,240,32"/>
+<area shape="rect" id="Node000003" href="$CommunicationInterface_8h.html" title="Declaration of CommunicationInterface: API for communication between microcontroller and server." alt="" coords="25,104,200,131"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="270,51,156,100,154,95,267,46"/>
+<area shape="rect" id="Node000004" href="$AbstractPin_8h.html" title="Declaration of AbstractPin: hardware abstraction layer for microcontroller pins." alt="" coords="224,104,409,131"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="319,48,319,88,314,88,314,48"/>
+<area shape="rect" id="Node000005" href="$Subscriber_8h.html" title="Declaration of Subscriber: Observer design pattern, interface for subscribers (actuators)." alt="" coords="433,104,605,131"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="365,46,477,95,475,100,363,51"/>
+<area shape="rect" id="Node000006" href="$BasicOutputInterface_8h.html" title="Declaration of BasicOutputInterface: interface for basic (on/off) output devices such as lights,..." alt="" coords="629,96,788,139"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="393,42,614,92,613,97,392,48"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="105,133,71,176,66,173,100,130"/>
 </map>

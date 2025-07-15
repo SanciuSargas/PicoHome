@@ -9,7 +9,10 @@
 class Subscriber
 {
     public:
-        Subscriber();
+        Subscriber() = default;
+        /**
+         * @brief Function for Publisher (sensors) to call once an action happens.
+         */
         virtual void callback() = 0;
         virtual ~Subscriber() = default;
 };

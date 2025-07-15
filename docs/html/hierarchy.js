@@ -1,5 +1,8 @@
 var hierarchy =
 [
+    [ "AbstractDigitalSensor", "classAbstractDigitalSensor.html", [
+      [ "BasicMomentarySwitchSensor", "classBasicMomentarySwitchSensor.html", null ]
+    ] ],
     [ "AbstractPin", "classAbstractPin.html", [
       [ "ExpanderPin", "classExpanderPin.html", null ],
       [ "LocalPin", "classLocalPin.html", null ],
@@ -18,15 +21,8 @@ var hierarchy =
     ] ],
     [ "DimmableInterface", "classDimmableInterface.html", null ],
     [ "PositionControlInterface", "classPositionControlInterface.html", null ],
-    [ "Publisher", "classPublisher.html", [
-      [ "AbstractDigitalSensor", "classAbstractDigitalSensor.html", [
-        [ "SwitchSensor", "classSwitchSensor.html", null ]
-      ] ]
-    ] ],
+    [ "Publisher", "classPublisher.html", null ],
     [ "Subscriber", "classSubscriber.html", [
       [ "BasicOutputDevice", "classBasicOutputDevice.html", null ]
-    ] ],
-    [ "SwitchStrategyInterface", "classSwitchStrategyInterface.html", [
-      [ "BasicToggleSwitchStrategy", "classBasicToggleSwitchStrategy.html", null ]
     ] ]
 ];

@@ -112,13 +112,15 @@ $(function(){initNavTree('TestPin_8h_source.html',''); initResizable(true); });
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    <span class="keyword">public</span>:</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        <span class="keywordtype">void</span> setPinMode(<span class="keywordtype">int</span> pin, <span class="keywordtype">int</span> mode) <span class="keyword">override</span>;</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>        <span class="keywordtype">void</span> digitalWrite(<span class="keywordtype">int</span> pin, <span class="keywordtype">int</span> value) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        <span class="keywordtype">int</span> digitalRead(<span class="keywordtype">int</span> pin) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        <span class="keywordtype">int</span> <a class="code hl_function" href="classAbstractPin.html#afe7682918876b4dd6a88bd0311033810">digitalRead</a>(<span class="keywordtype">int</span> pin) <span class="keyword">override</span>;</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        <span class="keywordtype">void</span> analogWrite(<span class="keywordtype">int</span> pin, <span class="keywordtype">int</span> value) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keywordtype">int</span> analogRead(<span class="keywordtype">int</span> pin) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keywordtype">int</span> <a class="code hl_function" href="classAbstractPin.html#adcf80af3db2ff1f10d4996ef1220fbfc">analogRead</a>(<span class="keywordtype">int</span> pin) <span class="keyword">override</span>;</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>};</div>
 </div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#endif </span><span class="comment">//TESTPIN_H</span></div>
 <div class="ttc" id="aAbstractPin_8h_html"><div class="ttname"><a href="AbstractPin_8h.html">AbstractPin.h</a></div><div class="ttdoc">Declaration of AbstractPin: hardware abstraction layer for microcontroller pins.</div></div>
+<div class="ttc" id="aclassAbstractPin_html_adcf80af3db2ff1f10d4996ef1220fbfc"><div class="ttname"><a href="classAbstractPin.html#adcf80af3db2ff1f10d4996ef1220fbfc">AbstractPin::analogRead</a></div><div class="ttdeci">virtual int analogRead()=0</div><div class="ttdoc">Analog reading of the pin.</div></div>
+<div class="ttc" id="aclassAbstractPin_html_afe7682918876b4dd6a88bd0311033810"><div class="ttname"><a href="classAbstractPin.html#afe7682918876b4dd6a88bd0311033810">AbstractPin::digitalRead</a></div><div class="ttdeci">virtual int digitalRead()=0</div><div class="ttdoc">Reads the digital value of the pin.</div></div>
 <div class="ttc" id="aclassTestPin_html"><div class="ttname"><a href="classTestPin.html">TestPin</a></div><div class="ttdef"><b>Definition</b> TestPin.h:11</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

@@ -130,20 +130,26 @@ Collaboration diagram for BasicOutputDevice:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af91f09ae009396c49e81aeb8b6a49ffc" id="r_af91f09ae009396c49e81aeb8b6a49ffc"><td class="memItemLeft" align="right" valign="top"><a id="af91f09ae009396c49e81aeb8b6a49ffc" name="af91f09ae009396c49e81aeb8b6a49ffc"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>BasicOutputDevice</b> (<a class="el" href="classAbstractPin.html">AbstractPin</a> *pinNumber)</td></tr>
-<tr class="separator:af91f09ae009396c49e81aeb8b6a49ffc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0796952022fd8fb6dbafc32f5812a5e" id="r_ad0796952022fd8fb6dbafc32f5812a5e"><td class="memItemLeft" align="right" valign="top"><a id="ad0796952022fd8fb6dbafc32f5812a5e" name="ad0796952022fd8fb6dbafc32f5812a5e"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>BasicOutputDevice</b> (<a class="el" href="classAbstractPin.html">AbstractPin</a> *pinObject, bool highTrigger, char *chanelPathForMQTT, <a class="el" href="classCommunicationInterface.html">CommunicationInterface</a> *communicationClient)</td></tr>
+<tr class="separator:ad0796952022fd8fb6dbafc32f5812a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a455eca8e09c7a2c07a428fae70e0b5c0" id="r_a455eca8e09c7a2c07a428fae70e0b5c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a455eca8e09c7a2c07a428fae70e0b5c0">initialize</a> () override</td></tr>
+<tr class="memdesc:a455eca8e09c7a2c07a428fae70e0b5c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles any code that needs to run at startup of the device.  <br /></td></tr>
 <tr class="separator:a455eca8e09c7a2c07a428fae70e0b5c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b0a4cab7b2349e0d4bcc30bd4d8c7ad" id="r_a5b0a4cab7b2349e0d4bcc30bd4d8c7ad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5b0a4cab7b2349e0d4bcc30bd4d8c7ad">turnOn</a> () override</td></tr>
+<tr class="memdesc:a5b0a4cab7b2349e0d4bcc30bd4d8c7ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Switches the device to the on state.  <br /></td></tr>
 <tr class="separator:a5b0a4cab7b2349e0d4bcc30bd4d8c7ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe69ddbda466b7af9a0c355cef045fcd" id="r_abe69ddbda466b7af9a0c355cef045fcd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abe69ddbda466b7af9a0c355cef045fcd">turnOff</a> () override</td></tr>
+<tr class="memdesc:abe69ddbda466b7af9a0c355cef045fcd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Switches the device to the off state.  <br /></td></tr>
 <tr class="separator:abe69ddbda466b7af9a0c355cef045fcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67a7e58262899f64f3b9ac20a844d4bf" id="r_a67a7e58262899f64f3b9ac20a844d4bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a67a7e58262899f64f3b9ac20a844d4bf">toggle</a> () override</td></tr>
+<tr class="memdesc:a67a7e58262899f64f3b9ac20a844d4bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Toggles the device from on to off state and vice versa.  <br /></td></tr>
 <tr class="separator:a67a7e58262899f64f3b9ac20a844d4bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39207e3ec8f6087a1a1424ab53b46d78" id="r_a39207e3ec8f6087a1a1424ab53b46d78"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a39207e3ec8f6087a1a1424ab53b46d78">getState</a> () override</td></tr>
-<tr class="separator:a39207e3ec8f6087a1a1424ab53b46d78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad565647f3946013de213d2ded9794f46" id="r_ad565647f3946013de213d2ded9794f46"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad565647f3946013de213d2ded9794f46">getState</a> () override</td></tr>
+<tr class="memdesc:ad565647f3946013de213d2ded9794f46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets current device state.  <br /></td></tr>
+<tr class="separator:ad565647f3946013de213d2ded9794f46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd27e29145c0c3eefacc9cbd0b8e5aad" id="r_abd27e29145c0c3eefacc9cbd0b8e5aad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abd27e29145c0c3eefacc9cbd0b8e5aad">callback</a> () override</td></tr>
+<tr class="memdesc:abd27e29145c0c3eefacc9cbd0b8e5aad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for <a class="el" href="classPublisher.html">Publisher</a> (sensors) to call once an action happens.  <br /></td></tr>
 <tr class="separator:abd27e29145c0c3eefacc9cbd0b8e5aad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -170,12 +176,14 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classSubscriber.html">Subscriber</a>.</p>
+<p>Function for <a class="el" href="classPublisher.html">Publisher</a> (sensors) to call once an action happens. </p>
+
+<p>Implements <a class="el" href="classSubscriber.html#afeed4920f3978d52980de85068d303c7">Subscriber</a>.</p>
 
 </div>
 </div>
-<a id="a39207e3ec8f6087a1a1424ab53b46d78" name="a39207e3ec8f6087a1a1424ab53b46d78"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a39207e3ec8f6087a1a1424ab53b46d78">&#9670;&#160;</a></span>getState()</h2>
+<a id="ad565647f3946013de213d2ded9794f46" name="ad565647f3946013de213d2ded9794f46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad565647f3946013de213d2ded9794f46">&#9670;&#160;</a></span>getState()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -184,7 +192,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void BasicOutputDevice::getState </td>
+          <td class="memname">int BasicOutputDevice::getState </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
@@ -197,7 +205,10 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classBasicOutputInterface.html">BasicOutputInterface</a>.</p>
+<p>Gets current device state. </p>
+<dl class="section return"><dt>Returns</dt><dd>Returns current device state. </dd></dl>
+
+<p>Implements <a class="el" href="classBasicOutputInterface.html#ad83de0fd7bd95db72517460c3f1589af">BasicOutputInterface</a>.</p>
 
 </div>
 </div>
@@ -224,7 +235,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classBasicOutputInterface.html">BasicOutputInterface</a>.</p>
+<p>Handles any code that needs to run at startup of the device. </p>
+
+<p>Implements <a class="el" href="classBasicOutputInterface.html#a6ea53bcd71a9d69f87a23403a660dfb8">BasicOutputInterface</a>.</p>
 
 </div>
 </div>
@@ -251,7 +264,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classBasicOutputInterface.html">BasicOutputInterface</a>.</p>
+<p>Toggles the device from on to off state and vice versa. </p>
+
+<p>Implements <a class="el" href="classBasicOutputInterface.html#ae4dedf58e0b7e2a731515f67271d60be">BasicOutputInterface</a>.</p>
 
 </div>
 </div>
@@ -278,7 +293,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classBasicOutputInterface.html">BasicOutputInterface</a>.</p>
+<p>Switches the device to the off state. </p>
+
+<p>Implements <a class="el" href="classBasicOutputInterface.html#ace589fee052cac2d150b930ab552414e">BasicOutputInterface</a>.</p>
 
 </div>
 </div>
@@ -305,7 +322,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classBasicOutputInterface.html">BasicOutputInterface</a>.</p>
+<p>Switches the device to the on state. </p>
+
+<p>Implements <a class="el" href="classBasicOutputInterface.html#ad20bf815f2499efcc19094dce9267f45">BasicOutputInterface</a>.</p>
 
 </div>
 </div>

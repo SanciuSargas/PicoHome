@@ -1,4 +1,4 @@
 var Subscriber_8h =
 [
-    [ "Subscriber", "classSubscriber.html", null ]
+    [ "Subscriber", "classSubscriber.html", "classSubscriber" ]
 ];

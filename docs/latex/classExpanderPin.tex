@@ -22,16 +22,16 @@ Collaboration diagram for Expander\+Pin\+:\nopagebreak
 \doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classAbstractPin}{Abstract\+Pin}}}
 \begin{DoxyCompactItemize}
 \item 
-virtual void {\bfseries set\+Pin\+Mode} (int pin, int mode)=0
-\item 
-virtual void {\bfseries digital\+Write} (int pin, int value)=0
-\item 
-virtual int {\bfseries digital\+Read} (int pin)=0
-\item 
-virtual void {\bfseries analog\+Write} (int pin, int value)=0
-\item 
-virtual int {\bfseries analog\+Read} (int pin)=0
-\end{DoxyCompactItemize}
+virtual void \mbox{\hyperlink{classAbstractPin_a117db7ad986902f14b2e350fde8ead10}{pin\+Mode}} (int mode)=0
+\begin{DoxyCompactList}\small\item\em Sets pin mode for the object. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classAbstractPin_a6f6144712cd926ad3be16738b7e17c8e}{digital\+Write}} (int value)=0
+\begin{DoxyCompactList}\small\item\em Sets the pin to HIGH or LOW. \end{DoxyCompactList}\item 
+virtual int \mbox{\hyperlink{classAbstractPin_afe7682918876b4dd6a88bd0311033810}{digital\+Read}} ()=0
+\begin{DoxyCompactList}\small\item\em Reads the digital value of the pin. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classAbstractPin_a27e32d079fade4de44c1f64dc9e4e48f}{analog\+Write}} (int value)=0
+\begin{DoxyCompactList}\small\item\em Writes a value for an analog functionality (or PWM) of the pin. \end{DoxyCompactList}\item 
+virtual int \mbox{\hyperlink{classAbstractPin_adcf80af3db2ff1f10d4996ef1220fbfc}{analog\+Read}} ()=0
+\begin{DoxyCompactList}\small\item\em Analog reading of the pin. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}

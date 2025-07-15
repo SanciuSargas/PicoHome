@@ -2,8 +2,7 @@
 \hypertarget{classBasicOutputDevice}{}\label{classBasicOutputDevice}\index{BasicOutputDevice@{BasicOutputDevice}}
 
 
-Inheritance diagram for Basic\+Output\+Device\+:
-\nopagebreak
+Inheritance diagram for Basic\+Output\+Device\+:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -12,8 +11,7 @@ Inheritance diagram for Basic\+Output\+Device\+:
 \end{figure}
 
 
-Collaboration diagram for Basic\+Output\+Device\+:
-\nopagebreak
+Collaboration diagram for Basic\+Output\+Device\+:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -23,21 +21,21 @@ Collaboration diagram for Basic\+Output\+Device\+:
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{classBasicOutputDevice_af91f09ae009396c49e81aeb8b6a49ffc}\label{classBasicOutputDevice_af91f09ae009396c49e81aeb8b6a49ffc} 
-{\bfseries Basic\+Output\+Device} (\mbox{\hyperlink{classAbstractPin}{Abstract\+Pin}} \texorpdfstring{$\ast$}{*}pin\+Number)
+\Hypertarget{classBasicOutputDevice_ad0796952022fd8fb6dbafc32f5812a5e}\label{classBasicOutputDevice_ad0796952022fd8fb6dbafc32f5812a5e} 
+{\bfseries Basic\+Output\+Device} (\mbox{\hyperlink{classAbstractPin}{Abstract\+Pin}} \texorpdfstring{$\ast$}{*}pin\+Object, bool high\+Trigger, char \texorpdfstring{$\ast$}{*}chanel\+Path\+For\+MQTT, \mbox{\hyperlink{classCommunicationInterface}{Communication\+Interface}} \texorpdfstring{$\ast$}{*}communication\+Client)
 \item 
 void \mbox{\hyperlink{classBasicOutputDevice_a455eca8e09c7a2c07a428fae70e0b5c0}{initialize}} () override
-\item 
+\begin{DoxyCompactList}\small\item\em Handles any code that needs to run at startup of the device. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{classBasicOutputDevice_a5b0a4cab7b2349e0d4bcc30bd4d8c7ad}{turn\+On}} () override
-\item 
+\begin{DoxyCompactList}\small\item\em Switches the device to the on state. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{classBasicOutputDevice_abe69ddbda466b7af9a0c355cef045fcd}{turn\+Off}} () override
-\item 
+\begin{DoxyCompactList}\small\item\em Switches the device to the off state. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{classBasicOutputDevice_a67a7e58262899f64f3b9ac20a844d4bf}{toggle}} () override
-\item 
-void \mbox{\hyperlink{classBasicOutputDevice_a39207e3ec8f6087a1a1424ab53b46d78}{get\+State}} () override
-\item 
+\begin{DoxyCompactList}\small\item\em Toggles the device from on to off state and vice versa. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{classBasicOutputDevice_ad565647f3946013de213d2ded9794f46}{get\+State}} () override
+\begin{DoxyCompactList}\small\item\em Gets current device state. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{classBasicOutputDevice_abd27e29145c0c3eefacc9cbd0b8e5aad}{callback}} () override
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Function for \doxylink{classPublisher}{Publisher} (sensors) to call once an action happens. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Member Function Documentation}
@@ -49,17 +47,28 @@ void Basic\+Output\+Device\+::callback (\begin{DoxyParamCaption}{}{}\end{DoxyPar
 
 
 
-Implements \mbox{\hyperlink{classSubscriber}{Subscriber}}.
+Function for \doxylink{classPublisher}{Publisher} (sensors) to call once an action happens. 
 
-\Hypertarget{classBasicOutputDevice_a39207e3ec8f6087a1a1424ab53b46d78}\index{BasicOutputDevice@{BasicOutputDevice}!getState@{getState}}
+
+
+Implements \mbox{\hyperlink{classSubscriber_afeed4920f3978d52980de85068d303c7}{Subscriber}}.
+
+\Hypertarget{classBasicOutputDevice_ad565647f3946013de213d2ded9794f46}\index{BasicOutputDevice@{BasicOutputDevice}!getState@{getState}}
 \index{getState@{getState}!BasicOutputDevice@{BasicOutputDevice}}
 \doxysubsubsection{\texorpdfstring{getState()}{getState()}}
-{\footnotesize\ttfamily \label{classBasicOutputDevice_a39207e3ec8f6087a1a1424ab53b46d78} 
-void Basic\+Output\+Device\+::get\+State (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+{\footnotesize\ttfamily \label{classBasicOutputDevice_ad565647f3946013de213d2ded9794f46} 
+int Basic\+Output\+Device\+::get\+State (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
 
 
 
-Implements \mbox{\hyperlink{classBasicOutputInterface}{Basic\+Output\+Interface}}.
+Gets current device state. 
+
+\begin{DoxyReturn}{Returns}
+Returns current device state. 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classBasicOutputInterface_ad83de0fd7bd95db72517460c3f1589af}{Basic\+Output\+Interface}}.
 
 \Hypertarget{classBasicOutputDevice_a455eca8e09c7a2c07a428fae70e0b5c0}\index{BasicOutputDevice@{BasicOutputDevice}!initialize@{initialize}}
 \index{initialize@{initialize}!BasicOutputDevice@{BasicOutputDevice}}
@@ -69,7 +78,11 @@ void Basic\+Output\+Device\+::initialize (\begin{DoxyParamCaption}{}{}\end{DoxyP
 
 
 
-Implements \mbox{\hyperlink{classBasicOutputInterface}{Basic\+Output\+Interface}}.
+Handles any code that needs to run at startup of the device. 
+
+
+
+Implements \mbox{\hyperlink{classBasicOutputInterface_a6ea53bcd71a9d69f87a23403a660dfb8}{Basic\+Output\+Interface}}.
 
 \Hypertarget{classBasicOutputDevice_a67a7e58262899f64f3b9ac20a844d4bf}\index{BasicOutputDevice@{BasicOutputDevice}!toggle@{toggle}}
 \index{toggle@{toggle}!BasicOutputDevice@{BasicOutputDevice}}
@@ -79,7 +92,11 @@ void Basic\+Output\+Device\+::toggle (\begin{DoxyParamCaption}{}{}\end{DoxyParam
 
 
 
-Implements \mbox{\hyperlink{classBasicOutputInterface}{Basic\+Output\+Interface}}.
+Toggles the device from on to off state and vice versa. 
+
+
+
+Implements \mbox{\hyperlink{classBasicOutputInterface_ae4dedf58e0b7e2a731515f67271d60be}{Basic\+Output\+Interface}}.
 
 \Hypertarget{classBasicOutputDevice_abe69ddbda466b7af9a0c355cef045fcd}\index{BasicOutputDevice@{BasicOutputDevice}!turnOff@{turnOff}}
 \index{turnOff@{turnOff}!BasicOutputDevice@{BasicOutputDevice}}
@@ -89,7 +106,11 @@ void Basic\+Output\+Device\+::turn\+Off (\begin{DoxyParamCaption}{}{}\end{DoxyPa
 
 
 
-Implements \mbox{\hyperlink{classBasicOutputInterface}{Basic\+Output\+Interface}}.
+Switches the device to the off state. 
+
+
+
+Implements \mbox{\hyperlink{classBasicOutputInterface_ace589fee052cac2d150b930ab552414e}{Basic\+Output\+Interface}}.
 
 \Hypertarget{classBasicOutputDevice_a5b0a4cab7b2349e0d4bcc30bd4d8c7ad}\index{BasicOutputDevice@{BasicOutputDevice}!turnOn@{turnOn}}
 \index{turnOn@{turnOn}!BasicOutputDevice@{BasicOutputDevice}}
@@ -99,7 +120,11 @@ void Basic\+Output\+Device\+::turn\+On (\begin{DoxyParamCaption}{}{}\end{DoxyPar
 
 
 
-Implements \mbox{\hyperlink{classBasicOutputInterface}{Basic\+Output\+Interface}}.
+Switches the device to the on state. 
+
+
+
+Implements \mbox{\hyperlink{classBasicOutputInterface_ad20bf815f2499efcc19094dce9267f45}{Basic\+Output\+Interface}}.
 
 
 

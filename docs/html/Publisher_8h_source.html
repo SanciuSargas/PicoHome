@@ -110,7 +110,7 @@ $(function(){initNavTree('Publisher_8h_source.html',''); initResizable(true); })
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="classPublisher.html">   10</a></span><span class="keyword">class </span>Publisher</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>{</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        Publisher();</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        Publisher() = <span class="keywordflow">default</span>;</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> subscribe(<a class="code hl_class" href="classSubscriber.html">Subscriber</a>* subscriber) = 0;</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> unsubscribe(<a class="code hl_class" href="classSubscriber.html">Subscriber</a>* subscriber) = 0;</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> notifySubscribers() = 0;</div>

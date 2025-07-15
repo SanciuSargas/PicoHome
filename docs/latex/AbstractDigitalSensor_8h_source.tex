@@ -1,23 +1,20 @@
 \doxysection{Abstract\+Digital\+Sensor.\+h}
 \hypertarget{AbstractDigitalSensor_8h_source}{}\label{AbstractDigitalSensor_8h_source}\index{lib/AbstractDigitalSensor/AbstractDigitalSensor.h@{lib/AbstractDigitalSensor/AbstractDigitalSensor.h}}
-\mbox{\hyperlink{AbstractDigitalSensor_8h}{Go to the documentation of this file.}}
+
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ }
-\DoxyCodeLine{00005\ }
-\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#ifndef\ ABSTRACTDIGITALSENSOR\_H}}
-\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ ABSTRACTDIGITALSENSOR\_H}}
-\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{CommunicationInterface_8h}{../CommunicationInterface/CommunicationInterface.h}}"{}}}
-\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Publisher_8h}{../Publisher/Publisher.h}}"{}}}
-\DoxyCodeLine{00010\ }
-\DoxyCodeLine{00011\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classAbstractDigitalSensor}{AbstractDigitalSensor}}\ :\ \textcolor{keyword}{public}\ Publisher}
-\DoxyCodeLine{00012\ \{}
-\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{protected}:}
-\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ initialize()\ =\ 0;}
-\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ update()\ =\ 0;}
-\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keyword}{private}:}
-\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classCommunicationInterface}{CommunicationInterface}}*\ commInterface;}
-\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classAbstractPin}{AbstractPin}}*\ dataPin;}
-\DoxyCodeLine{00019\ \};}
-\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//ABSTRACTDIGITALSENSOR\_H}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#ifndef\ ABSTRACTDIGITALSENSOR\_H}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ ABSTRACTDIGITALSENSOR\_H}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{CommunicationInterface_8h}{../CommunicationInterface/CommunicationInterface.h}}"{}}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classAbstractDigitalSensor}{AbstractDigitalSensor}}\ \textcolor{comment}{//\ :\ public\ Publisher}}
+\DoxyCodeLine{00010\ \{}
+\DoxyCodeLine{00011\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ initialize()\ =\ 0;}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ update()\ =\ 0;}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classAbstractDigitalSensor}{\string~AbstractDigitalSensor}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{00015\ \};}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//ABSTRACTDIGITALSENSOR\_H}}
 
 \end{DoxyCode}

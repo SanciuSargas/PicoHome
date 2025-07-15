@@ -2,8 +2,7 @@
 \hypertarget{classBasicOutputInterface}{}\label{classBasicOutputInterface}\index{BasicOutputInterface@{BasicOutputInterface}}
 
 
-Inheritance diagram for Basic\+Output\+Interface\+:
-\nopagebreak
+Inheritance diagram for Basic\+Output\+Interface\+:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -13,21 +12,92 @@ Inheritance diagram for Basic\+Output\+Interface\+:
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{classBasicOutputInterface_a6ea53bcd71a9d69f87a23403a660dfb8}\label{classBasicOutputInterface_a6ea53bcd71a9d69f87a23403a660dfb8} 
-virtual void {\bfseries initialize} ()=0
-\item 
-\Hypertarget{classBasicOutputInterface_ad20bf815f2499efcc19094dce9267f45}\label{classBasicOutputInterface_ad20bf815f2499efcc19094dce9267f45} 
-virtual void {\bfseries turn\+On} ()=0
-\item 
-\Hypertarget{classBasicOutputInterface_ace589fee052cac2d150b930ab552414e}\label{classBasicOutputInterface_ace589fee052cac2d150b930ab552414e} 
-virtual void {\bfseries turn\+Off} ()=0
-\item 
-\Hypertarget{classBasicOutputInterface_ae4dedf58e0b7e2a731515f67271d60be}\label{classBasicOutputInterface_ae4dedf58e0b7e2a731515f67271d60be} 
-virtual void {\bfseries toggle} ()=0
-\item 
-\Hypertarget{classBasicOutputInterface_aa57f3f953fc0f254746fd74dadc25fda}\label{classBasicOutputInterface_aa57f3f953fc0f254746fd74dadc25fda} 
-virtual void {\bfseries get\+State} ()=0
-\end{DoxyCompactItemize}
+virtual void \mbox{\hyperlink{classBasicOutputInterface_a6ea53bcd71a9d69f87a23403a660dfb8}{initialize}} ()=0
+\begin{DoxyCompactList}\small\item\em Handles any code that needs to run at startup of the device. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classBasicOutputInterface_ad20bf815f2499efcc19094dce9267f45}{turn\+On}} ()=0
+\begin{DoxyCompactList}\small\item\em Switches the device to the on state. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classBasicOutputInterface_ace589fee052cac2d150b930ab552414e}{turn\+Off}} ()=0
+\begin{DoxyCompactList}\small\item\em Switches the device to the off state. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classBasicOutputInterface_ae4dedf58e0b7e2a731515f67271d60be}{toggle}} ()=0
+\begin{DoxyCompactList}\small\item\em Toggles the device from on to off state and vice versa. \end{DoxyCompactList}\item 
+virtual int \mbox{\hyperlink{classBasicOutputInterface_ad83de0fd7bd95db72517460c3f1589af}{get\+State}} ()=0
+\begin{DoxyCompactList}\small\item\em Gets current device state. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classBasicOutputInterface_ad83de0fd7bd95db72517460c3f1589af}\index{BasicOutputInterface@{BasicOutputInterface}!getState@{getState}}
+\index{getState@{getState}!BasicOutputInterface@{BasicOutputInterface}}
+\doxysubsubsection{\texorpdfstring{getState()}{getState()}}
+{\footnotesize\ttfamily \label{classBasicOutputInterface_ad83de0fd7bd95db72517460c3f1589af} 
+virtual int Basic\+Output\+Interface\+::get\+State (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Gets current device state. 
+
+\begin{DoxyReturn}{Returns}
+Returns current device state. 
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{classBasicOutputDevice_ad565647f3946013de213d2ded9794f46}{Basic\+Output\+Device}}.
+
+\Hypertarget{classBasicOutputInterface_a6ea53bcd71a9d69f87a23403a660dfb8}\index{BasicOutputInterface@{BasicOutputInterface}!initialize@{initialize}}
+\index{initialize@{initialize}!BasicOutputInterface@{BasicOutputInterface}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily \label{classBasicOutputInterface_a6ea53bcd71a9d69f87a23403a660dfb8} 
+virtual void Basic\+Output\+Interface\+::initialize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Handles any code that needs to run at startup of the device. 
+
+
+
+Implemented in \mbox{\hyperlink{classBasicOutputDevice_a455eca8e09c7a2c07a428fae70e0b5c0}{Basic\+Output\+Device}}.
+
+\Hypertarget{classBasicOutputInterface_ae4dedf58e0b7e2a731515f67271d60be}\index{BasicOutputInterface@{BasicOutputInterface}!toggle@{toggle}}
+\index{toggle@{toggle}!BasicOutputInterface@{BasicOutputInterface}}
+\doxysubsubsection{\texorpdfstring{toggle()}{toggle()}}
+{\footnotesize\ttfamily \label{classBasicOutputInterface_ae4dedf58e0b7e2a731515f67271d60be} 
+virtual void Basic\+Output\+Interface\+::toggle (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Toggles the device from on to off state and vice versa. 
+
+
+
+Implemented in \mbox{\hyperlink{classBasicOutputDevice_a67a7e58262899f64f3b9ac20a844d4bf}{Basic\+Output\+Device}}.
+
+\Hypertarget{classBasicOutputInterface_ace589fee052cac2d150b930ab552414e}\index{BasicOutputInterface@{BasicOutputInterface}!turnOff@{turnOff}}
+\index{turnOff@{turnOff}!BasicOutputInterface@{BasicOutputInterface}}
+\doxysubsubsection{\texorpdfstring{turnOff()}{turnOff()}}
+{\footnotesize\ttfamily \label{classBasicOutputInterface_ace589fee052cac2d150b930ab552414e} 
+virtual void Basic\+Output\+Interface\+::turn\+Off (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Switches the device to the off state. 
+
+
+
+Implemented in \mbox{\hyperlink{classBasicOutputDevice_abe69ddbda466b7af9a0c355cef045fcd}{Basic\+Output\+Device}}.
+
+\Hypertarget{classBasicOutputInterface_ad20bf815f2499efcc19094dce9267f45}\index{BasicOutputInterface@{BasicOutputInterface}!turnOn@{turnOn}}
+\index{turnOn@{turnOn}!BasicOutputInterface@{BasicOutputInterface}}
+\doxysubsubsection{\texorpdfstring{turnOn()}{turnOn()}}
+{\footnotesize\ttfamily \label{classBasicOutputInterface_ad20bf815f2499efcc19094dce9267f45} 
+virtual void Basic\+Output\+Interface\+::turn\+On (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Switches the device to the on state. 
+
+
+
+Implemented in \mbox{\hyperlink{classBasicOutputDevice_a5b0a4cab7b2349e0d4bcc30bd4d8c7ad}{Basic\+Output\+Device}}.
+
 
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}

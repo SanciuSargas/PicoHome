@@ -120,22 +120,188 @@ Inheritance diagram for AbstractPin:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a28e9fc044aa2a0a6b6cf594290aaa905" id="r_a28e9fc044aa2a0a6b6cf594290aaa905"><td class="memItemLeft" align="right" valign="top"><a id="a28e9fc044aa2a0a6b6cf594290aaa905" name="a28e9fc044aa2a0a6b6cf594290aaa905"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setPinMode</b> (int pin, int mode)=0</td></tr>
-<tr class="separator:a28e9fc044aa2a0a6b6cf594290aaa905"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac904745565f5e58808f7dcb1207ba996" id="r_ac904745565f5e58808f7dcb1207ba996"><td class="memItemLeft" align="right" valign="top"><a id="ac904745565f5e58808f7dcb1207ba996" name="ac904745565f5e58808f7dcb1207ba996"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>digitalWrite</b> (int pin, int value)=0</td></tr>
-<tr class="separator:ac904745565f5e58808f7dcb1207ba996"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc17ae451372b6b178904d83b83f25fe" id="r_adc17ae451372b6b178904d83b83f25fe"><td class="memItemLeft" align="right" valign="top"><a id="adc17ae451372b6b178904d83b83f25fe" name="adc17ae451372b6b178904d83b83f25fe"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>digitalRead</b> (int pin)=0</td></tr>
-<tr class="separator:adc17ae451372b6b178904d83b83f25fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcc2f33b6b769096e3d7123d3a0367eb" id="r_adcc2f33b6b769096e3d7123d3a0367eb"><td class="memItemLeft" align="right" valign="top"><a id="adcc2f33b6b769096e3d7123d3a0367eb" name="adcc2f33b6b769096e3d7123d3a0367eb"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>analogWrite</b> (int pin, int value)=0</td></tr>
-<tr class="separator:adcc2f33b6b769096e3d7123d3a0367eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afaeb799f53263646077348fc207a9fb4" id="r_afaeb799f53263646077348fc207a9fb4"><td class="memItemLeft" align="right" valign="top"><a id="afaeb799f53263646077348fc207a9fb4" name="afaeb799f53263646077348fc207a9fb4"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>analogRead</b> (int pin)=0</td></tr>
-<tr class="separator:afaeb799f53263646077348fc207a9fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a117db7ad986902f14b2e350fde8ead10" id="r_a117db7ad986902f14b2e350fde8ead10"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a117db7ad986902f14b2e350fde8ead10">pinMode</a> (int mode)=0</td></tr>
+<tr class="memdesc:a117db7ad986902f14b2e350fde8ead10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets pin mode for the object.  <br /></td></tr>
+<tr class="separator:a117db7ad986902f14b2e350fde8ead10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f6144712cd926ad3be16738b7e17c8e" id="r_a6f6144712cd926ad3be16738b7e17c8e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f6144712cd926ad3be16738b7e17c8e">digitalWrite</a> (int value)=0</td></tr>
+<tr class="memdesc:a6f6144712cd926ad3be16738b7e17c8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the pin to HIGH or LOW.  <br /></td></tr>
+<tr class="separator:a6f6144712cd926ad3be16738b7e17c8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe7682918876b4dd6a88bd0311033810" id="r_afe7682918876b4dd6a88bd0311033810"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afe7682918876b4dd6a88bd0311033810">digitalRead</a> ()=0</td></tr>
+<tr class="memdesc:afe7682918876b4dd6a88bd0311033810"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the digital value of the pin.  <br /></td></tr>
+<tr class="separator:afe7682918876b4dd6a88bd0311033810"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27e32d079fade4de44c1f64dc9e4e48f" id="r_a27e32d079fade4de44c1f64dc9e4e48f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a27e32d079fade4de44c1f64dc9e4e48f">analogWrite</a> (int value)=0</td></tr>
+<tr class="memdesc:a27e32d079fade4de44c1f64dc9e4e48f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a value for an analog functionality (or PWM) of the pin.  <br /></td></tr>
+<tr class="separator:a27e32d079fade4de44c1f64dc9e4e48f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcf80af3db2ff1f10d4996ef1220fbfc" id="r_adcf80af3db2ff1f10d4996ef1220fbfc"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adcf80af3db2ff1f10d4996ef1220fbfc">analogRead</a> ()=0</td></tr>
+<tr class="memdesc:adcf80af3db2ff1f10d4996ef1220fbfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Analog reading of the pin.  <br /></td></tr>
+<tr class="separator:adcf80af3db2ff1f10d4996ef1220fbfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="adcf80af3db2ff1f10d4996ef1220fbfc" name="adcf80af3db2ff1f10d4996ef1220fbfc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcf80af3db2ff1f10d4996ef1220fbfc">&#9670;&#160;</a></span>analogRead()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int AbstractPin::analogRead </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Analog reading of the pin. </p>
+<dl class="section return"><dt>Returns</dt><dd>pin reading. </dd></dl>
+
+<p>Implemented in <a class="el" href="classLocalPin.html#adc2aae7613d130688b0eb4be42f4e0d9">LocalPin</a>.</p>
+
+</div>
+</div>
+<a id="a27e32d079fade4de44c1f64dc9e4e48f" name="a27e32d079fade4de44c1f64dc9e4e48f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27e32d079fade4de44c1f64dc9e4e48f">&#9670;&#160;</a></span>analogWrite()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void AbstractPin::analogWrite </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>value</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Writes a value for an analog functionality (or PWM) of the pin. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>value to set pin to. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="classLocalPin.html#ae08dacafc27e55054b4b34e85caf59b0">LocalPin</a>.</p>
+
+</div>
+</div>
+<a id="afe7682918876b4dd6a88bd0311033810" name="afe7682918876b4dd6a88bd0311033810"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe7682918876b4dd6a88bd0311033810">&#9670;&#160;</a></span>digitalRead()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int AbstractPin::digitalRead </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reads the digital value of the pin. </p>
+<dl class="section return"><dt>Returns</dt><dd>reading from the pin. </dd></dl>
+
+<p>Implemented in <a class="el" href="classLocalPin.html#ae0f86386be73f7e32b0544d63b6e0033">LocalPin</a>.</p>
+
+</div>
+</div>
+<a id="a6f6144712cd926ad3be16738b7e17c8e" name="a6f6144712cd926ad3be16738b7e17c8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f6144712cd926ad3be16738b7e17c8e">&#9670;&#160;</a></span>digitalWrite()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void AbstractPin::digitalWrite </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>value</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the pin to HIGH or LOW. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>value to set the pin to either 0 or 1. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="classLocalPin.html#acad340b81097373a5d47e9a803d7e6d1">LocalPin</a>.</p>
+
+</div>
+</div>
+<a id="a117db7ad986902f14b2e350fde8ead10" name="a117db7ad986902f14b2e350fde8ead10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a117db7ad986902f14b2e350fde8ead10">&#9670;&#160;</a></span>pinMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void AbstractPin::pinMode </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>mode</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets pin mode for the object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mode</td><td>pin mode either INPUT or OUTPUT. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="classLocalPin.html#a6edebbd43f9702ea64e8871f46ba8dc9">LocalPin</a>.</p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>lib/AbstractPin/<a class="el" href="AbstractPin_8h_source.html">AbstractPin.h</a></li>
 </ul>

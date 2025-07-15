@@ -8,12 +8,14 @@
 \DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ MQTTCOMMUNICATION\_H}}
 \DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{CommunicationInterface_8h}{../CommunicationInterface/CommunicationInterface.h}}"{}}}
 \DoxyCodeLine{00009\ }
-\DoxyCodeLine{00010\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classMQTTCommunication}{MQTTCommunication}}\ :\ CommunicationInterface}
-\DoxyCodeLine{00011\ \{}
-\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{public}:}
-\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ publish(\textcolor{keywordtype}{char}*\ topic,\ \textcolor{keywordtype}{byte}*\ payload)\ \textcolor{keyword}{override};}
-\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ subscribe(\textcolor{keywordtype}{char}*\ topic)\ \textcolor{keyword}{override};}
-\DoxyCodeLine{00015\ \};}
-\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//MQTTCOMMUNICATION\_H}}
+\DoxyCodeLine{00010\ \textcolor{comment}{//\ TODO:\ maybe\ instead\ of\ implementing\ this\ just\ pass\ MQTT\ library\ client\ less\ coding}}
+\DoxyCodeLine{00011\ \textcolor{keyword}{class\ }MQTTCommunication\ :\ \textcolor{keyword}{public}\ CommunicationInterface}
+\DoxyCodeLine{00012\ \{}
+\DoxyCodeLine{00013\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00014\ \ \ \ \ MQTTCommunication();}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{void}\ publish(\textcolor{keywordtype}{char}*\ topic,\ \textcolor{keywordtype}{byte}*\ payload)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keywordtype}{void}\ subscribe(\textcolor{keywordtype}{char}*\ topic)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00017\ \};}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//MQTTCOMMUNICATION\_H}}
 
 \end{DoxyCode}

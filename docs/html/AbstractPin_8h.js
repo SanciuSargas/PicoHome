@@ -1,4 +1,4 @@
 var AbstractPin_8h =
 [
-    [ "AbstractPin", "classAbstractPin.html", null ]
+    [ "AbstractPin", "classAbstractPin.html", "classAbstractPin" ]
 ];

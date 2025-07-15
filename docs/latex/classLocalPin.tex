@@ -21,68 +21,140 @@ Collaboration diagram for Local\+Pin\+:\nopagebreak
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \mbox{\hyperlink{classLocalPin_a9e34ba3c11d7db3a36b7669818c7a76a}{set\+Pin\+Mode}} (int pin, int mode) override
+\Hypertarget{classLocalPin_a68d9d9cbc1b671670a235256f98df9ca}\label{classLocalPin_a68d9d9cbc1b671670a235256f98df9ca} 
+{\bfseries Local\+Pin} (int pin\+Number)
 \item 
-void \mbox{\hyperlink{classLocalPin_ad78ea91d20c9baae39420d2a8097ea9a}{digital\+Write}} (int pin, int value) override
-\item 
-int \mbox{\hyperlink{classLocalPin_a37edfc42b1540709c4a522f1e409ba8e}{digital\+Read}} (int pin) override
-\item 
-void \mbox{\hyperlink{classLocalPin_a45b5cae2bb156e2818ea1e2ca351d2bb}{analog\+Write}} (int pin, int value) override
-\item 
-int \mbox{\hyperlink{classLocalPin_a77dfbf4e0bae48635473e5afeac34ec6}{analog\+Read}} (int pin) override
-\end{DoxyCompactItemize}
+void \mbox{\hyperlink{classLocalPin_a6edebbd43f9702ea64e8871f46ba8dc9}{pin\+Mode}} (int mode) override
+\begin{DoxyCompactList}\small\item\em Sets pin mode for the object. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classLocalPin_acad340b81097373a5d47e9a803d7e6d1}{digital\+Write}} (int value) override
+\begin{DoxyCompactList}\small\item\em Sets the pin to HIGH or LOW. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{classLocalPin_ae0f86386be73f7e32b0544d63b6e0033}{digital\+Read}} () override
+\begin{DoxyCompactList}\small\item\em Reads the digital value of the pin. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classLocalPin_ae08dacafc27e55054b4b34e85caf59b0}{analog\+Write}} (int value) override
+\begin{DoxyCompactList}\small\item\em Writes a value for an analog functionality (or PWM) of the pin. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{classLocalPin_adc2aae7613d130688b0eb4be42f4e0d9}{analog\+Read}} () override
+\begin{DoxyCompactList}\small\item\em Analog reading of the pin. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Member Function Documentation}
-\Hypertarget{classLocalPin_a77dfbf4e0bae48635473e5afeac34ec6}\index{LocalPin@{LocalPin}!analogRead@{analogRead}}
+\Hypertarget{classLocalPin_adc2aae7613d130688b0eb4be42f4e0d9}\index{LocalPin@{LocalPin}!analogRead@{analogRead}}
 \index{analogRead@{analogRead}!LocalPin@{LocalPin}}
 \doxysubsubsection{\texorpdfstring{analogRead()}{analogRead()}}
-{\footnotesize\ttfamily \label{classLocalPin_a77dfbf4e0bae48635473e5afeac34ec6} 
-int Local\+Pin\+::analog\+Read (\begin{DoxyParamCaption}\item[{int}]{pin}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+{\footnotesize\ttfamily \label{classLocalPin_adc2aae7613d130688b0eb4be42f4e0d9} 
+int Local\+Pin\+::analog\+Read (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
 
 
 
-Implements \mbox{\hyperlink{classAbstractPin}{Abstract\+Pin}}.
+Analog reading of the pin. 
 
-\Hypertarget{classLocalPin_a45b5cae2bb156e2818ea1e2ca351d2bb}\index{LocalPin@{LocalPin}!analogWrite@{analogWrite}}
+\begin{DoxyReturn}{Returns}
+pin reading. 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classAbstractPin_adcf80af3db2ff1f10d4996ef1220fbfc}{Abstract\+Pin}}.
+
+\Hypertarget{classLocalPin_ae08dacafc27e55054b4b34e85caf59b0}\index{LocalPin@{LocalPin}!analogWrite@{analogWrite}}
 \index{analogWrite@{analogWrite}!LocalPin@{LocalPin}}
 \doxysubsubsection{\texorpdfstring{analogWrite()}{analogWrite()}}
-{\footnotesize\ttfamily \label{classLocalPin_a45b5cae2bb156e2818ea1e2ca351d2bb} 
-void Local\+Pin\+::analog\+Write (\begin{DoxyParamCaption}\item[{int}]{pin}{, }\item[{int}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+{\footnotesize\ttfamily \label{classLocalPin_ae08dacafc27e55054b4b34e85caf59b0} 
+void Local\+Pin\+::analog\+Write (\begin{DoxyParamCaption}\item[{int}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
 
 
 
-Implements \mbox{\hyperlink{classAbstractPin}{Abstract\+Pin}}.
+Writes a value for an analog functionality (or PWM) of the pin. 
 
-\Hypertarget{classLocalPin_a37edfc42b1540709c4a522f1e409ba8e}\index{LocalPin@{LocalPin}!digitalRead@{digitalRead}}
+
+\begin{DoxyParams}{Parameters}
+{\em value} & value to set pin to. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{classAbstractPin_a27e32d079fade4de44c1f64dc9e4e48f}{Abstract\+Pin}}.
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{classLocalPin_ae08dacafc27e55054b4b34e85caf59b0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{classLocalPin_ae08dacafc27e55054b4b34e85caf59b0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classLocalPin_ae0f86386be73f7e32b0544d63b6e0033}\index{LocalPin@{LocalPin}!digitalRead@{digitalRead}}
 \index{digitalRead@{digitalRead}!LocalPin@{LocalPin}}
 \doxysubsubsection{\texorpdfstring{digitalRead()}{digitalRead()}}
-{\footnotesize\ttfamily \label{classLocalPin_a37edfc42b1540709c4a522f1e409ba8e} 
-int Local\+Pin\+::digital\+Read (\begin{DoxyParamCaption}\item[{int}]{pin}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+{\footnotesize\ttfamily \label{classLocalPin_ae0f86386be73f7e32b0544d63b6e0033} 
+int Local\+Pin\+::digital\+Read (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
 
 
 
-Implements \mbox{\hyperlink{classAbstractPin}{Abstract\+Pin}}.
+Reads the digital value of the pin. 
 
-\Hypertarget{classLocalPin_ad78ea91d20c9baae39420d2a8097ea9a}\index{LocalPin@{LocalPin}!digitalWrite@{digitalWrite}}
+\begin{DoxyReturn}{Returns}
+reading from the pin. 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classAbstractPin_afe7682918876b4dd6a88bd0311033810}{Abstract\+Pin}}.
+
+\Hypertarget{classLocalPin_acad340b81097373a5d47e9a803d7e6d1}\index{LocalPin@{LocalPin}!digitalWrite@{digitalWrite}}
 \index{digitalWrite@{digitalWrite}!LocalPin@{LocalPin}}
 \doxysubsubsection{\texorpdfstring{digitalWrite()}{digitalWrite()}}
-{\footnotesize\ttfamily \label{classLocalPin_ad78ea91d20c9baae39420d2a8097ea9a} 
-void Local\+Pin\+::digital\+Write (\begin{DoxyParamCaption}\item[{int}]{pin}{, }\item[{int}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+{\footnotesize\ttfamily \label{classLocalPin_acad340b81097373a5d47e9a803d7e6d1} 
+void Local\+Pin\+::digital\+Write (\begin{DoxyParamCaption}\item[{int}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
 
 
 
-Implements \mbox{\hyperlink{classAbstractPin}{Abstract\+Pin}}.
-
-\Hypertarget{classLocalPin_a9e34ba3c11d7db3a36b7669818c7a76a}\index{LocalPin@{LocalPin}!setPinMode@{setPinMode}}
-\index{setPinMode@{setPinMode}!LocalPin@{LocalPin}}
-\doxysubsubsection{\texorpdfstring{setPinMode()}{setPinMode()}}
-{\footnotesize\ttfamily \label{classLocalPin_a9e34ba3c11d7db3a36b7669818c7a76a} 
-void Local\+Pin\+::set\+Pin\+Mode (\begin{DoxyParamCaption}\item[{int}]{pin}{, }\item[{int}]{mode}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+Sets the pin to HIGH or LOW. 
 
 
+\begin{DoxyParams}{Parameters}
+{\em value} & value to set the pin to either 0 or 1. \\
+\hline
+\end{DoxyParams}
 
-Implements \mbox{\hyperlink{classAbstractPin}{Abstract\+Pin}}.
+
+Implements \mbox{\hyperlink{classAbstractPin_a6f6144712cd926ad3be16738b7e17c8e}{Abstract\+Pin}}.
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{classLocalPin_acad340b81097373a5d47e9a803d7e6d1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{classLocalPin_acad340b81097373a5d47e9a803d7e6d1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classLocalPin_a6edebbd43f9702ea64e8871f46ba8dc9}\index{LocalPin@{LocalPin}!pinMode@{pinMode}}
+\index{pinMode@{pinMode}!LocalPin@{LocalPin}}
+\doxysubsubsection{\texorpdfstring{pinMode()}{pinMode()}}
+{\footnotesize\ttfamily \label{classLocalPin_a6edebbd43f9702ea64e8871f46ba8dc9} 
+void Local\+Pin\+::pin\+Mode (\begin{DoxyParamCaption}\item[{int}]{mode}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Sets pin mode for the object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mode} & pin mode either INPUT or OUTPUT. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{classAbstractPin_a117db7ad986902f14b2e350fde8ead10}{Abstract\+Pin}}.
 
 
 

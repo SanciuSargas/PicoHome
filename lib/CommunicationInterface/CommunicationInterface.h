@@ -10,7 +10,7 @@
 class CommunicationInterface
 {
     public:
-        CommunicationInterface();
+        CommunicationInterface() = default;
         virtual void publish(char* topic, byte* payload) = 0;
         virtual void subscribe(char* topic) = 0;
         virtual ~CommunicationInterface() = default;

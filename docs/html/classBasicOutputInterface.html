@@ -116,22 +116,169 @@ Inheritance diagram for BasicOutputInterface:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6ea53bcd71a9d69f87a23403a660dfb8" id="r_a6ea53bcd71a9d69f87a23403a660dfb8"><td class="memItemLeft" align="right" valign="top"><a id="a6ea53bcd71a9d69f87a23403a660dfb8" name="a6ea53bcd71a9d69f87a23403a660dfb8"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>initialize</b> ()=0</td></tr>
+<tr class="memitem:a6ea53bcd71a9d69f87a23403a660dfb8" id="r_a6ea53bcd71a9d69f87a23403a660dfb8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6ea53bcd71a9d69f87a23403a660dfb8">initialize</a> ()=0</td></tr>
+<tr class="memdesc:a6ea53bcd71a9d69f87a23403a660dfb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles any code that needs to run at startup of the device.  <br /></td></tr>
 <tr class="separator:a6ea53bcd71a9d69f87a23403a660dfb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad20bf815f2499efcc19094dce9267f45" id="r_ad20bf815f2499efcc19094dce9267f45"><td class="memItemLeft" align="right" valign="top"><a id="ad20bf815f2499efcc19094dce9267f45" name="ad20bf815f2499efcc19094dce9267f45"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>turnOn</b> ()=0</td></tr>
+<tr class="memitem:ad20bf815f2499efcc19094dce9267f45" id="r_ad20bf815f2499efcc19094dce9267f45"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad20bf815f2499efcc19094dce9267f45">turnOn</a> ()=0</td></tr>
+<tr class="memdesc:ad20bf815f2499efcc19094dce9267f45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Switches the device to the on state.  <br /></td></tr>
 <tr class="separator:ad20bf815f2499efcc19094dce9267f45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace589fee052cac2d150b930ab552414e" id="r_ace589fee052cac2d150b930ab552414e"><td class="memItemLeft" align="right" valign="top"><a id="ace589fee052cac2d150b930ab552414e" name="ace589fee052cac2d150b930ab552414e"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>turnOff</b> ()=0</td></tr>
+<tr class="memitem:ace589fee052cac2d150b930ab552414e" id="r_ace589fee052cac2d150b930ab552414e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ace589fee052cac2d150b930ab552414e">turnOff</a> ()=0</td></tr>
+<tr class="memdesc:ace589fee052cac2d150b930ab552414e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Switches the device to the off state.  <br /></td></tr>
 <tr class="separator:ace589fee052cac2d150b930ab552414e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4dedf58e0b7e2a731515f67271d60be" id="r_ae4dedf58e0b7e2a731515f67271d60be"><td class="memItemLeft" align="right" valign="top"><a id="ae4dedf58e0b7e2a731515f67271d60be" name="ae4dedf58e0b7e2a731515f67271d60be"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>toggle</b> ()=0</td></tr>
+<tr class="memitem:ae4dedf58e0b7e2a731515f67271d60be" id="r_ae4dedf58e0b7e2a731515f67271d60be"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae4dedf58e0b7e2a731515f67271d60be">toggle</a> ()=0</td></tr>
+<tr class="memdesc:ae4dedf58e0b7e2a731515f67271d60be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Toggles the device from on to off state and vice versa.  <br /></td></tr>
 <tr class="separator:ae4dedf58e0b7e2a731515f67271d60be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa57f3f953fc0f254746fd74dadc25fda" id="r_aa57f3f953fc0f254746fd74dadc25fda"><td class="memItemLeft" align="right" valign="top"><a id="aa57f3f953fc0f254746fd74dadc25fda" name="aa57f3f953fc0f254746fd74dadc25fda"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>getState</b> ()=0</td></tr>
-<tr class="separator:aa57f3f953fc0f254746fd74dadc25fda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad83de0fd7bd95db72517460c3f1589af" id="r_ad83de0fd7bd95db72517460c3f1589af"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad83de0fd7bd95db72517460c3f1589af">getState</a> ()=0</td></tr>
+<tr class="memdesc:ad83de0fd7bd95db72517460c3f1589af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets current device state.  <br /></td></tr>
+<tr class="separator:ad83de0fd7bd95db72517460c3f1589af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="ad83de0fd7bd95db72517460c3f1589af" name="ad83de0fd7bd95db72517460c3f1589af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad83de0fd7bd95db72517460c3f1589af">&#9670;&#160;</a></span>getState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int BasicOutputInterface::getState </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets current device state. </p>
+<dl class="section return"><dt>Returns</dt><dd>Returns current device state. </dd></dl>
+
+<p>Implemented in <a class="el" href="classBasicOutputDevice.html#ad565647f3946013de213d2ded9794f46">BasicOutputDevice</a>.</p>
+
+</div>
+</div>
+<a id="a6ea53bcd71a9d69f87a23403a660dfb8" name="a6ea53bcd71a9d69f87a23403a660dfb8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ea53bcd71a9d69f87a23403a660dfb8">&#9670;&#160;</a></span>initialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void BasicOutputInterface::initialize </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Handles any code that needs to run at startup of the device. </p>
+
+<p>Implemented in <a class="el" href="classBasicOutputDevice.html#a455eca8e09c7a2c07a428fae70e0b5c0">BasicOutputDevice</a>.</p>
+
+</div>
+</div>
+<a id="ae4dedf58e0b7e2a731515f67271d60be" name="ae4dedf58e0b7e2a731515f67271d60be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4dedf58e0b7e2a731515f67271d60be">&#9670;&#160;</a></span>toggle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void BasicOutputInterface::toggle </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Toggles the device from on to off state and vice versa. </p>
+
+<p>Implemented in <a class="el" href="classBasicOutputDevice.html#a67a7e58262899f64f3b9ac20a844d4bf">BasicOutputDevice</a>.</p>
+
+</div>
+</div>
+<a id="ace589fee052cac2d150b930ab552414e" name="ace589fee052cac2d150b930ab552414e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace589fee052cac2d150b930ab552414e">&#9670;&#160;</a></span>turnOff()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void BasicOutputInterface::turnOff </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Switches the device to the off state. </p>
+
+<p>Implemented in <a class="el" href="classBasicOutputDevice.html#abe69ddbda466b7af9a0c355cef045fcd">BasicOutputDevice</a>.</p>
+
+</div>
+</div>
+<a id="ad20bf815f2499efcc19094dce9267f45" name="ad20bf815f2499efcc19094dce9267f45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad20bf815f2499efcc19094dce9267f45">&#9670;&#160;</a></span>turnOn()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void BasicOutputInterface::turnOn </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Switches the device to the on state. </p>
+
+<p>Implemented in <a class="el" href="classBasicOutputDevice.html#a5b0a4cab7b2349e0d4bcc30bd4d8c7ad">BasicOutputDevice</a>.</p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>lib/BasicOutputInterface/<a class="el" href="BasicOutputInterface_8h_source.html">BasicOutputInterface.h</a></li>
 </ul>

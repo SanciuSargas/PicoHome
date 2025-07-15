@@ -6,17 +6,18 @@
 
 #include "BasicOutputDevice.h"
 
-BasicOutputDevice::BasicOutputDevice(AbstractPin* pinObject, bool highTrigger, char* chanelPathForMQTT, CommunicationInterface* communicationClient) : BasicOutputInterface(), Subscriber()
+BasicOutputDevice::BasicOutputDevice(AbstractPin* pinObject, bool highTrigger, char* chanelPathForMQTT, CommunicationInterface* communicationClient)
 {
     this->pinObject = pinObject;
     this->highTrigger = highTrigger;
+    this->currentState = !highTrigger;
     strcpy(this->chanelPathForMQTT, chanelPathForMQTT);
     this->communicationClient = communicationClient;
 }
 
 void BasicOutputDevice::initialize()
 {
-    pinObject->setPinMode(OUTPUT);
+    pinObject->pinMode(OUTPUT);
     pinObject->digitalWrite(!highTrigger);
     communicationClient->publish(chanelPathForMQTT, reinterpret_cast<uint8_t*>(&currentState));
 }
@@ -34,6 +35,7 @@ void BasicOutputDevice::turnOff()
 }
 void BasicOutputDevice::toggle()
 {
+    Serial.println("toggle");
     if(currentState == highTrigger)
     {
         pinObject->digitalWrite(!highTrigger);
@@ -43,7 +45,7 @@ void BasicOutputDevice::toggle()
         pinObject->digitalWrite(highTrigger);
         currentState = highTrigger;
     }
-    communicationClient->publish(chanelPathForMQTT, reinterpret_cast<uint8_t*>(&currentState));
+    // communicationClient->publish(chanelPathForMQTT, reinterpret_cast<uint8_t*>(&currentState));
 }
 int BasicOutputDevice::getState()
 {

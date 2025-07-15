@@ -11,7 +11,7 @@
 class LocalPin : public AbstractPin
 {
 public:
-    LocalPin(pin pinNumber);
+    LocalPin(int pinNumber);
     void pinMode(int mode) override;
     void digitalWrite(int value) override;
     int digitalRead() override;

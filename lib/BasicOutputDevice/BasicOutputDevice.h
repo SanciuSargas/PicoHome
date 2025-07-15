@@ -26,7 +26,7 @@ private:
     AbstractPin* pinObject;
     bool highTrigger;
     CommunicationInterface* communicationClient;
-    char* chanelPathForMQTT;
+    char* chanelPathForMQTT = nullptr;
     int currentState;
 };
 

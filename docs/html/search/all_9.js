@@ -1,9 +1,10 @@
 var searchData=
 [
-  ['testcommunication_0',['TestCommunication',['../classTestCommunication.html',1,'']]],
-  ['testcommunication_2ecpp_1',['TestCommunication.cpp',['../TestCommunication_8cpp.html',1,'']]],
-  ['testcommunication_2eh_2',['TestCommunication.h',['../TestCommunication_8h.html',1,'']]],
-  ['testpin_3',['TestPin',['../classTestPin.html',1,'']]],
-  ['testpin_2ecpp_4',['TestPin.cpp',['../TestPin_8cpp.html',1,'']]],
-  ['testpin_2eh_5',['TestPin.h',['../TestPin_8h.html',1,'']]]
+  ['pinmode_0',['pinMode',['../classAbstractPin.html#a117db7ad986902f14b2e350fde8ead10',1,'AbstractPin::pinMode()'],['../classLocalPin.html#a6edebbd43f9702ea64e8871f46ba8dc9',1,'LocalPin::pinMode()']]],
+  ['positioncontrolinterface_1',['PositionControlInterface',['../classPositionControlInterface.html',1,'']]],
+  ['positioncontrolinterface_2ecpp_2',['PositionControlInterface.cpp',['../PositionControlInterface_8cpp.html',1,'']]],
+  ['positioncontrolinterface_2eh_3',['PositionControlInterface.h',['../PositionControlInterface_8h.html',1,'']]],
+  ['publisher_4',['Publisher',['../classPublisher.html',1,'']]],
+  ['publisher_2ecpp_5',['Publisher.cpp',['../Publisher_8cpp.html',1,'']]],
+  ['publisher_2eh_6',['Publisher.h',['../Publisher_8h.html',1,'']]]
 ];

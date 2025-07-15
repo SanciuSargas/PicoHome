@@ -1,0 +1,42 @@
+\doxysection{Basic\+Momentary\+Switch\+Sensor.\+h}
+\hypertarget{BasicMomentarySwitchSensor_8h_source}{}\label{BasicMomentarySwitchSensor_8h_source}\index{lib/BasicMomentarySwitchSensor/BasicMomentarySwitchSensor.h@{lib/BasicMomentarySwitchSensor/BasicMomentarySwitchSensor.h}}
+\mbox{\hyperlink{BasicMomentarySwitchSensor_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#ifndef\ MOMENTARYSWITCHSENSOR\_H}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ MOMENTARYSWITCHSENSOR\_H}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{AbstractPin_8h}{AbstractPin.h}}"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}../AbstractDigitalSensor/AbstractDigitalSensor.h"{}}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{using\ }Callback\ =\ std::function<void()>;}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{comment}{//\ TODO:\ instead\ of\ publishers/subscribers\ have\ void*\ functions\ to\ call\ on\ each\ action}}
+\DoxyCodeLine{00014\ \textcolor{keyword}{class\ }BasicMomentarySwitchSensor\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classAbstractDigitalSensor}{AbstractDigitalSensor}}}
+\DoxyCodeLine{00015\ \{}
+\DoxyCodeLine{00016\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00017\ \ \ \ \ BasicMomentarySwitchSensor(\mbox{\hyperlink{classAbstractPin}{AbstractPin}}*\ dataPinObject,\ \textcolor{keywordtype}{char}*\ chanelPathForMQTT,\ Callback\ singlePressCallback);}
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keywordtype}{void}\ initialize()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{void}\ update()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{void}\ checkIfPressCompleted();}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{void}\ flush();}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{void}\ getDebauncedReading();}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{comment}{//\ void\ subscribe(Subscriber*\ subscriber)\ override;}}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{comment}{//\ void\ unsubscribe(Subscriber*\ subscriber)\ override;}}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{comment}{//\ void\ notifySubscribers()\ override;}}
+\DoxyCodeLine{00026\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00027\ \ \ \ \ Callback\ \_singlePressCallback;}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{comment}{//\ void\ (*singlePressCallback)()\ =\ nullptr;\ //\ TODO:\ add\ [maxNumberOfFunctions]}}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{classAbstractPin}{AbstractPin}}*\ dataPinObject;}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{char}*\ chanelPathForMQTT\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{classCommunicationInterface}{CommunicationInterface}}*\ commInterface\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordtype}{int}\ currentState\ =\ 0;}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{int}\ stateChanged\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordtype}{int}\ pressCompleted\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordtype}{int}\ lastReading\ =\ 0;}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ debounceDelay\ =\ 0;}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ lastDebounceTime\ =\ 0;}
+\DoxyCodeLine{00038\ \};}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//MOMENTARYSWITCHSENSOR\_H}}
+
+\end{DoxyCode}
