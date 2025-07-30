@@ -7,11 +7,10 @@
 #define MQTTCOMMUNICATION_H
 #include "../CommunicationInterface/CommunicationInterface.h"
 
-// TODO: maybe instead of implementing this just pass MQTT library client less coding
 class MQTTCommunication : public CommunicationInterface
 {
 public:
-    MQTTCommunication();
+    MQTTCommunication(); // TODO: add PubSubClient* client
     void publish(char* topic, byte* payload) override;
     void subscribe(char* topic) override;
 };

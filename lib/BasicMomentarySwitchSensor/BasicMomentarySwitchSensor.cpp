@@ -6,13 +6,12 @@
 
 #include "BasicMomentarySwitchSensor.h"
 
-BasicMomentarySwitchSensor::BasicMomentarySwitchSensor(AbstractPin* dataPinObject, char* chanelPathForMQTT, Callback singlePressCallback)
+BasicMomentarySwitchSensor::BasicMomentarySwitchSensor(AbstractPin* dataPinObject, char* chanelPathForMQTT, Callback singlePressCallback, CommunicationInterface* commInterface)
 {
     this->dataPinObject = dataPinObject;
     this->chanelPathForMQTT = chanelPathForMQTT;
     this->commInterface = commInterface;
     _singlePressCallback = std::move(singlePressCallback);
-    // this->singlePressCallback = singlePressCallback;
 }
 
 void BasicMomentarySwitchSensor::initialize()

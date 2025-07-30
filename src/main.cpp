@@ -15,12 +15,16 @@
 #include "../lib/MQTTCommunication/MQTTCommunication.h"
 #include "../lib/CommunicationInterface/CommunicationInterface.h"
 
+// MQTT details
+char* mqttServer;
+char* mqttClientID;
+
 
 BasicOutputDevice* light;
 AbstractDigitalSensor* lightSwitch;
 AbstractPin* outputPin;
 AbstractPin* inputPin;
-// CommunicationInterface* communicationClient;
+CommunicationInterface* communicationClient;
 
 void setup() {
     Serial.begin(9600);
@@ -30,12 +34,13 @@ void setup() {
     }
 
     // TODO: construct devices from json file
+    // TODO: add PubSubClient
     outputPin = new LocalPin(5);
     inputPin = new LocalPin(4);
-    CommunicationInterface* communicationClient = new MQTTCommunication();
+    communicationClient = new MQTTCommunication();
     char path[5] = "1234";
     light = new BasicOutputDevice(outputPin, 1, path, communicationClient);
-    lightSwitch = new BasicMomentarySwitchSensor(inputPin, path, [ObjectPtr = light] { ObjectPtr->toggle(); });
+    lightSwitch = new BasicMomentarySwitchSensor(inputPin, path, [ObjectPtr = light] { ObjectPtr->toggle(); }, communicationClient);
     light->initialize();
     lightSwitch->initialize();
     Serial.println("Setup done");

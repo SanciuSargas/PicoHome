@@ -14,7 +14,7 @@ using Callback = std::function<void()>;
 class BasicMomentarySwitchSensor : public AbstractDigitalSensor
 {
 public:
-    BasicMomentarySwitchSensor(AbstractPin* dataPinObject, char* chanelPathForMQTT, Callback singlePressCallback);
+    BasicMomentarySwitchSensor(AbstractPin* dataPinObject, char* chanelPathForMQTT, Callback singlePressCallback, CommunicationInterface* commInterface);
     void initialize() override;
     void update() override;
     void checkIfPressCompleted();
