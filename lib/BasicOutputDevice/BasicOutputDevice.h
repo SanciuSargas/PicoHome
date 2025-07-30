@@ -15,6 +15,7 @@
 class BasicOutputDevice : public BasicOutputInterface, public Subscriber
 {
 public:
+    BasicOutputDevice() = default;
     BasicOutputDevice(AbstractPin* pinObject, bool highTrigger, char* chanelPathForMQTT, CommunicationInterface* communicationClient);
     void initialize() override;
     void turnOn() override;
