@@ -16,6 +16,11 @@ void LocalPin::pinMode(int mode)
     ArduinoPinMode arduinoMode = static_cast<ArduinoPinMode>(mode);
     arduino::pinMode(pinNumber, arduinoMode);
 }
+void LocalPin::attachInterrupt(voidFuncPtr callback, int mode)
+{
+    PinStatus arduinoValue = static_cast<PinStatus>(mode);
+    ::attachInterrupt(digitalPinToInterrupt(pinNumber), callback, arduinoValue);
+}
 void LocalPin::digitalWrite(int value)
 {
     // TODO: check if pin mode is OUTPUT

@@ -9,6 +9,8 @@
 #ifndef ABSTRACTPIN_H
 #define ABSTRACTPIN_H
 
+#include <Arduino.h>
+
 class AbstractPin
 {
 public:
@@ -20,6 +22,15 @@ public:
      * @param mode pin mode either INPUT or OUTPUT.
      */
     virtual void pinMode(int mode) = 0;
+
+
+    /**
+     * @brief Attach an interrupt to the pin.
+     *
+     * @param callback function to call once interrupt is triggered
+     * @param mode trigger type for the interrupt
+     */
+    virtual void attachInterrupt(voidFuncPtr callback, int mode) = 0;
 
     /**
      * @brief Sets the pin to HIGH or LOW.

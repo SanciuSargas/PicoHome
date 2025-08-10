@@ -21,23 +21,25 @@ void BasicMomentarySwitchSensor::initialize()
     lastReading = currentState;
 }
 
-void BasicMomentarySwitchSensor::flush()
-{
-
-}
-
 void BasicMomentarySwitchSensor::update()
 {
     getDebauncedReading();
     checkIfPressCompleted();
 
     if (pressCompleted) {
+        Serial.println("press completed");
         // commInterface->publish(chanelPathForMQTT, reinterpret_cast<uint8_t*>(&currentState));
         if  (_singlePressCallback) {
             _singlePressCallback();
         }
     }
 }
+
+void BasicMomentarySwitchSensor::dealWithInterrupt()
+{
+    interruptTriggered = true;
+}
+
 
 void BasicMomentarySwitchSensor::checkIfPressCompleted()
 {
@@ -48,12 +50,25 @@ void BasicMomentarySwitchSensor::checkIfPressCompleted()
     }
 }
 
+void BasicMomentarySwitchSensor::flush()
+{
+
+}
+
+
 void BasicMomentarySwitchSensor::getDebauncedReading()
 {
-    byte newReading = dataPinObject->digitalRead();
+    byte newReading = lastReading;
 
-    if (newReading != lastReading) {
-        lastDebounceTime = millis();
+    if (interruptTriggered)
+    {
+        interruptTriggered = false;
+
+        newReading = dataPinObject->digitalRead();
+
+        if (newReading != lastReading) {
+            lastDebounceTime = millis();
+        }
     }
 
     if (millis() - lastDebounceTime > debounceDelay) {

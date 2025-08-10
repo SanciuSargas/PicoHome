@@ -17,6 +17,7 @@ public:
     BasicMomentarySwitchSensor(AbstractPin* dataPinObject, char* chanelPathForMQTT, Callback singlePressCallback, CommunicationInterface* commInterface);
     void initialize() override;
     void update() override;
+    void dealWithInterrupt() override;
     void checkIfPressCompleted();
     void flush();
     void getDebauncedReading();
@@ -24,6 +25,7 @@ public:
     // void unsubscribe(Subscriber* subscriber) override;
     // void notifySubscribers() override;
 private:
+    volatile bool interruptTriggered = false;
     Callback _singlePressCallback;
     // void (*singlePressCallback)() = nullptr; // TODO: add [maxNumberOfFunctions]
     AbstractPin* dataPinObject;

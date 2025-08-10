@@ -11,6 +11,12 @@ class AbstractDigitalSensor // : public Publisher
 public:
     virtual void initialize() = 0;
     virtual void update() = 0;
+    
+    /**
+     * @brief Handles interrupts dedicated to this device.
+     */
+    virtual void dealWithInterrupt() = 0;
+
     virtual ~AbstractDigitalSensor() = default;
 };
 #endif //ABSTRACTDIGITALSENSOR_H

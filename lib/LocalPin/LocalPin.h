@@ -5,14 +5,15 @@
 
 #ifndef LOCALPIN_H
 #define LOCALPIN_H
-#include "../AbstractPin/AbstractPin.h"
 #include <Arduino.h>
+#include <AbstractPin.h>
 
 class LocalPin : public AbstractPin
 {
 public:
     LocalPin(int pinNumber);
     void pinMode(int mode) override;
+    void attachInterrupt(voidFuncPtr callback, int mode) override;
     void digitalWrite(int value) override;
     int digitalRead() override;
     void analogWrite(int value) override;
