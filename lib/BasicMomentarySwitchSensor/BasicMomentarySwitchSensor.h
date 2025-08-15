@@ -6,30 +6,32 @@
 #ifndef MOMENTARYSWITCHSENSOR_H
 #define MOMENTARYSWITCHSENSOR_H
 #include "AbstractPin.h"
-#include "../AbstractDigitalSensor/AbstractDigitalSensor.h"
+#include "functional"
+#include <AbstractDigitalSensor.h>
 
 using Callback = std::function<void()>;
 
-// TODO: instead of publishers/subscribers have void* functions to call on each action
+
 class BasicMomentarySwitchSensor : public AbstractDigitalSensor
 {
 public:
-    BasicMomentarySwitchSensor(AbstractPin* dataPinObject, char* chanelPathForMQTT, Callback singlePressCallback, CommunicationInterface* commInterface);
+    BasicMomentarySwitchSensor(AbstractPin* dataPinObject, char* chanelPathForMQTT, uint16_t MQTTDeviceID, Callback singlePressCallback, CommunicationInterface* commInterface);
     void initialize() override;
     void update() override;
     void dealWithInterrupt() override;
+    uint16_t getMQTTDeviceID() override;
     void checkIfPressCompleted();
     void flush();
-    void getDebauncedReading();
+    void getDebouncedReading();
     // void subscribe(Subscriber* subscriber) override;
     // void unsubscribe(Subscriber* subscriber) override;
     // void notifySubscribers() override;
 private:
     volatile bool interruptTriggered = false;
-    Callback _singlePressCallback;
-    // void (*singlePressCallback)() = nullptr; // TODO: add [maxNumberOfFunctions]
+    Callback _singlePressCallback;// TODO: add [maxNumberOfFunctions]
     AbstractPin* dataPinObject;
     char* chanelPathForMQTT = nullptr;
+    uint16_t MQTTDeviceID = 0;
     CommunicationInterface* commInterface = nullptr;
     int currentState = 0;
     int stateChanged = false;

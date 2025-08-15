@@ -6,17 +6,20 @@
 #ifndef COLORSELECTINTERFACE_H
 #define COLORSELECTINTERFACE_H
 
+#include <Arduino.h>
+
 class ColorSelectInterface
 {
-    public:
-        ColorSelectInterface();
-        virtual void initialize() = 0;
-        virtual void setRed() = 0;
-        virtual void setGreen() = 0;
-        virtual void setBlue() = 0;
-        virtual int getRed() = 0;
-        virtual int getGreen() = 0;
-        virtual int getBlue() = 0;
-        virtual ~ColorSelectInterface();
+public:
+    ColorSelectInterface();
+    virtual void initialize() = 0;
+    virtual uint16_t getMQTTDeviceID() = 0;
+    virtual void setRed() = 0;
+    virtual void setGreen() = 0;
+    virtual void setBlue() = 0;
+    virtual int getRed() = 0;
+    virtual int getGreen() = 0;
+    virtual int getBlue() = 0;
+    virtual ~ColorSelectInterface();
 };
 #endif //COLORSELECTINTERFACE_H

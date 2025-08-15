@@ -6,10 +6,11 @@
 
 #include "BasicMomentarySwitchSensor.h"
 
-BasicMomentarySwitchSensor::BasicMomentarySwitchSensor(AbstractPin* dataPinObject, char* chanelPathForMQTT, Callback singlePressCallback, CommunicationInterface* commInterface)
+BasicMomentarySwitchSensor::BasicMomentarySwitchSensor(AbstractPin* dataPinObject, char* chanelPathForMQTT, uint16_t MQTTDeviceID, Callback singlePressCallback, CommunicationInterface* commInterface)
 {
     this->dataPinObject = dataPinObject;
     this->chanelPathForMQTT = chanelPathForMQTT;
+    this->MQTTDeviceID = MQTTDeviceID;
     this->commInterface = commInterface;
     _singlePressCallback = std::move(singlePressCallback);
 }
@@ -23,7 +24,7 @@ void BasicMomentarySwitchSensor::initialize()
 
 void BasicMomentarySwitchSensor::update()
 {
-    getDebauncedReading();
+    getDebouncedReading();
     checkIfPressCompleted();
 
     if (pressCompleted) {
@@ -38,6 +39,11 @@ void BasicMomentarySwitchSensor::update()
 void BasicMomentarySwitchSensor::dealWithInterrupt()
 {
     interruptTriggered = true;
+}
+
+uint16_t BasicMomentarySwitchSensor::getMQTTDeviceID()
+{
+    return MQTTDeviceID;
 }
 
 
@@ -56,7 +62,7 @@ void BasicMomentarySwitchSensor::flush()
 }
 
 
-void BasicMomentarySwitchSensor::getDebauncedReading()
+void BasicMomentarySwitchSensor::getDebouncedReading()
 {
     byte newReading = lastReading;
 

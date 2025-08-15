@@ -6,6 +6,8 @@
 #ifndef BASICOUTPUTINTERFACE_H
 #define BASICOUTPUTINTERFACE_H
 
+#include <Arduino.h>
+
 class BasicOutputInterface
 {
 public:
@@ -15,6 +17,11 @@ public:
      * @brief Handles any code that needs to run at startup of the device.
      */
     virtual void initialize() = 0;
+
+    /**
+     * @breaf Returns MQTT device id.
+     */
+    virtual uint16_t getMQTTDeviceId() = 0;
 
     /**
      * @brief Switches the device to the on state.
@@ -37,6 +44,7 @@ public:
      * @return Returns current device state.
      */
     virtual int getState() = 0;
+    virtual void dealWithMQTTCallback(int payload) = 0;
     virtual ~BasicOutputInterface() = default;
 };
 

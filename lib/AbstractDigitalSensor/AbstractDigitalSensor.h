@@ -17,6 +17,8 @@ public:
      */
     virtual void dealWithInterrupt() = 0;
 
+    virtual uint16_t getMQTTDeviceID() = 0;
+
     virtual ~AbstractDigitalSensor() = default;
 };
 #endif //ABSTRACTDIGITALSENSOR_H

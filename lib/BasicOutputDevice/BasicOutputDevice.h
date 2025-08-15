@@ -7,28 +7,33 @@
 #define BASICOUTPUTDEVICE_H
 #include <Arduino.h>
 
-#include "CommunicationInterface.h"
-#include "../AbstractPin/AbstractPin.h"
-#include "../Subscriber/Subscriber.h"
-#include "../BasicOutputInterface/BasicOutputInterface.h"
+#include <CommunicationInterface.h>
+#include <AbstractPin.h>
+#include <Subscriber.h>
+#include <BasicOutputInterface.h>
 
 class BasicOutputDevice : public BasicOutputInterface, public Subscriber
 {
 public:
     BasicOutputDevice() = default;
-    BasicOutputDevice(AbstractPin* pinObject, bool highTrigger, char* chanelPathForMQTT, CommunicationInterface* communicationClient);
+    BasicOutputDevice(AbstractPin* pinObject, bool highTrigger, char* chanelPathForMQTT, uint16_t MQTTDeviceID,
+                      CommunicationInterface* communicationClient);
     void initialize() override;
+    uint16_t getMQTTDeviceId() override;
     void turnOn() override;
     void turnOff() override;
     void toggle() override;
     int getState() override;
     void callback() override;
+    void dealWithMQTTCallback(int payload) override;
 private:
-    AbstractPin* pinObject;
-    bool highTrigger;
-    CommunicationInterface* communicationClient;
+    AbstractPin* pinObject = nullptr;
+    bool highTrigger = false;
+    CommunicationInterface* communicationClient = nullptr;
+    // PubSubClient mqttClient;
     char* chanelPathForMQTT = nullptr;
-    int currentState;
+    uint16_t MQTTDeviceID = 0;
+    int currentState = 0;
 };
 
 #endif //BASICOUTPUTDEVICE_H
