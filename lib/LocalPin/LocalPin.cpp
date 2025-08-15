@@ -13,8 +13,7 @@ LocalPin::LocalPin(int pinNumber)
 
 void LocalPin::pinMode(int mode)
 {
-    ArduinoPinMode arduinoMode = static_cast<ArduinoPinMode>(mode);
-    arduino::pinMode(pinNumber, arduinoMode);
+    arduino::pinMode(pinNumber, mode);
 }
 void LocalPin::attachInterrupt(voidFuncPtr callback, int mode)
 {

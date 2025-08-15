@@ -19,8 +19,7 @@ void ExpanderPin::attachInterrupt(voidFuncPtr callback, int mode)
 
 void ExpanderPin::pinMode(int mode)
 {
-    ArduinoPinMode arduinoMode = static_cast<ArduinoPinMode>(mode);
-    mcp->pinMode(pinNumber, arduinoMode);
+    mcp->pinMode(pinNumber, mode);
 }
 
 void ExpanderPin::digitalWrite(int value)
