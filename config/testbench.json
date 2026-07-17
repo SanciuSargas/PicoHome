@@ -1,0 +1,28 @@
+{
+  // PicoHome bench-test config: one light relay + one wall switch.
+  // Copy to the SD card as /config.json (SD loading is an upcoming milestone;
+  // until then controller/src/main.cpp embeds this same config).
+  "schema_version": 1,
+  "building": "testbench",
+  "network": {
+    "mac": [18, 237, 103, 254, 84, 237],
+    "ip": "192.168.1.201",
+    "netmask": "255.255.255.0",
+    "gateway": "192.168.1.1",
+    "broker": "192.168.1.200",
+    "broker_port": 1883
+  },
+  "devices": {
+    "binary_actuators": [
+      {"type": "light", "id": 29, "room": "kitchen",
+       "pin": {"expander": -1, "pin": 2, "active_high": true}}
+    ],
+    "buttons": [
+      // Wall switch between GPIO3 and GND, internal pull-up -> active low.
+      // Inherits the plan number of the light it controls.
+      {"id": 29, "room": "kitchen",
+       "pin": {"expander": -1, "pin": 3, "active_high": false, "pull_up": true},
+       "controls": {"type": "light", "id": 29}}
+    ]
+  }
+}

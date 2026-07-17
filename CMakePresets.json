@@ -1,0 +1,39 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "pico",
+      "displayName": "Pico firmware (arm-none-eabi)",
+      "binaryDir": "${sourceDir}/build/pico",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "PICO_BOARD": "pico",
+        "PICO_SDK_PATH": "$env{HOME}/pico-sdk",
+        "CMAKE_POLICY_VERSION_MINIMUM": "3.5"
+      }
+    },
+    {
+      "name": "host",
+      "displayName": "Host unit tests",
+      "binaryDir": "${sourceDir}/build/host",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "PICOHOME_HOST_BUILD": "ON",
+        "CMAKE_POLICY_VERSION_MINIMUM": "3.5"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "pico", "configurePreset": "pico" },
+    { "name": "host", "configurePreset": "host" }
+  ],
+  "testPresets": [
+    {
+      "name": "host",
+      "configurePreset": "host",
+      "output": { "outputOnFailure": true }
+    }
+  ]
+}
