@@ -27,11 +27,11 @@ if(PICOHOME_HOST_BUILD)
     add_subdirectory(tests)
 else()
     pico_sdk_init()
+    add_subdirectory(external/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico/src)
     add_subdirectory(controller)
     add_subdirectory(roomnode)
 endif()
 
 # Vendored but not yet wired into the build (upcoming milestones):
-#   external/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico  - SD card config loading
-#   external/ioLibrary_Driver                  - W5100 Ethernet + MQTT
-#   external/nanomodbus                        - Modbus RTU master/slave
+#   external/ioLibrary_Driver  - W5100 Ethernet + MQTT
+#   external/nanomodbus        - Modbus RTU master/slave

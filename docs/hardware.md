@@ -112,6 +112,18 @@ Requirements: small, wired preferred (wireless acceptable), Home Assistant integ
 **1–10 V circuits (32D, 51D, 61D): DECIDED** — RP2040 hardware PWM → user's existing
 PWM-to-0-10V converter modules; the plan's relay handles on/off. No DAC needed.
 
+## SD cards (config storage)
+
+**Must be SDHC, 4–32 GB, formatted FAT32** — one per controller.
+
+- **SDSC (Standard Capacity, ≤2 GB) does not work.** The card initializes fine but the
+  no-OS-FatFS driver supports only block-addressed cards and rejects byte-addressed SDSC
+  (`sd_card_spi_init: SD Standard Capacity Memory Card unsupported` → `f_mount` returns
+  FR_NOT_READY). Verified on the bench 2026-07-25.
+- **SDXC (≥64 GB) is accepted by the driver but ships exFAT**, which this FatFs build does
+  not support → `FR_NO_FILESYSTEM`. Reformat as FAT32 if such a card must be used.
+- Config file goes in the card root as `config.json`.
+
 ## Electrical / level-shifting rules
 
 - RP2040 GPIO is **not 5 V tolerant**.

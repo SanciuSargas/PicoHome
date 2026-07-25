@@ -4,6 +4,7 @@ Home automation firmware for RP2040 (YD-RP2040) building controllers — three b
 each driven by one controller configured from a JSON file on SD card, exposed over MQTT
 (Home Assistant on top). Room co-processor nodes report over RS485/Modbus RTU.
 
+- Design rationale (the concepts behind every decision): [`docs/design_rationale.md`](docs/design_rationale.md)
 - Hardware reference, BOM, dimmer options: [`docs/hardware.md`](docs/hardware.md)
 - Device number assignments: [`docs/device_numbering.md`](docs/device_numbering.md)
 - Wiring source of truth: `docs/naujas_dizainas_geroji_versija_laidu_sujungimai.xlsx`
@@ -61,6 +62,8 @@ Settings → Build, Execution, Deployment → CMake.
       register map needed for the Modbus master config)
 - [ ] Confirm MQTT broker details (old code used 192.168.1.200:1883) and that
       Home Assistant can reach it
+- [ ] Get 3 SD cards: **SDHC, 4–32 GB, FAT32** (SDSC ≤2 GB is rejected by the driver,
+      SDXC ≥64 GB ships exFAT — see `docs/hardware.md`)
 
 ### Later / background
 - [ ] Watering system scope (future 4th controller — cellar + 2 underground points)
