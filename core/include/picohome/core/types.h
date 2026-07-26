@@ -15,8 +15,7 @@ enum class DeviceType : uint8_t {
     Damper,
     HeatingMat,
     Rgb,
-    Button,
-    Toggle,
+    Button,  // wall switch, momentary or toggle — see SwitchKind
     Reed,
     WaterLeak,
     Pir,
@@ -32,5 +31,11 @@ enum class DeviceType : uint8_t {
 
 std::string_view toSegment(DeviceType type);
 DeviceType typeFromSegment(std::string_view segment);
+
+// Lights are the only devices motion bindings may drive, and the only ones
+// carrying the night_mode gate.
+inline bool isLight(DeviceType type) {
+    return type == DeviceType::Light || type == DeviceType::DimmableLight;
+}
 
 }  // namespace picohome

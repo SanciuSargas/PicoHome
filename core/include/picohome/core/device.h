@@ -4,6 +4,7 @@
 #include <string>
 #include <string_view>
 
+#include "picohome/core/capabilities.h"
 #include "picohome/core/types.h"
 
 namespace picohome {
@@ -43,6 +44,14 @@ public:
 
     // Re-publish current retained state (e.g. after broker reconnect).
     virtual void publishState() {}
+
+    // Capability queries — see capabilities.h. A device overrides only the ones
+    // it actually supports; everything else stays null and the boot-time
+    // binding validator turns a mismatch into a clear config error.
+    virtual IBinaryActuator* asBinary() { return nullptr; }
+    virtual IRangeActuator* asRange() { return nullptr; }
+    virtual IPositionActuator* asPosition() { return nullptr; }
+    virtual IMotionGated* asMotionGated() { return nullptr; }
 
 protected:
     void publish(std::string_view command, std::string_view payload, bool retained);

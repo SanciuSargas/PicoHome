@@ -1,31 +1,33 @@
 #pragma once
 
+#include "picohome/control/event_router.h"
 #include "picohome/core/device.h"
 #include "picohome/core/gesture.h"
 #include "picohome/hal/hal.h"
 
 namespace picohome {
 
-class Button;
-
-// Wiring hook for local bindings; the BindingEngine implements this.
-class IButtonListener {
-public:
-    virtual ~IButtonListener() = default;
-    virtual void onButtonGesture(const Button& button, Gesture gesture) = 0;
-};
-
-// Momentary wall switch. Publishes gestures on .../button/<id>/event and
-// forwards them to the local binding engine. By convention a button inherits
-// the plan number of the device it primarily controls; several physical
-// switches of one P-group share the same id (they are one logical button).
+// Wall switch — momentary pushbutton or latching toggle, per config (see
+// SwitchKind). Publishes gestures on .../button/<id>/event and emits them into
+// the EventRouter, where bindings pick them up. The button knows nothing about
+// what it controls, and a binding does not care which kind of switch produced a
+// press: that is what lets the two be swapped on a plain light.
+//
+// By convention a button carries the plan number of the device it primarily
+// controls; several physical switches of one P-group share the same id, because
+// they are one logical button in several places.
 class Button : public Device, private IGestureListener {
 public:
     Button(uint16_t id, std::string room, hal::IDigitalInput& input,
-           GestureDetector::Timing timing = GestureDetector::Timing{});
+           SwitchKind kind = SwitchKind::Momentary);
+    Button(uint16_t id, std::string room, hal::IDigitalInput& input, SwitchKind kind,
+           GestureDetector::Timing timing);
 
-    void attachListener(IButtonListener* listener) { listener_ = listener; }
+    void attachRouter(EventRouter* router) { router_ = router; }
 
+    SwitchKind switchKind() const { return detector_.kind(); }
+
+    void initialize() override;
     void update(uint32_t nowMs) override;
 
 private:
@@ -33,7 +35,7 @@ private:
 
     hal::IDigitalInput& input_;
     GestureDetector detector_;
-    IButtonListener* listener_ = nullptr;
+    EventRouter* router_ = nullptr;
 };
 
 }  // namespace picohome

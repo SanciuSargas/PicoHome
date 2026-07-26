@@ -1,4 +1,4 @@
-# Portable core: device model, gesture grammar, bindings, topics, config parsing.
+# Portable core: device model, gesture grammar, control model, topics, config parsing.
 # No pico-sdk dependencies — builds for both the firmware and the host tests.
 add_library(picohome_core STATIC
     src/types.cpp
@@ -7,8 +7,11 @@ add_library(picohome_core STATIC
     src/gesture_detector.cpp
     src/topic.cpp
     src/relay.cpp
+    src/binary_sensor.cpp
     src/button.cpp
-    src/binding_engine.cpp
+    src/event_router.cpp
+    src/binding.cpp
+    src/binding_set.cpp
     src/config_parser.cpp
 )
 

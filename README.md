@@ -29,6 +29,39 @@ cmake --preset pico && cmake --build --preset pico
 In CLion: open the project, pick the `host` or `pico` CMake preset in
 Settings → Build, Execution, Deployment → CMake.
 
+## Build and flash the controller
+
+```bash
+# Configure once per clone (or after changing CMakeLists/presets)
+cmake --preset pico
+
+# Build just the building controller -> build/pico/controller/controller.uf2
+cmake --build --preset pico --target controller
+```
+
+Flash it — hold **BOOTSEL** while plugging the board in, then either:
+
+```bash
+# a) drag-and-drop equivalent: copy the UF2 to the mounted RPI-RP2 drive
+cp build/pico/controller/controller.uf2 /run/media/$USER/RPI-RP2/
+
+# b) or use picotool (built by the SDK; also reboots the board afterwards)
+build/pico/_deps/picotool/picotool load -x build/pico/controller/controller.uf2
+```
+
+Watch the boot log over USB serial (attach *before* pressing RST — the banner is
+printed once and USB CDC output is dropped while nothing is listening):
+
+```bash
+cat /dev/ttyACM0
+# PicoHome controller booting, reading /config.json
+# PicoHome 'testbench' up: 2 devices, 1 bindings, 1 subscriptions
+```
+
+The SD card must hold `config.json` in its root (start from
+[`config/testbench.json`](config/testbench.json)); a bad or missing config gives a fast
+blink plus the reason on serial every 2 s.
+
 ## User TODO list
 
 ### Decisions
@@ -48,6 +81,10 @@ Settings → Build, Execution, Deployment → CMake.
         lights 110–112, whether a blind (500) exists
 - [ ] Confirm proposed new sauna light numbers 110 (shower), 111 (sauna), 112 (rest_room)
 - [ ] Copy all confirmed numbers into the wiring Excel
+- [ ] Record for **every switch** whether it is momentary (spring-return pushbutton) or
+      toggle (latching rocker) — the config requires `"kind"` per button and there is no
+      safe default. Devices needing hold gestures (dimmable lights, blinds, curtains, air
+      dampers) want momentary ones
 
 ### Development machine
 - [x] Install compilers (done 2026-07-17; host tests and firmware both build)
@@ -62,6 +99,9 @@ Settings → Build, Execution, Deployment → CMake.
       register map needed for the Modbus master config)
 - [ ] Confirm MQTT broker details (old code used 192.168.1.200:1883) and that
       Home Assistant can reach it
+- [ ] When HA is set up (M13): the entity driving each light's `set_night_mode` must
+      publish with `retain: true`, so a rebooted controller picks up the current
+      day/night value from the broker instead of defaulting to night
 - [ ] Get 3 SD cards: **SDHC, 4–32 GB, FAT32** (SDSC ≤2 GB is rejected by the driver,
       SDXC ≥64 GB ships exFAT — see `docs/hardware.md`)
 

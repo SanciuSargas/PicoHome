@@ -8,6 +8,9 @@ namespace picohome::commands {
 
 inline constexpr std::string_view kSetBinary = "set_binary";
 inline constexpr std::string_view kSetRange = "set_range";
+// Lights only: high level decides when motion may switch a light on.
+inline constexpr std::string_view kSetNightMode = "set_night_mode";
+inline constexpr std::string_view kNightMode = "night_mode";
 inline constexpr std::string_view kSetPosition = "set_position";
 inline constexpr std::string_view kSetTilt = "set_tilt";
 inline constexpr std::string_view kState = "state";

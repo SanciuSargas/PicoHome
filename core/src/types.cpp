@@ -19,7 +19,6 @@ constexpr Entry kEntries[] = {
     {DeviceType::HeatingMat, "heating_mat"},
     {DeviceType::Rgb, "rgb"},
     {DeviceType::Button, "button"},
-    {DeviceType::Toggle, "toggle"},
     {DeviceType::Reed, "reed"},
     {DeviceType::WaterLeak, "water_leak"},
     {DeviceType::Pir, "pir"},

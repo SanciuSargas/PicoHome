@@ -1,10 +1,8 @@
 #include <doctest/doctest.h>
 
-#include <memory>
-
 #include "mocks/fakes.h"
-#include "picohome/control/binding_engine.h"
-#include "picohome/core/device_registry.h"
+#include "picohome/control/event_router.h"
+#include "picohome/devices/binary_sensor.h"
 #include "picohome/devices/button.h"
 #include "picohome/devices/relay.h"
 
@@ -37,40 +35,31 @@ TEST_CASE("relay handles set_binary and publishes retained state") {
     CHECK_FALSE(relay.handleCommand("set_range", "50"));
 }
 
-TEST_CASE("press_1 toggles the bound relay end to end") {
+TEST_CASE("relay exposes the binary capability and nothing else") {
     FakeDigitalOutput out;
-    FakeDigitalInput in;
-    DeviceRegistry registry;
-    BindingEngine bindings(registry);
+    Relay relay(DeviceType::Light, 29, "kitchen", out);
+    CHECK(relay.asBinary() != nullptr);
+    CHECK(relay.asRange() == nullptr);
+    CHECK(relay.asPosition() == nullptr);
 
-    auto* relay = static_cast<Relay*>(
-        registry.add(std::make_unique<Relay>(DeviceType::Light, 29, "kitchen", out)));
-    auto button = std::make_unique<Button>(29, "kitchen", in);
-    button->attachListener(&bindings);
-    registry.add(std::move(button));
-    bindings.addToggle({29, DeviceType::Light, 29});
-    registry.initializeAll();
-
-    uint32_t now = 0;
-    const auto run = [&](bool pressed, uint32_t ms) {
-        in.value = pressed;
-        for (uint32_t i = 0; i < ms; ++i) registry.updateAll(++now);
-    };
-
-    run(true, 100);
-    run(false, 450);
-    CHECK(relay->isOn());
-
-    run(true, 100);
-    run(false, 450);
-    CHECK_FALSE(relay->isOn());
+    relay.asBinary()->toggle();
+    CHECK(relay.isOn());
 }
 
-TEST_CASE("button publishes gesture events") {
+TEST_CASE("button publishes gesture events and emits them to the router") {
     FakeDigitalInput in;
     RecordingPublisher publisher;
+    EventRouter router;
+
+    struct Recorder : IEventObserver {
+        std::vector<SourceEvent> events;
+        void onSourceEvent(const SourceEvent& event) override { events.push_back(event); }
+    } recorder;
+    router.subscribe(SourceKey::button(29), &recorder);
+
     Button button(29, "kitchen", in);
     button.attachPublisher(&publisher);
+    button.attachRouter(&router);
 
     uint32_t now = 0;
     const auto run = [&](bool pressed, uint32_t ms) {
@@ -80,8 +69,54 @@ TEST_CASE("button publishes gesture events") {
 
     run(true, 100);
     run(false, 450);
+
     REQUIRE(publisher.messages.size() == 1);
     CHECK(publisher.messages[0].command == "event");
     CHECK(publisher.messages[0].payload == "press_1");
     CHECK_FALSE(publisher.messages[0].retained);
+
+    REQUIRE(recorder.events.size() == 1);
+    CHECK(recorder.events[0].kind == EventKind::Gesture);
+    CHECK(recorder.events[0].gesture() == Gesture::Press1);
+}
+
+TEST_CASE("binary sensor debounces, publishes retained state and emits edges") {
+    FakeDigitalInput in;
+    RecordingPublisher publisher;
+    EventRouter router;
+
+    struct Recorder : IEventObserver {
+        std::vector<SourceEvent> events;
+        void onSourceEvent(const SourceEvent& event) override { events.push_back(event); }
+    } recorder;
+    router.subscribe(SourceKey::sensor(DeviceType::Pir, 720), &recorder);
+
+    BinarySensor sensor(DeviceType::Pir, 720, "corridor", in, /*debounceMs=*/50);
+    sensor.attachPublisher(&publisher);
+    sensor.attachRouter(&router);
+    sensor.initialize();
+
+    uint32_t now = 0;
+    const auto run = [&](bool active, uint32_t ms) {
+        in.value = active;
+        for (uint32_t i = 0; i < ms; ++i) sensor.update(++now);
+    };
+
+    run(true, 20);  // shorter than the debounce window
+    CHECK_FALSE(sensor.isActive());
+    CHECK(recorder.events.empty());
+
+    run(true, 60);
+    CHECK(sensor.isActive());
+    REQUIRE(recorder.events.size() == 1);
+    CHECK(recorder.events[0].kind == EventKind::SensorEdge);
+    CHECK(recorder.events[0].active());
+    CHECK(publisher.messages.back().command == "state");
+    CHECK(publisher.messages.back().payload == "1");
+    CHECK(publisher.messages.back().retained);
+
+    run(false, 80);
+    CHECK_FALSE(sensor.isActive());
+    REQUIRE(recorder.events.size() == 2);
+    CHECK_FALSE(recorder.events[1].active());
 }

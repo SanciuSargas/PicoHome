@@ -18,28 +18,70 @@ enum class Gesture : uint8_t {
 // MQTT event payload for a gesture: "press_1", "hold_start", ...
 std::string_view toPayload(Gesture gesture);
 
+// Inverse of toPayload(); false if the text names no gesture.
+bool gestureFromPayload(std::string_view payload, Gesture& out);
+
+// Hold gestures require a switch that springs back — see SwitchKind.
+inline bool isHoldGesture(Gesture gesture) {
+    return gesture == Gesture::HoldStart || gesture == Gesture::HoldLong ||
+           gesture == Gesture::HoldEnd;
+}
+
+// Both switch types are used around the house, often interchangeably on plain
+// lights, so which one is fitted is a per-switch config field:
+//
+//  - Momentary (spring-return pushbutton): the full grammar. A press counts on
+//    release, so multi-press and hold are both available.
+//  - Toggle (latching rocker that stays where you put it): every change of
+//    position is one user action and emits press_1 — in either direction, since
+//    the position no longer tracks the light once MQTT or a second switch of a
+//    P-group can drive it. Holding is physically impossible, so a toggle switch
+//    never produces hold gestures, and anything needing them (covers, dimmers)
+//    wants a momentary switch.
+//
+// This mirrors the old Arduino MomentarySwitch/ToggleSwitch pair, where a
+// toggle's "press" was likewise any state change.
+enum class SwitchKind : uint8_t { Momentary, Toggle };
+
+inline bool producesHoldGestures(SwitchKind kind) { return kind == SwitchKind::Momentary; }
+
 class IGestureListener {
 public:
     virtual ~IGestureListener() = default;
     virtual void onGesture(Gesture gesture) = 0;
 };
 
-// Turns a raw (bouncy) press/release signal into gestures. Pure logic driven by
-// pin state + monotonic time — no hardware dependencies, host-testable.
+// Turns a raw (bouncy) switch signal into gestures. Pure logic driven by pin
+// state + monotonic time — no hardware dependencies, host-testable.
 //
-// Current simplification: a hold is only detected when it is the first press of
-// a sequence (press-press-hold combinations are not a gesture yet).
+// Current simplification for momentary switches: a hold is only detected when
+// it is the first press of a sequence (press-press-hold is not a gesture yet).
 class GestureDetector {
 public:
     struct Timing {
         uint32_t debounceMs = 30;
-        uint32_t multiPressGapMs = 350;
-        uint32_t holdMs = 500;
-        uint32_t holdLongMs = 3000;
+        uint32_t multiPressGapMs = 300;
+        uint32_t holdMs = 500;      // momentary only
+        uint32_t holdLongMs = 3000; // momentary only, covers
     };
 
+    // A toggle switch gets a shorter multi-press window (values carried over
+    // from the old Arduino switches, which were tuned on these very rockers):
+    // flipping a rocker back and forth is quicker than double-clicking a
+    // pushbutton, and every single flip pays the window as latency before it
+    // acts, so it wants to be as short as it can be.
+    static Timing timingFor(SwitchKind kind);
+
     explicit GestureDetector(IGestureListener& listener);
-    GestureDetector(IGestureListener& listener, Timing timing);
+    GestureDetector(IGestureListener& listener, SwitchKind kind);
+    GestureDetector(IGestureListener& listener, SwitchKind kind, Timing timing);
+
+    SwitchKind kind() const { return kind_; }
+
+    // Adopt the switch's current position without reporting it. Called at boot
+    // so a toggle switch resting in the "on" position does not look like a flip
+    // and switch every bound light the moment the controller powers up.
+    void prime(bool rawState);
 
     // Call every loop iteration with the current raw pin state.
     void update(bool rawPressed, uint32_t nowMs);
@@ -47,9 +89,11 @@ public:
 private:
     void onStablePress(uint32_t nowMs);
     void onStableRelease(uint32_t nowMs);
+    void countPress(uint32_t nowMs);
     void emitPressCount();
 
     IGestureListener& listener_;
+    SwitchKind kind_;
     Timing timing_;
 
     bool rawLast_ = false;

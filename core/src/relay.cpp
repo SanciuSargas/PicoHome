@@ -5,7 +5,7 @@
 namespace picohome {
 
 Relay::Relay(DeviceType type, uint16_t id, std::string room, hal::IDigitalOutput& output)
-    : Device(type, id, std::move(room)), output_(output) {}
+    : Device(type, id, std::move(room)), output_(output), supportsNightMode_(isLight(type)) {}
 
 void Relay::initialize() {
     output_.write(false);
@@ -15,27 +15,39 @@ void Relay::initialize() {
 void Relay::update(uint32_t) {}
 
 bool Relay::handleCommand(std::string_view command, std::string_view payload) {
-    if (command != commands::kSetBinary) return false;
-    if (payload == "1") {
-        set(true);
-    } else if (payload == "0") {
-        set(false);
-    } else {
-        return false;
+    const bool one = payload == "1";
+    const bool zero = payload == "0";
+    if (command == commands::kSetBinary) {
+        if (!one && !zero) return false;
+        setBinary(one);
+        return true;
     }
-    return true;
+    if (command == commands::kSetNightMode && supportsNightMode_) {
+        if (!one && !zero) return false;
+        setNightMode(one);
+        return true;
+    }
+    return false;
 }
 
-void Relay::set(bool on) {
+void Relay::setBinary(bool on) {
     on_ = on;
     output_.write(on_);
-    publishState();
+    publish(commands::kState, on_ ? "1" : "0", /*retained=*/true);
 }
 
-void Relay::toggle() { set(!on_); }
+void Relay::setNightMode(bool on) {
+    nightMode_ = on;
+    publish(commands::kNightMode, nightMode_ ? "1" : "0", /*retained=*/true);
+}
 
+// Full refresh — used on MQTT (re)connect, so both retained topics are correct
+// for a subscriber that has just arrived.
 void Relay::publishState() {
     publish(commands::kState, on_ ? "1" : "0", /*retained=*/true);
+    if (supportsNightMode_) {
+        publish(commands::kNightMode, nightMode_ ? "1" : "0", /*retained=*/true);
+    }
 }
 
 }  // namespace picohome

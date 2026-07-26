@@ -5,6 +5,8 @@ add_executable(picohome_tests
     test_topic.cpp
     test_config_parser.cpp
     test_relay_button_binding.cpp
+    test_binding_model.cpp
+    test_binding_validation.cpp
 )
 
 target_include_directories(picohome_tests PRIVATE

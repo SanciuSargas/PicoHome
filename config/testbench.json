@@ -1,8 +1,15 @@
 {
-  // PicoHome bench-test config: one light relay + one wall switch.
-  // Copy to the SD card as /config.json (SD loading is an upcoming milestone;
-  // until then controller/src/main.cpp embeds this same config).
-  "schema_version": 1,
+  // PicoHome bench-test config (schema v2): devices are declared first, then
+  // bindings say what controls what. Copy to the SD card as /config.json.
+  //
+  // Try the control model without touching firmware:
+  //  - add a second actuator and list it in the binding's "targets" -> one
+  //    switch drives both lights
+  //  - add a second button and list it in "sources" -> both switches drive the
+  //    same light (a P-group)
+  //  - add a pir sensor and a "motion" binding -> motion lighting, gated by the
+  //    light's night_mode (which Home Assistant sets; defaults to on)
+  "schema_version": 2,
   "building": "testbench",
   "network": {
     "mac": [18, 237, 103, 254, 84, 237],
@@ -12,17 +19,26 @@
     "broker": "192.168.1.200",
     "broker_port": 1883
   },
+
   "devices": {
-    "binary_actuators": [
+    "actuators": [
       {"type": "light", "id": 29, "room": "kitchen",
-       "pin": {"expander": -1, "pin": 2, "active_high": true}}
+       "backend": {"kind": "gpio", "pin": 2, "active_high": true}}
     ],
     "buttons": [
       // Wall switch between GPIO3 and GND, internal pull-up -> active low.
-      // Inherits the plan number of the light it controls.
-      {"id": 29, "room": "kitchen",
-       "pin": {"expander": -1, "pin": 3, "active_high": false, "pull_up": true},
-       "controls": {"type": "light", "id": 29}}
+      // Carries the plan number of the light it primarily controls.
+      // "kind": "momentary" = spring-return pushbutton (full gesture grammar),
+      //         "toggle"    = latching rocker (every flip is one press_1).
+      // Required — a wrong guess fails silently on a live panel.
+      {"id": 29, "room": "kitchen", "kind": "momentary",
+       "pin": {"pin": 3, "active_high": false, "pull_up": true}}
     ]
-  }
+  },
+
+  "bindings": [
+    {"name": "kitchen light", "rule": "toggle",
+     "sources": [{"button": 29}],
+     "targets": [{"type": "light", "id": 29}]}
+  ]
 }

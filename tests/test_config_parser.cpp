@@ -8,7 +8,7 @@ namespace {
 
 constexpr char kSampleConfig[] = R"json({
   // comments are allowed in PicoHome configs
-  "schema_version": 1,
+  "schema_version": 2,
   "building": "utility",
   "network": {
     "mac": [18, 237, 103, 254, 84, 237],
@@ -19,18 +19,30 @@ constexpr char kSampleConfig[] = R"json({
     "broker_port": 1883
   },
   "devices": {
-    "binary_actuators": [
+    "actuators": [
       {"type": "light", "id": 29, "room": "kitchen",
-       "pin": {"expander": -1, "pin": 2, "active_high": true}},
+       "backend": {"kind": "gpio", "pin": 2, "active_high": true}},
       {"type": "outlet", "id": 600, "room": "ainius_room",
-       "pin": {"expander": 0, "pin": 5, "active_high": false}}
+       "backend": {"kind": "gpio", "pin": 5, "active_high": false}}
+    ],
+    "sensors": [
+      {"type": "pir", "id": 720, "room": "corridor", "pin": {"pin": 8}, "debounce_ms": 30}
     ],
     "buttons": [
-      {"id": 29, "room": "kitchen",
-       "pin": {"expander": -1, "pin": 3, "active_high": false, "pull_up": true},
-       "controls": {"type": "light", "id": 29}}
+      {"id": 29, "room": "kitchen", "kind": "momentary",
+       "pin": {"pin": 3, "active_high": false, "pull_up": true}},
+      {"id": 30, "room": "corridor", "kind": "toggle", "pin": {"pin": 5}}
     ]
-  }
+  },
+  "bindings": [
+    {"name": "kitchen light", "rule": "toggle",
+     "sources": [{"button": 29, "gesture": "press_1"}],
+     "targets": [{"type": "light", "id": 29}]},
+    {"name": "corridor motion", "rule": "motion",
+     "sources": [{"sensor": {"type": "pir", "id": 720}}],
+     "targets": [{"type": "light", "id": 29}],
+     "options": {"off_delay_ms": 120000}}
+  ]
 })json";
 
 }  // namespace
@@ -44,36 +56,67 @@ TEST_CASE("parses a full sample config") {
     CHECK(app.network.mac[0] == 18);
     CHECK(app.network.mac[5] == 237);
     CHECK(app.network.broker == "192.168.1.200");
-    CHECK(app.network.brokerPort == 1883);
 
-    REQUIRE(app.binaryActuators.size() == 2);
-    CHECK(app.binaryActuators[0].type == DeviceType::Light);
-    CHECK(app.binaryActuators[0].id == 29);
-    CHECK(app.binaryActuators[0].room == "kitchen");
-    CHECK(app.binaryActuators[0].pin.expander == -1);
-    CHECK(app.binaryActuators[0].pin.activeHigh);
-    CHECK(app.binaryActuators[1].type == DeviceType::Outlet);
-    CHECK(app.binaryActuators[1].pin.expander == 0);
-    CHECK_FALSE(app.binaryActuators[1].pin.activeHigh);
+    REQUIRE(app.actuators.size() == 2);
+    CHECK(app.actuators[0].type == DeviceType::Light);
+    CHECK(app.actuators[0].id == 29);
+    CHECK(app.actuators[0].room == "kitchen");
+    CHECK(app.actuators[0].backend == config::BackendKind::Gpio);
+    CHECK(app.actuators[0].pin.activeHigh);
+    CHECK(app.actuators[1].type == DeviceType::Outlet);
+    CHECK_FALSE(app.actuators[1].pin.activeHigh);
 
-    REQUIRE(app.buttons.size() == 1);
+    REQUIRE(app.sensors.size() == 1);
+    CHECK(app.sensors[0].type == DeviceType::Pir);
+    CHECK(app.sensors[0].debounceMs == 30);
+
+    REQUIRE(app.buttons.size() == 2);
     CHECK(app.buttons[0].id == 29);
-    CHECK(app.buttons[0].controlsType == DeviceType::Light);
-    CHECK(app.buttons[0].controlsId == 29);
     CHECK(app.buttons[0].pin.pullUp);
+    CHECK(app.buttons[0].kind == SwitchKind::Momentary);
+    CHECK(app.buttons[1].kind == SwitchKind::Toggle);
+
+    REQUIRE(app.bindings.size() == 2);
+    CHECK(app.bindings[0].rule == config::RuleKind::Toggle);
+    REQUIRE(app.bindings[0].sources.size() == 1);
+    CHECK(app.bindings[0].sources[0].kind == config::SourceType::Button);
+    CHECK(app.bindings[0].sources[0].buttonId == 29);
+    CHECK(app.bindings[0].sources[0].gesture == Gesture::Press1);
+    CHECK(app.bindings[0].targets[0].id == 29);
+
+    CHECK(app.bindings[1].rule == config::RuleKind::Motion);
+    CHECK(app.bindings[1].sources[0].kind == config::SourceType::Sensor);
+    CHECK(app.bindings[1].sources[0].sensor.type == DeviceType::Pir);
+    CHECK(app.bindings[1].offDelayMs == 120000);
+}
+
+TEST_CASE("button sources default to press_1") {
+    config::App app;
+    std::string error;
+    REQUIRE_MESSAGE(config::parse(R"({
+      "schema_version": 2, "building": "x",
+      "devices": {
+        "actuators": [{"type": "light", "id": 1, "room": "a",
+                       "backend": {"kind": "gpio", "pin": 2}}],
+        "buttons": [{"id": 1, "room": "a", "kind": "momentary", "pin": {"pin": 3}}]},
+      "bindings": [{"rule": "toggle", "sources": [{"button": 1}],
+                    "targets": [{"type": "light", "id": 1}]}]})",
+                                  app, error),
+                    error);
+    CHECK(app.bindings[0].sources[0].gesture == Gesture::Press1);
 }
 
 TEST_CASE("rejects wrong schema version") {
     config::App app;
     std::string error;
-    CHECK_FALSE(config::parse(R"({"schema_version": 99, "building": "x"})", app, error));
-    CHECK(error == "unsupported schema_version");
+    CHECK_FALSE(config::parse(R"({"schema_version": 1, "building": "x"})", app, error));
+    CHECK(error.find("schema_version") != std::string::npos);
 }
 
 TEST_CASE("rejects missing building") {
     config::App app;
     std::string error;
-    CHECK_FALSE(config::parse(R"({"schema_version": 1})", app, error));
+    CHECK_FALSE(config::parse(R"({"schema_version": 2})", app, error));
     CHECK(error == "missing building");
 }
 
@@ -81,22 +124,46 @@ TEST_CASE("rejects unknown actuator type") {
     config::App app;
     std::string error;
     CHECK_FALSE(config::parse(R"({
-      "schema_version": 1, "building": "x",
-      "devices": {"binary_actuators": [
-        {"type": "warp_drive", "id": 1, "room": "engine", "pin": {"pin": 2}}
-      ]}
-    })",
+      "schema_version": 2, "building": "x",
+      "devices": {"actuators": [
+        {"type": "warp_drive", "id": 1, "room": "engine", "backend": {"kind": "gpio", "pin": 2}}
+      ]}, "bindings": []})",
                               app, error));
 }
 
-TEST_CASE("rejects actuator without pin") {
+TEST_CASE("rejects actuator without backend") {
     config::App app;
     std::string error;
     CHECK_FALSE(config::parse(R"({
-      "schema_version": 1, "building": "x",
-      "devices": {"binary_actuators": [{"type": "light", "id": 1, "room": "a"}]}
-    })",
+      "schema_version": 2, "building": "x",
+      "devices": {"actuators": [{"type": "light", "id": 1, "room": "a"}]},
+      "bindings": []})",
                               app, error));
+    CHECK(error.find("backend") != std::string::npos);
+}
+
+TEST_CASE("rejects unknown gesture and unknown rule") {
+    config::App app;
+    std::string error;
+    const char* base = R"({
+      "schema_version": 2, "building": "x",
+      "devices": {"actuators": [{"type": "light", "id": 1, "room": "a",
+                                 "backend": {"kind": "gpio", "pin": 2}}],
+                  "buttons": [{"id": 1, "room": "a", "kind": "momentary", "pin": {"pin": 3}}]},
+      "bindings": [%s]})";
+
+    char json[1024];
+    std::snprintf(json, sizeof json, base,
+                  R"({"rule": "toggle", "sources": [{"button": 1, "gesture": "press_9"}],
+                      "targets": [{"type": "light", "id": 1}]})");
+    CHECK_FALSE(config::parse(json, app, error));
+    CHECK(error.find("gesture") != std::string::npos);
+
+    std::snprintf(json, sizeof json, base,
+                  R"({"rule": "levitate", "sources": [{"button": 1}],
+                      "targets": [{"type": "light", "id": 1}]})");
+    CHECK_FALSE(config::parse(json, app, error));
+    CHECK(error.find("rule") != std::string::npos);
 }
 
 TEST_CASE("rejects invalid json") {

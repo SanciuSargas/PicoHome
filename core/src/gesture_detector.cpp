@@ -14,11 +14,41 @@ std::string_view toPayload(Gesture gesture) {
     return "unknown";
 }
 
-GestureDetector::GestureDetector(IGestureListener& listener)
-    : GestureDetector(listener, Timing{}) {}
+bool gestureFromPayload(std::string_view payload, Gesture& out) {
+    constexpr Gesture kAll[] = {Gesture::Press1,    Gesture::Press2,   Gesture::Press3,
+                                Gesture::HoldStart, Gesture::HoldLong, Gesture::HoldEnd};
+    for (const Gesture gesture : kAll) {
+        if (toPayload(gesture) == payload) {
+            out = gesture;
+            return true;
+        }
+    }
+    return false;
+}
 
-GestureDetector::GestureDetector(IGestureListener& listener, Timing timing)
-    : listener_(listener), timing_(timing) {}
+GestureDetector::Timing GestureDetector::timingFor(SwitchKind kind) {
+    Timing timing;
+    if (kind == SwitchKind::Toggle) timing.multiPressGapMs = 200;
+    return timing;
+}
+
+GestureDetector::GestureDetector(IGestureListener& listener)
+    : GestureDetector(listener, SwitchKind::Momentary) {}
+
+GestureDetector::GestureDetector(IGestureListener& listener, SwitchKind kind)
+    : GestureDetector(listener, kind, timingFor(kind)) {}
+
+GestureDetector::GestureDetector(IGestureListener& listener, SwitchKind kind, Timing timing)
+    : listener_(listener), kind_(kind), timing_(timing) {}
+
+void GestureDetector::prime(bool rawState) {
+    rawLast_ = rawState;
+    stable_ = rawState;
+    rawChangeMs_ = 0;
+    holding_ = false;
+    holdLongSent_ = false;
+    pressCount_ = 0;
+}
 
 void GestureDetector::update(bool rawPressed, uint32_t nowMs) {
     if (rawPressed != rawLast_) {
@@ -27,14 +57,17 @@ void GestureDetector::update(bool rawPressed, uint32_t nowMs) {
     }
     if (rawPressed != stable_ && nowMs - rawChangeMs_ >= timing_.debounceMs) {
         stable_ = rawPressed;
-        if (stable_) {
+        if (kind_ == SwitchKind::Toggle) {
+            // Either direction is one flip of the rocker, so both count.
+            countPress(nowMs);
+        } else if (stable_) {
             onStablePress(nowMs);
         } else {
             onStableRelease(nowMs);
         }
     }
 
-    if (stable_) {
+    if (kind_ == SwitchKind::Momentary && stable_) {
         const uint32_t heldFor = nowMs - pressStartMs_;
         if (!holding_ && pressCount_ == 0 && heldFor >= timing_.holdMs) {
             holding_ = true;
@@ -44,9 +77,13 @@ void GestureDetector::update(bool rawPressed, uint32_t nowMs) {
             holdLongSent_ = true;
             listener_.onGesture(Gesture::HoldLong);
         }
-    } else if (pressCount_ > 0 && nowMs - releaseMs_ >= timing_.multiPressGapMs) {
-        emitPressCount();
+        return;
     }
+
+    // A momentary switch only counts presses out while released, so that a
+    // second press starting inside the gap is not cut short. A toggle switch
+    // rests in both positions, so its window always runs.
+    if (pressCount_ > 0 && nowMs - releaseMs_ >= timing_.multiPressGapMs) emitPressCount();
 }
 
 void GestureDetector::onStablePress(uint32_t nowMs) { pressStartMs_ = nowMs; }
@@ -58,6 +95,10 @@ void GestureDetector::onStableRelease(uint32_t nowMs) {
         listener_.onGesture(Gesture::HoldEnd);
         return;
     }
+    countPress(nowMs);
+}
+
+void GestureDetector::countPress(uint32_t nowMs) {
     ++pressCount_;
     releaseMs_ = nowMs;
     if (pressCount_ >= 3) emitPressCount();
