@@ -303,12 +303,18 @@ TEST_CASE("a remote motion sensor whose two edges are identical is rejected") {
 TEST_CASE("unsupported backends name their milestone") {
     config::App config;
     std::string error;
-    CHECK_FALSE(config::parse(R"({
-      "schema_version": 2, "building": "t",
-      "devices": {"actuators": [
-        {"type": "light", "id": 29, "room": "k",
-         "backend": {"kind": "mcp", "expander": 0, "pin": 3}}]},
-      "bindings": []})",
-                              config, error));
-    CHECK(error.find("M3") != std::string::npos);
+    const auto parseBackend = [&](const char* backend) {
+        std::string json = R"({"schema_version": 2, "building": "t",
+          "devices": {"actuators": [{"type": "light", "id": 29, "room": "k",
+           "backend": )";
+        json += backend;
+        json += R"(}]}, "bindings": []})";
+        return config::parse(json, config, error);
+    };
+
+    CHECK_FALSE(parseBackend(R"({"kind": "pwm", "pin": 14})"));
+    CHECK(error.find("M10") != std::string::npos);
+
+    CHECK_FALSE(parseBackend(R"({"kind": "modbus", "slave": 1, "coil": 3})"));
+    CHECK(error.find("M8") != std::string::npos);
 }

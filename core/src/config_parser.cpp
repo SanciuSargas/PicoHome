@@ -2,6 +2,8 @@
 
 #include <ArduinoJson.h>
 
+#include <cstdlib>
+
 namespace picohome::config {
 
 namespace {
@@ -27,7 +29,7 @@ bool parseBackend(JsonObjectConst obj, ActuatorDef& actuator, std::string& error
     if (kind == "gpio") {
         actuator.backend = BackendKind::Gpio;
     } else if (kind == "mcp") {
-        return fail(error, "backend 'mcp': expander pins are not implemented yet (M3)");
+        actuator.backend = BackendKind::Mcp;
     } else if (kind == "pwm") {
         return fail(error, "backend 'pwm': dimming is not implemented yet (M10)");
     } else if (kind == "cover") {
@@ -38,6 +40,26 @@ bool parseBackend(JsonObjectConst obj, ActuatorDef& actuator, std::string& error
         return fail(error, "unknown backend kind");
     }
     parsePin(obj, actuator.pin);
+    return true;
+}
+
+// I2C addresses are universally written in hex, so accept "0x20" as well as a
+// plain number — a hardware config file is edited by humans reading datasheets.
+bool parseI2cAddress(JsonVariantConst value, uint8_t& out, std::string& error) {
+    if (value.is<const char*>()) {
+        const char* text = value.as<const char*>();
+        char* end = nullptr;
+        const unsigned long parsed = std::strtoul(text, &end, 0);
+        if (end == text || *end != '\0') return fail(error, "expander: bad address");
+        out = static_cast<uint8_t>(parsed);
+    } else if (value.is<unsigned>()) {
+        out = value.as<uint8_t>();
+    } else {
+        return fail(error, "expander: missing address");
+    }
+    if (out < 0x20 || out > 0x27) {
+        return fail(error, "expander: address must be between 0x20 and 0x27");
+    }
     return true;
 }
 
@@ -220,6 +242,25 @@ bool parse(std::string_view json, App& out, std::string& error) {
 
     JsonObjectConst devices = doc["devices"].as<JsonObjectConst>();
 
+    for (JsonVariantConst entry : devices["expanders"].as<JsonArrayConst>()) {
+        JsonObjectConst obj = entry.as<JsonObjectConst>();
+        ExpanderDef expander;
+        if (obj["index"].isNull()) return fail(error, "expander: missing index");
+        expander.index = obj["index"] | static_cast<uint8_t>(0);
+        if (expander.index > 7) return fail(error, "expander: index must be 0..7");
+        if (!parseI2cAddress(obj["address"], expander.address, error)) return false;
+        if (obj["int_pin"].isNull()) return fail(error, "expander: missing int_pin");
+        expander.intPin = obj["int_pin"] | static_cast<uint8_t>(0);
+
+        for (const ExpanderDef& existing : out.expanders) {
+            if (existing.index == expander.index) return fail(error, "expander: duplicate index");
+            if (existing.address == expander.address) {
+                return fail(error, "expander: duplicate I2C address");
+            }
+        }
+        out.expanders.push_back(expander);
+    }
+
     for (JsonVariantConst entry : devices["actuators"].as<JsonArrayConst>()) {
         JsonObjectConst obj = entry.as<JsonObjectConst>();
         ActuatorDef actuator;
@@ -281,6 +322,37 @@ bool parse(std::string_view json, App& out, std::string& error) {
         BindingDef binding;
         if (!parseBinding(entry.as<JsonObjectConst>(), binding, error)) return false;
         out.bindings.push_back(std::move(binding));
+    }
+
+    // Every pin that claims to sit on an expander must name one that exists,
+    // and a pin number must be within the chip. Catching this here means a
+    // typo cannot end up driving the wrong circuit.
+    const auto checkPin = [&](const PinRef& pin, const std::string& what) {
+        if (pin.expander < 0) return true;
+        if (pin.pin > 15) return fail(error, what + ": expander pins are 0..15");
+        for (const ExpanderDef& expander : out.expanders) {
+            if (expander.index == pin.expander) return true;
+        }
+        return fail(error, what + ": expander " + std::to_string(pin.expander) +
+                               " is not declared in devices.expanders");
+    };
+
+    for (const ActuatorDef& actuator : out.actuators) {
+        const std::string what =
+            std::string(toSegment(actuator.type)) + "/" + std::to_string(actuator.id);
+        if ((actuator.backend == BackendKind::Mcp) != (actuator.pin.expander >= 0)) {
+            return fail(error, what + ": backend 'mcp' needs an expander, 'gpio' must not have one");
+        }
+        if (!checkPin(actuator.pin, what)) return false;
+    }
+    for (const SensorDef& sensor : out.sensors) {
+        if (!checkPin(sensor.pin,
+                      std::string(toSegment(sensor.type)) + "/" + std::to_string(sensor.id))) {
+            return false;
+        }
+    }
+    for (const ButtonDef& button : out.buttons) {
+        if (!checkPin(button.pin, "button/" + std::to_string(button.id))) return false;
     }
 
     return true;

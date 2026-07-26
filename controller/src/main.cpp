@@ -18,12 +18,14 @@
 #include "pico/stdlib.h"
 
 #include "board_config.h"
+#include "hal/pico_i2c.h"
 #include "hal/pico_pins.h"
 #include "net/net_core.h"
 #include "picohome/config/config.h"
 #include "picohome/control/binding_set.h"
 #include "picohome/control/event_router.h"
 #include "picohome/core/device_registry.h"
+#include "picohome/drivers/mcp23017.h"
 #include "picohome/devices/binary_sensor.h"
 #include "picohome/devices/button.h"
 #include "picohome/devices/relay.h"
@@ -42,23 +44,79 @@ picohome::RemoteSourceTable gRemoteSources;
 std::vector<std::unique_ptr<picohome::hal::IDigitalOutput>> gOutputs;
 std::vector<std::unique_ptr<picohome::hal::IDigitalInput>> gInputs;
 
+// MCP23017 port expanders, indexed as the config numbers them.
+picohome::pico_hal::PicoI2cBus* gI2c = nullptr;
+std::vector<std::unique_ptr<picohome::Mcp23017>> gExpanders;
+
+// GPIO number -> expander, so the shared pin interrupt can find its chip.
+picohome::Mcp23017* gExpanderByIntPin[32] = {};
+
+void gpioIrqHandler(uint gpio, uint32_t) {
+    // Interrupt context: flag it and get out. The bus read happens in the
+    // control loop, where taking ~100 µs is allowed.
+    if (gpio < 32 && gExpanderByIntPin[gpio] != nullptr) gExpanderByIntPin[gpio]->onInterrupt();
+}
+
+picohome::Mcp23017* expanderFor(int8_t index) {
+    for (std::size_t i = 0; i < gConfig.expanders.size(); ++i) {
+        if (gConfig.expanders[i].index == index) return gExpanders[i].get();
+    }
+    return nullptr;  // the parser already proved this cannot happen
+}
+
+// Builds the expanders and arms their interrupt lines. Pin objects claim their
+// directions afterwards, so the chips are configured once everything is known.
+bool buildExpanders(std::string& error) {
+    static picohome::pico_hal::PicoI2cBus bus;
+    gI2c = &bus;
+
+    for (const auto& def : gConfig.expanders) {
+        gExpanders.push_back(std::make_unique<picohome::Mcp23017>(*gI2c, def.address));
+
+        gpio_init(def.intPin);
+        gpio_set_dir(def.intPin, GPIO_IN);
+        gpio_pull_up(def.intPin);  // the chip drives INT low on a change
+        gExpanderByIntPin[def.intPin] = gExpanders.back().get();
+        gpio_set_irq_enabled_with_callback(def.intPin, GPIO_IRQ_EDGE_FALL, true, &gpioIrqHandler);
+    }
+    (void)error;
+    return true;
+}
+
 bool buildDevices(const picohome::config::App& config, picohome::DeviceRegistry& registry,
                   picohome::EventRouter& router, std::string& error) {
     using namespace picohome;
 
+    // A pin is either a controller GPIO or a bit on an expander; above this
+    // point nothing else in the firmware can tell which.
+    const auto makeInput = [](const config::PinRef& pin) -> std::unique_ptr<hal::IDigitalInput> {
+        if (pin.expander < 0) {
+            return std::make_unique<pico_hal::GpioDigitalInput>(pin.pin, pin.activeHigh,
+                                                                pin.pullUp);
+        }
+        return std::make_unique<McpDigitalInput>(*expanderFor(pin.expander), pin.pin,
+                                                 pin.activeHigh, pin.pullUp);
+    };
+    const auto makeOutput = [](const config::PinRef& pin) -> std::unique_ptr<hal::IDigitalOutput> {
+        if (pin.expander < 0) {
+            return std::make_unique<pico_hal::GpioDigitalOutput>(pin.pin, pin.activeHigh);
+        }
+        return std::make_unique<McpDigitalOutput>(*expanderFor(pin.expander), pin.pin,
+                                                  pin.activeHigh);
+    };
+
     for (const auto& def : config.actuators) {
-        if (def.backend != config::BackendKind::Gpio) {
+        if (def.backend != config::BackendKind::Gpio && def.backend != config::BackendKind::Mcp) {
             error = "actuator backend not supported yet";  // parser already rejects these
             return false;
         }
-        auto output = std::make_unique<pico_hal::GpioDigitalOutput>(def.pin.pin, def.pin.activeHigh);
+        auto output = makeOutput(def.pin);
         registry.add(std::make_unique<Relay>(def.type, def.id, def.room, *output));
         gOutputs.push_back(std::move(output));
     }
 
     for (const auto& def : config.sensors) {
-        auto input = std::make_unique<pico_hal::GpioDigitalInput>(def.pin.pin, def.pin.activeHigh,
-                                                                  def.pin.pullUp);
+        auto input = makeInput(def.pin);
         auto sensor =
             std::make_unique<BinarySensor>(def.type, def.id, def.room, *input, def.debounceMs);
         sensor->attachRouter(&router);
@@ -67,12 +125,22 @@ bool buildDevices(const picohome::config::App& config, picohome::DeviceRegistry&
     }
 
     for (const auto& def : config.buttons) {
-        auto input = std::make_unique<pico_hal::GpioDigitalInput>(def.pin.pin, def.pin.activeHigh,
-                                                                  def.pin.pullUp);
+        auto input = makeInput(def.pin);
         auto button = std::make_unique<Button>(def.id, def.room, *input, def.kind);
         button->attachRouter(&router);
         registry.add(std::move(button));
         gInputs.push_back(std::move(input));
+    }
+
+    // Every pin has claimed its direction and pull-up by now, so the chips can
+    // be configured in one shot.
+    for (std::size_t i = 0; i < gExpanders.size(); ++i) {
+        if (!gExpanders[i]->initialize(to_ms_since_boot(get_absolute_time()))) {
+            error = "MCP23017 at address 0x" +
+                    std::to_string(static_cast<unsigned>(gConfig.expanders[i].address)) +
+                    " did not answer";
+            return false;
+        }
     }
     return true;
 }
@@ -133,6 +201,7 @@ int main() {
     picohome::BindingSet bindings;
     picohome::net::initQueues();
 
+    if (!buildExpanders(error)) errorLoopWithNetwork("expanders: " + error);
     if (!buildDevices(gConfig, registry, router, error)) errorLoopWithNetwork("devices: " + error);
     if (!bindings.build(gConfig, registry, router, gRemoteSources, error)) {
         errorLoopWithNetwork("bindings: " + error);
@@ -158,6 +227,10 @@ int main() {
     while (true) {
         const uint32_t now = clock.nowMs();
 
+        // Pull in whatever the expanders' interrupts flagged, so the pin
+        // objects read fresh values this iteration.
+        for (auto& expander : gExpanders) expander->refreshInputs(now);
+
         // Inbound MQTT first, so a command and a switch press in the same
         // iteration resolve in arrival order. Bounded so a flood of traffic
         // can never starve the inputs.
@@ -170,6 +243,9 @@ int main() {
         // synchronously; bindings then run their own timers.
         registry.updateAll(now);
         bindings.updateAll(now);
+
+        // One bus write per expander, however many relays on it moved.
+        for (auto& expander : gExpanders) expander->flushOutputs();
 
         // Heartbeat: visibly proves the control loop never blocks.
         if (now - lastBlinkMs >= 500) {

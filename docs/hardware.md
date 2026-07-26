@@ -133,7 +133,10 @@ PWM-to-0-10V converter modules; the plan's relay handles on/off. No DAC needed.
 - The 5 V rail in the wiring powers sensors (PIR, LD2410C, smoke). Check each *output*:
   HC-SR501 OUT = 3.3 V ✓, LD2410C OUT = 3.3 V ✓, analog smoke out swings to 5 V → resistor
   divider before any ADC.
-- I2C stays panel-local (MCP23017, PCA9548A, DAC); anything leaving the panel goes RS485.
+- I2C stays panel-local (MCP23017 expanders); anything leaving the panel goes RS485.
+  Up to eight chips share one bus at addresses 0x20–0x27, set by their A0–A2 pins, so no
+  I2C mux is needed (**PCA9548A dropped 2026-07-26**). Each chip's INT goes to its own
+  controller GPIO; `IOCON.MIRROR` makes one wire cover all 16 of its pins.
 - RS485 transceivers must be 3.3 V-logic (MAX3485-class); classic 5 V MAX485 modules only
   with proven 3.3 V thresholds or a shifter.
 - RGB strips are **WS2815**: 12 V supply rail required; data logic still wants 5 V →
@@ -154,5 +157,5 @@ PWM-to-0-10V converter modules; the plan's relay handles on/off. No DAC needed.
 | (fallback only) W5500 lite + SPI microSD breakout | 3 | If W5100 doesn't work out on pico-sdk |
 
 Already owned, no purchase needed: W5100 shields, PWM→0-10V converter modules,
-MCP23017, PCA9548A, relays, Modbus relay module, sensors.
+MCP23017, relays, Modbus relay module, sensors. (PCA9548A no longer needed.)
 | Chosen dimmer hardware | TBD | See dimmer options |

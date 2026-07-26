@@ -44,6 +44,15 @@ struct Network {
     uint16_t brokerPort = 1883;
 };
 
+// One MCP23017 on the panel's I2C bus. `index` is what a PinRef.expander
+// refers to; it is written out rather than implied by list order so that
+// reordering the list cannot silently remap every pin in the building.
+struct ExpanderDef {
+    uint8_t index = 0;
+    uint8_t address = 0x20;  // 0x20..0x27, set by the chip's A0..A2 pins
+    uint8_t intPin = 0;      // controller GPIO the chip's INT is wired to
+};
+
 struct ActuatorDef {
     DeviceType type = DeviceType::Light;
     uint16_t id = 0;
@@ -112,6 +121,7 @@ struct App {
     uint32_t schemaVersion = 0;
     std::string building;
     Network network;
+    std::vector<ExpanderDef> expanders;
     std::vector<ActuatorDef> actuators;
     std::vector<SensorDef> sensors;
     std::vector<ButtonDef> buttons;

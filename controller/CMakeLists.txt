@@ -3,6 +3,7 @@ set(IOLIB ${CMAKE_SOURCE_DIR}/external/ioLibrary_Driver)
 add_executable(controller
     src/main.cpp
     src/hal/pico_pins.cpp
+    src/hal/pico_i2c.cpp
     src/hw_config.c
     src/sd_config_loader.cpp
     src/net/w5100_link.cpp
@@ -43,6 +44,7 @@ target_link_libraries(controller PRIVATE
     pico_stdlib
     pico_multicore
     hardware_gpio
+    hardware_i2c
 )
 
 pico_enable_stdio_usb(controller 1)

@@ -40,4 +40,15 @@ public:
     virtual uint32_t nowMs() = 0;
 };
 
+// Panel-local I2C (MCP23017 port expanders). Register-oriented rather than
+// byte-oriented because that is all the chips on this bus need, and it keeps
+// the fake used by the host tests trivial.
+class II2cBus {
+public:
+    virtual ~II2cBus() = default;
+    virtual bool writeRegister(uint8_t address, uint8_t reg, uint8_t value) = 0;
+    virtual bool writeRegister16(uint8_t address, uint8_t reg, uint16_t value) = 0;
+    virtual bool readRegister16(uint8_t address, uint8_t reg, uint16_t& value) = 0;
+};
+
 }  // namespace picohome::hal

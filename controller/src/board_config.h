@@ -26,6 +26,14 @@
 // pushing jumper wires faster.
 #define PICOHOME_SD_SPI_BAUD (1 * 1000 * 1000)
 
+// Panel-local I2C: the MCP23017 port expanders. Compile-time like the SPI bus
+// because the panel design is the same in all three buildings; how many chips
+// hang off it, their addresses and their INT pins come from the SD config.
+#define PICOHOME_I2C_INSTANCE i2c0
+#define PICOHOME_I2C_SDA_GPIO 4
+#define PICOHOME_I2C_SCL_GPIO 5
+#define PICOHOME_I2C_BAUD (400 * 1000)
+
 // The W5100 tolerates a faster clock than the SD card does on these jumpers;
 // core 1 raises the bus to this once the config has been read.
 #define PICOHOME_W5100_SPI_BAUD (4 * 1000 * 1000)
