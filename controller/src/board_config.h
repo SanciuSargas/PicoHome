@@ -26,6 +26,10 @@
 // pushing jumper wires faster.
 #define PICOHOME_SD_SPI_BAUD (1 * 1000 * 1000)
 
+// The W5100 tolerates a faster clock than the SD card does on these jumpers;
+// core 1 raises the bus to this once the config has been read.
+#define PICOHOME_W5100_SPI_BAUD (4 * 1000 * 1000)
+
 #define PICOHOME_HEARTBEAT_LED_GPIO 25  // YD-RP2040 user LED (WS2812 on GPIO23 later)
 
 #define PICOHOME_CONFIG_PATH "/config.json"

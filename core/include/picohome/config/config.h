@@ -85,8 +85,13 @@ struct SourceDef {
 
     DeviceRef sensor;                   // Sensor — motion rule, pir/presence only
 
-    std::string topic;                  // Remote (M5)
-    std::string payload;                // Remote (M5)
+    // Remote: a device on another controller. A button event carries one exact
+    // payload; a remote sensor carries a state, so it needs both edges — which
+    // default to the "1"/"0" this firmware publishes on its own state topics.
+    std::string topic;
+    std::string payload;                   // action semantics (toggle/cover)
+    std::string payloadActive = "1";       // sensor semantics (motion)
+    std::string payloadInactive = "0";
 };
 
 // toggle: button -> lights / outlets / dampers

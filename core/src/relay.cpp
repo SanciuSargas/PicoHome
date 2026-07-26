@@ -31,12 +31,16 @@ bool Relay::handleCommand(std::string_view command, std::string_view payload) {
 }
 
 void Relay::setBinary(bool on) {
+    if (on_ == on) return;  // nothing moved, nothing to announce
     on_ = on;
     output_.write(on_);
     publish(commands::kState, on_ ? "1" : "0", /*retained=*/true);
 }
 
 void Relay::setNightMode(bool on) {
+    // Home Assistant re-asserts the gate on a schedule, so most of these
+    // commands carry the value the light already has.
+    if (nightMode_ == on) return;
     nightMode_ = on;
     publish(commands::kNightMode, nightMode_ ? "1" : "0", /*retained=*/true);
 }

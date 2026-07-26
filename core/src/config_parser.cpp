@@ -115,14 +115,29 @@ bool parseSource(JsonObjectConst obj, RuleKind rule, SourceDef& source, std::str
         return true;
     }
     if (!obj["topic"].isNull()) {
-        // Cross-panel bindings: a switch wired to another controller publishes
-        // its gesture and this controller reacts (e.g. corridor 30PJ/31PJ).
+        // A device on another controller: the corridor 30PJ/31PJ switches live
+        // on the closet panel, and a motion sensor may just as well sit on a
+        // different one from the light it drives.
         source.kind = SourceType::Remote;
         source.topic = obj["topic"] | "";
-        source.payload = obj["payload"] | "";
         if (source.topic.empty()) return fail(error, "binding source: empty topic");
+
+        if (rule == RuleKind::Motion) {
+            // A remote sensor reports a state, so both edges are needed for the
+            // off-delay. The defaults match the "1"/"0" this firmware publishes
+            // on its own state topics, so a PicoHome sensor needs no payloads.
+            source.payloadActive = obj["payload_active"] | "1";
+            source.payloadInactive = obj["payload_inactive"] | "0";
+            if (source.payloadActive == source.payloadInactive) {
+                return fail(error, "binding source: payload_active and payload_inactive "
+                                   "must differ");
+            }
+            return true;
+        }
+
+        source.payload = obj["payload"] | "";
         if (source.payload.empty()) return fail(error, "binding source: topic needs a payload");
-        return fail(error, "binding source 'topic': remote sources need MQTT (M5)");
+        return true;
     }
     return fail(error, "binding source must have button, sensor or topic");
 }

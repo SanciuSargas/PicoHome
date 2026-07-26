@@ -2,6 +2,9 @@
 
 #include <array>
 #include <cstdio>
+#include <iterator>
+
+#include "picohome/core/commands.h"
 
 namespace picohome {
 
@@ -17,6 +20,21 @@ bool buildTopic(char* buffer, std::size_t size, std::string_view building,
         static_cast<unsigned>(id),
         static_cast<int>(command.size()), command.data());
     return written > 0 && static_cast<std::size_t>(written) < size;
+}
+
+std::vector<std::string> buildSubscriptions(std::string_view building,
+                                            const std::vector<std::string>& remoteTopics) {
+    // Command verbs this firmware accepts today; M6 adds set_position/set_tilt
+    // and M10 set_range.
+    constexpr std::string_view kVerbs[] = {commands::kSetBinary, commands::kSetNightMode};
+
+    std::vector<std::string> subscriptions;
+    subscriptions.reserve(std::size(kVerbs) + remoteTopics.size());
+    for (const std::string_view verb : kVerbs) {
+        subscriptions.emplace_back(std::string(building) + "/+/+/+/" + std::string(verb));
+    }
+    for (const std::string& topic : remoteTopics) subscriptions.push_back(topic);
+    return subscriptions;
 }
 
 bool parseTopic(std::string_view topic, ParsedTopic& out) {

@@ -2,7 +2,9 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 #include <string_view>
+#include <vector>
 
 #include "picohome/core/types.h"
 
@@ -27,5 +29,12 @@ bool buildTopic(char* buffer, std::size_t size, std::string_view building,
 // Parses an exactly-5-segment PicoHome topic; returns false on malformed input.
 // The returned string_views point into `topic`.
 bool parseTopic(std::string_view topic, ParsedTopic& out);
+
+// The MQTT subscriptions a controller needs: one wildcard per command verb it
+// accepts (`<building>/+/+/+/set_binary` …) plus one exact topic per remote
+// binding source. Wildcards keep the count constant as devices are added —
+// the fixed five-segment layout is what makes them possible.
+std::vector<std::string> buildSubscriptions(std::string_view building,
+                                            const std::vector<std::string>& remoteTopics);
 
 }  // namespace picohome

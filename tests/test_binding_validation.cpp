@@ -37,6 +37,7 @@ BuildResult build(const std::string& json) {
     DeviceRegistry registry;
     EventRouter router;
     BindingSet bindings;
+    RemoteSourceTable remoteSources;
 
     for (const auto& def : config.actuators) {
         auto out = std::make_unique<test::FakeDigitalOutput>();
@@ -59,7 +60,7 @@ BuildResult build(const std::string& json) {
         inputs.push_back(std::move(in));
     }
 
-    result.built = bindings.build(config, registry, router, result.error);
+    result.built = bindings.build(config, registry, router, remoteSources, result.error);
     return result;
 }
 
@@ -243,20 +244,60 @@ TEST_CASE("both switch kinds drive a plain light interchangeably") {
     CHECK_MESSAGE(result.built, result.error);
 }
 
-TEST_CASE("unimplemented rules and sources name their milestone") {
+TEST_CASE("unimplemented rules name their milestone") {
     const auto cover = build(configWith(R"([
       {"name": "blind", "rule": "cover",
        "sources": [{"button": 29}], "targets": [{"type": "blinds", "id": 500}]}])"));
     CHECK_FALSE(cover.parsed);
     CHECK(cover.error.find("M6") != std::string::npos);
+}
 
-    // Cross-panel switch: kept as a first-class source, waiting on MQTT.
-    const auto remote = build(configWith(R"([
+TEST_CASE("a remote topic is a valid binding source (cross-panel switch)") {
+    const auto result = build(configWith(R"([
       {"name": "cross panel", "rule": "toggle",
-       "sources": [{"topic": "closet/corridor/button/31/event", "payload": "press_1"}],
+       "sources": [{"button": 29},
+                   {"topic": "closet/corridor/button/31/event", "payload": "press_1"}],
        "targets": [{"type": "light", "id": 29}]}])"));
-    CHECK_FALSE(remote.parsed);
-    CHECK(remote.error.find("M5") != std::string::npos);
+    CHECK_MESSAGE(result.built, result.error);
+}
+
+TEST_CASE("a remote button event needs an exact payload to match") {
+    const auto result = build(configWith(R"([
+      {"name": "no payload", "rule": "toggle",
+       "sources": [{"topic": "closet/corridor/button/31/event"}],
+       "targets": [{"type": "light", "id": 29}]}])"));
+    CHECK_FALSE(result.parsed);
+    CHECK(result.error.find("payload") != std::string::npos);
+}
+
+TEST_CASE("a remote motion sensor defaults to this firmware's own 1/0 state payloads") {
+    const auto result = build(configWith(R"([
+      {"name": "remote motion", "rule": "motion",
+       "sources": [{"topic": "closet/corridor/pir/720/state"}],
+       "targets": [{"type": "light", "id": 29}],
+       "options": {"off_delay_ms": 1000}}])"));
+    CHECK_MESSAGE(result.built, result.error);
+}
+
+TEST_CASE("a remote motion sensor may spell out a foreign device's payloads") {
+    const auto result = build(configWith(R"([
+      {"name": "foreign motion", "rule": "motion",
+       "sources": [{"topic": "zigbee2mqtt/hall_sensor/occupancy",
+                    "payload_active": "true", "payload_inactive": "false"}],
+       "targets": [{"type": "light", "id": 29}],
+       "options": {"off_delay_ms": 1000}}])"));
+    CHECK_MESSAGE(result.built, result.error);
+}
+
+TEST_CASE("a remote motion sensor whose two edges are identical is rejected") {
+    const auto result = build(configWith(R"([
+      {"name": "same payloads", "rule": "motion",
+       "sources": [{"topic": "closet/corridor/pir/720/state",
+                    "payload_active": "1", "payload_inactive": "1"}],
+       "targets": [{"type": "light", "id": 29}],
+       "options": {"off_delay_ms": 1000}}])"));
+    CHECK_FALSE(result.parsed);
+    CHECK(result.error.find("must differ") != std::string::npos);
 }
 
 TEST_CASE("unsupported backends name their milestone") {

@@ -40,7 +40,7 @@ bool collectBinary(const config::BindingDef& def, const std::vector<Device*>& de
 }
 
 bool attachSources(const config::BindingDef& def, const config::App& config, Binding& binding,
-                   EventRouter& router, std::string& error) {
+                   EventRouter& router, RemoteSourceTable& remoteSources, std::string& error) {
     for (const config::SourceDef& source : def.sources) {
         SourceFilter filter;
         switch (source.kind) {
@@ -88,11 +88,20 @@ bool attachSources(const config::BindingDef& def, const config::App& config, Bin
                 filter.anyGesture = true;  // sensor edges, no gesture to match
                 break;
             }
-            case config::SourceType::Remote:
-                // The parser rejects remote sources until M5 wires MQTT in; the
-                // key space and dispatch path are already in place for them.
-                error = describe(def) + ": remote sources need MQTT (M5)";
-                return false;
+            case config::SourceType::Remote: {
+                // A device on another controller. Interning here is also what
+                // produces the extra MQTT subscriptions the session needs.
+                // Motion wants a sensor's two edges; everything else wants one
+                // exact button event.
+                const uint16_t index =
+                    def.rule == config::RuleKind::Motion
+                        ? remoteSources.internSensor(source.topic, source.payloadActive,
+                                                     source.payloadInactive)
+                        : remoteSources.internAction(source.topic, source.payload);
+                filter.key = SourceKey::remote(index);
+                filter.anyGesture = true;  // the payload match *is* the filter
+                break;
+            }
         }
         binding.addSource(filter);
         router.subscribe(filter.key, &binding);
@@ -103,7 +112,7 @@ bool attachSources(const config::BindingDef& def, const config::App& config, Bin
 }  // namespace
 
 bool BindingSet::build(const config::App& config, DeviceRegistry& registry, EventRouter& router,
-                       std::string& error) {
+                       RemoteSourceTable& remoteSources, std::string& error) {
     bindings_.clear();
     bindings_.reserve(config.bindings.size());
 
@@ -142,7 +151,7 @@ bool BindingSet::build(const config::App& config, DeviceRegistry& registry, Even
                 return false;
         }
 
-        if (!attachSources(def, config, *binding, router, error)) return false;
+        if (!attachSources(def, config, *binding, router, remoteSources, error)) return false;
         binding->finalize();
         bindings_.push_back(std::move(binding));
     }

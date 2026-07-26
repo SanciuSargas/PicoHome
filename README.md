@@ -62,6 +62,33 @@ The SD card must hold `config.json` in its root (start from
 [`config/testbench.json`](config/testbench.json)); a bad or missing config gives a fast
 blink plus the reason on serial every 2 s.
 
+## Checking MQTT from the command line
+
+Set `network.ip` / `network.broker` in `config.json` to suit your LAN first. Then, with
+`mosquitto-clients` installed:
+
+```bash
+# Watch everything this controller says (states are retained, so they show up at once)
+mosquitto_sub -h 192.168.1.200 -v -t 'testbench/#'
+
+# Switch the bench relay from "high level"
+mosquitto_pub -h 192.168.1.200 -t testbench/kitchen/light/29/set_binary -m 1
+mosquitto_pub -h 192.168.1.200 -t testbench/kitchen/light/29/set_binary -m 0
+
+# Day mode: motion may no longer switch this light on (retain it, so the
+# controller picks the value up again after a reboot)
+mosquitto_pub -h 192.168.1.200 -r -t testbench/kitchen/light/29/set_night_mode -m 0
+```
+
+Expected traffic: `testbench/controller/status/0/alive` = `online` (and `offline` a few
+seconds after you unplug the board — the broker publishes that on the controller's
+behalf), `.../light/29/state` after every switch press, `.../button/29/event` = `press_1`
+per press.
+
+**The point of the milestone:** pull the Ethernet cable and the wall switch must keep
+working with no change in feel; plug it back in and the current states reappear on the
+broker by themselves.
+
 ## User TODO list
 
 ### Decisions

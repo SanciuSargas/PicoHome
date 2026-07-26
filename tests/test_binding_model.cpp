@@ -25,6 +25,7 @@ struct System {
     DeviceRegistry registry;
     EventRouter router;
     BindingSet bindings;
+    RemoteSourceTable remoteSources;
     config::App config;
     std::string error;
 
@@ -63,7 +64,7 @@ struct System {
             buttonInputs[def.id] = in.get();
             inputs.push_back(std::move(in));
         }
-        if (!bindings.build(config, registry, router, error)) return false;
+        if (!bindings.build(config, registry, router, remoteSources, error)) return false;
         registry.initializeAll();
         return true;
     }

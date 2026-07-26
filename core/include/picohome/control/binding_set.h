@@ -8,6 +8,7 @@
 #include "picohome/control/binding.h"
 #include "picohome/control/event_router.h"
 #include "picohome/core/device_registry.h"
+#include "picohome/net/remote_sources.h"
 
 namespace picohome {
 
@@ -19,8 +20,10 @@ namespace picohome {
 // clear config error instead of a surprise at 2 a.m.
 class BindingSet {
 public:
+    // `remoteSources` is filled with the {topic, payload} pairs the config
+    // binds to; the MQTT session subscribes to exactly those.
     bool build(const config::App& config, DeviceRegistry& registry, EventRouter& router,
-               std::string& error);
+               RemoteSourceTable& remoteSources, std::string& error);
 
     void updateAll(uint32_t nowMs);
 
