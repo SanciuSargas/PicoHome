@@ -195,11 +195,16 @@ TEST_CASE("a remote sensor is one source reported by two payloads") {
 }
 
 TEST_CASE("subscriptions cover the command verbs plus every remote topic") {
+    // One wildcard per command verb — their number stays constant however many
+    // devices a building has — plus one exact topic per remote source.
     const auto subs = buildSubscriptions("utility", {"closet/corridor/button/31/event"});
-    REQUIRE(subs.size() == 3);
+    REQUIRE(subs.size() == 6);
     CHECK(subs[0] == "utility/+/+/+/set_binary");
     CHECK(subs[1] == "utility/+/+/+/set_night_mode");
-    CHECK(subs[2] == "closet/corridor/button/31/event");
+    CHECK(subs[2] == "utility/+/+/+/set_position");
+    CHECK(subs[3] == "utility/+/+/+/set_tilt");
+    CHECK(subs[4] == "utility/+/+/+/stop");
+    CHECK(subs[5] == "closet/corridor/button/31/event");
 }
 
 TEST_CASE("a cross-panel switch drives a local light end to end") {

@@ -28,6 +28,7 @@
 #include "picohome/drivers/mcp23017.h"
 #include "picohome/devices/binary_sensor.h"
 #include "picohome/devices/button.h"
+#include "picohome/devices/cover.h"
 #include "picohome/devices/relay.h"
 #include "picohome/net/command_router.h"
 #include "picohome/net/publisher.h"
@@ -106,6 +107,20 @@ bool buildDevices(const picohome::config::App& config, picohome::DeviceRegistry&
     };
 
     for (const auto& def : config.actuators) {
+        if (def.backend == config::BackendKind::Cover) {
+            auto up = makeOutput(def.pin);
+            auto down = makeOutput(def.pinDown);
+            Cover::Timing timing;
+            timing.travelMs = def.cover.travelMs;
+            timing.tiltMs = def.cover.tiltMs;
+            timing.stepMs = def.cover.stepMs;
+            timing.reverseDelayMs = def.cover.reverseDelayMs;
+            timing.bootOpen = def.cover.bootOpen;
+            registry.add(std::make_unique<Cover>(def.type, def.id, def.room, *up, *down, timing));
+            gOutputs.push_back(std::move(up));
+            gOutputs.push_back(std::move(down));
+            continue;
+        }
         if (def.backend != config::BackendKind::Gpio && def.backend != config::BackendKind::Mcp) {
             error = "actuator backend not supported yet";  // parser already rejects these
             return false;

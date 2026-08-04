@@ -85,6 +85,43 @@ void MotionRule::switchOn() {
     }
 }
 
+// --- cover ----------------------------------------------------------------
+
+CoverRule::CoverRule(std::string name, std::vector<IPositionActuator*> targets)
+    : Binding(std::move(name)), targets_(std::move(targets)) {}
+
+void CoverRule::handle(const SourceEvent& event, std::size_t) {
+    if (event.kind != EventKind::Gesture) return;
+
+    for (IPositionActuator* target : targets_) {
+        switch (event.gesture()) {
+            case Gesture::Press1:
+                // The press that everyone reaches for first: halt a moving
+                // blind, or nudge the slats when it is already still.
+                if (target->isMoving()) {
+                    target->stop();
+                } else {
+                    target->stepAlongDirection();
+                }
+                break;
+            case Gesture::Press2:
+                target->toggleDirection();
+                break;
+            case Gesture::HoldStart:
+                target->moveAlongDirection();
+                break;
+            case Gesture::HoldLong:
+                target->moveToEnd();
+                break;
+            case Gesture::HoldEnd:
+                target->releaseHold();
+                break;
+            case Gesture::Press3:
+                break;  // unused for covers
+        }
+    }
+}
+
 void MotionRule::switchOff() {
     on_ = false;
     for (std::size_t i = 0; i < targets_.size(); ++i) {

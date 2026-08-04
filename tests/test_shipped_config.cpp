@@ -9,6 +9,7 @@
 #include "picohome/control/event_router.h"
 #include "picohome/core/device_registry.h"
 #include "picohome/devices/button.h"
+#include "picohome/devices/cover.h"
 #include "picohome/devices/relay.h"
 #include "picohome/drivers/mcp23017.h"
 #include "picohome/net/remote_sources.h"
@@ -69,7 +70,19 @@ TEST_CASE("the shipped bench config parses and describes a buildable system") {
 
     for (const auto& def : app.actuators) {
         auto out = std::make_unique<test::FakeDigitalOutput>();
-        registry.add(std::make_unique<Relay>(def.type, def.id, def.room, *out));
+        if (def.backend == config::BackendKind::Cover) {
+            auto down = std::make_unique<test::FakeDigitalOutput>();
+            Cover::Timing timing;
+            timing.travelMs = def.cover.travelMs;
+            timing.tiltMs = def.cover.tiltMs;
+            timing.stepMs = def.cover.stepMs;
+            timing.reverseDelayMs = def.cover.reverseDelayMs;
+            timing.bootOpen = def.cover.bootOpen;
+            registry.add(std::make_unique<Cover>(def.type, def.id, def.room, *out, *down, timing));
+            outputs.push_back(std::move(down));
+        } else {
+            registry.add(std::make_unique<Relay>(def.type, def.id, def.room, *out));
+        }
         outputs.push_back(std::move(out));
     }
     for (const auto& def : app.buttons) {

@@ -1,0 +1,268 @@
+#include "picohome/devices/cover.h"
+
+#include <cstdio>
+
+#include "picohome/core/commands.h"
+
+namespace picohome {
+
+namespace {
+
+// While travelling, position is republished at this rate so Home Assistant's
+// cover slider follows an 82-second blind instead of appearing frozen.
+constexpr uint32_t kTravelPublishMs = 1000;
+
+uint32_t scaleToPercent(uint32_t value, uint32_t total) {
+    if (total == 0) return 0;
+    return (value * 100 + total / 2) / total;
+}
+
+uint32_t percentToMs(uint8_t percent, uint32_t total) {
+    if (percent > 100) percent = 100;
+    return (total * percent) / 100;
+}
+
+bool parsePercent(std::string_view payload, uint8_t& out) {
+    if (payload.empty() || payload.size() > 3) return false;
+    uint32_t value = 0;
+    for (const char c : payload) {
+        if (c < '0' || c > '9') return false;
+        value = value * 10 + static_cast<uint32_t>(c - '0');
+    }
+    if (value > 100) return false;
+    out = static_cast<uint8_t>(value);
+    return true;
+}
+
+}  // namespace
+
+Cover::Cover(DeviceType type, uint16_t id, std::string room, hal::IDigitalOutput& up,
+             hal::IDigitalOutput& down, Timing timing)
+    : Device(type, id, std::move(room)), up_(up), down_(down), timing_(timing) {}
+
+void Cover::initialize() {
+    up_.write(false);
+    down_.write(false);
+    moving_ = false;
+    reversing_ = false;
+    target_ = Target::None;
+
+    // Nothing can be asked about where the blind is, so it is assumed and the
+    // first run to a limit re-synchronises it. The slats are packed at either
+    // limit, hence tilt 0; the direction points at the useful next move.
+    positionMs_ = timing_.bootOpen ? timing_.travelMs : 0;
+    tiltMs_ = 0;
+    direction_ = timing_.bootOpen ? Direction::Down : Direction::Up;
+}
+
+void Cover::update(uint32_t nowMs) {
+    if (!started_) {
+        started_ = true;
+        nowMs_ = nowMs;
+        return;
+    }
+    const uint32_t elapsed = nowMs - nowMs_;
+    nowMs_ = nowMs;
+
+    if (reversing_) {
+        // Both relays are already off; the motor is resting before it reverses.
+        if (nowMs - reverseStartMs_ < timing_.reverseDelayMs) return;
+        reversing_ = false;
+        direction_ = pendingDirection_;
+        moving_ = true;
+        up_.write(direction_ == Direction::Up);
+        down_.write(direction_ == Direction::Down);
+        return;
+    }
+
+    if (!moving_) return;
+
+    integrate(elapsed);
+
+    const bool atLimit = (direction_ == Direction::Up && positionMs_ >= timing_.travelMs) ||
+                         (direction_ == Direction::Down && positionMs_ == 0);
+    if (atLimit || targetReached()) {
+        stop();
+        return;
+    }
+    publishIfDue(false);
+}
+
+void Cover::integrate(uint32_t elapsedMs) {
+    if (elapsedMs == 0) return;
+
+    if (direction_ == Direction::Up) {
+        // Slats open before the blind rises.
+        const uint32_t tiltRoom = timing_.tiltMs - tiltMs_;
+        const uint32_t toTilt = elapsedMs < tiltRoom ? elapsedMs : tiltRoom;
+        tiltMs_ += toTilt;
+        const uint32_t rest = elapsedMs - toTilt;
+        positionMs_ = positionMs_ + rest >= timing_.travelMs ? timing_.travelMs : positionMs_ + rest;
+    } else {
+        // Slats close before the blind lowers.
+        const uint32_t toTilt = elapsedMs < tiltMs_ ? elapsedMs : tiltMs_;
+        tiltMs_ -= toTilt;
+        const uint32_t rest = elapsedMs - toTilt;
+        positionMs_ = rest >= positionMs_ ? 0 : positionMs_ - rest;
+    }
+}
+
+bool Cover::targetReached() const {
+    switch (target_) {
+        case Target::Position:
+            return direction_ == Direction::Up ? positionMs_ >= targetPositionMs_
+                                               : positionMs_ <= targetPositionMs_;
+        case Target::Tilt:
+            return direction_ == Direction::Up ? tiltMs_ >= targetTiltMs_ : tiltMs_ <= targetTiltMs_;
+        case Target::Duration:
+            return static_cast<int32_t>(nowMs_ - targetEndMs_) >= 0;
+        case Target::None:
+            return false;
+    }
+    return false;
+}
+
+void Cover::requestMove(Direction direction) {
+    if (moving_ && direction_ != direction) {
+        // Never energise both windings, and give the motor a moment to stop
+        // before it is asked to run the other way.
+        up_.write(false);
+        down_.write(false);
+        moving_ = false;
+        reversing_ = true;
+        pendingDirection_ = direction;
+        reverseStartMs_ = nowMs_;
+        return;
+    }
+    if (reversing_) {
+        pendingDirection_ = direction;
+        return;
+    }
+    direction_ = direction;
+    moving_ = true;
+    up_.write(direction == Direction::Up);
+    down_.write(direction == Direction::Down);
+}
+
+void Cover::stop() {
+    up_.write(false);
+    down_.write(false);
+    moving_ = false;
+    reversing_ = false;
+    target_ = Target::None;
+    committedToEnd_ = false;
+
+    // Reaching a limit both re-calibrates the estimate and means the only
+    // useful thing left to do is go the other way — the behaviour the old
+    // Arduino shade code had, and what makes a one-button switch workable.
+    if (positionMs_ >= timing_.travelMs) {
+        positionMs_ = timing_.travelMs;
+        direction_ = Direction::Down;
+    } else if (positionMs_ == 0) {
+        direction_ = Direction::Up;
+    }
+    publishIfDue(true);
+}
+
+void Cover::stepAlongDirection() {
+    target_ = Target::Duration;
+    targetEndMs_ = nowMs_ + timing_.stepMs;
+    requestMove(direction_);
+}
+
+void Cover::toggleDirection() {
+    const Direction flipped = direction_ == Direction::Up ? Direction::Down : Direction::Up;
+    if (isMoving()) {
+        target_ = Target::None;
+        committedToEnd_ = false;
+        requestMove(flipped);  // reverses through the motor rest
+        return;
+    }
+    direction_ = flipped;  // idle: just aim the next gesture
+}
+
+void Cover::moveAlongDirection() {
+    target_ = Target::None;  // dead-man: runs until released
+    committedToEnd_ = false;
+    requestMove(direction_);
+}
+
+void Cover::moveToEnd() {
+    target_ = Target::Position;
+    targetPositionMs_ = direction_ == Direction::Up ? timing_.travelMs : 0;
+    committedToEnd_ = true;
+    requestMove(direction_);
+}
+
+void Cover::releaseHold() {
+    // A long hold has already committed to running to the limit, so letting go
+    // must not cancel it; an ordinary hold is dead-man control.
+    if (committedToEnd_) return;
+    stop();
+}
+
+void Cover::setPosition(uint8_t percent) {
+    const uint32_t target = percentToMs(percent, timing_.travelMs);
+    if (target == positionMs_) return;
+    target_ = Target::Position;
+    targetPositionMs_ = target;
+    committedToEnd_ = false;
+    requestMove(target > positionMs_ ? Direction::Up : Direction::Down);
+}
+
+void Cover::setTilt(uint8_t percent) {
+    if (timing_.tiltMs == 0) return;  // curtain-style cover, nothing to tilt
+    const uint32_t target = percentToMs(percent, timing_.tiltMs);
+    if (target == tiltMs_) return;
+    target_ = Target::Tilt;
+    targetTiltMs_ = target;
+    committedToEnd_ = false;
+    // Opening the slats is the start of an up movement, closing them of a down one.
+    requestMove(target > tiltMs_ ? Direction::Up : Direction::Down);
+}
+
+uint8_t Cover::position() const {
+    return static_cast<uint8_t>(scaleToPercent(positionMs_, timing_.travelMs));
+}
+
+uint8_t Cover::tilt() const {
+    return static_cast<uint8_t>(scaleToPercent(tiltMs_, timing_.tiltMs));
+}
+
+bool Cover::handleCommand(std::string_view command, std::string_view payload) {
+    if (command == commands::kSetPosition) {
+        uint8_t percent = 0;
+        if (!parsePercent(payload, percent)) return false;
+        setPosition(percent);
+        return true;
+    }
+    if (command == commands::kSetTilt) {
+        uint8_t percent = 0;
+        if (!parsePercent(payload, percent)) return false;
+        setTilt(percent);
+        return true;
+    }
+    if (command == commands::kStop) {
+        stop();
+        return true;
+    }
+    return false;
+}
+
+void Cover::publishIfDue(bool force) {
+    if (!force && nowMs_ - lastPublishMs_ < kTravelPublishMs) return;
+    lastPublishMs_ = nowMs_;
+    publishState();
+}
+
+void Cover::publishState() {
+    char payload[4];
+    std::snprintf(payload, sizeof(payload), "%u", static_cast<unsigned>(position()));
+    publish(commands::kState, payload, /*retained=*/true);
+    if (timing_.tiltMs > 0) {
+        std::snprintf(payload, sizeof(payload), "%u", static_cast<unsigned>(tilt()));
+        publish(commands::kTilt, payload, /*retained=*/true);
+    }
+}
+
+}  // namespace picohome

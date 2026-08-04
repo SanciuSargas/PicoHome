@@ -13,6 +13,7 @@ add_library(picohome_core STATIC
     src/binding.cpp
     src/binding_set.cpp
     src/config_parser.cpp
+    src/cover.cpp
     src/mcp23017.cpp
     src/remote_sources.cpp
     src/command_router.cpp

@@ -10,6 +10,7 @@
 #include "picohome/core/device_registry.h"
 #include "picohome/devices/binary_sensor.h"
 #include "picohome/devices/button.h"
+#include "picohome/devices/cover.h"
 #include "picohome/devices/relay.h"
 
 using namespace picohome;
@@ -41,7 +42,16 @@ BuildResult build(const std::string& json) {
 
     for (const auto& def : config.actuators) {
         auto out = std::make_unique<test::FakeDigitalOutput>();
-        registry.add(std::make_unique<Relay>(def.type, def.id, def.room, *out));
+        if (def.backend == config::BackendKind::Cover) {
+            auto down = std::make_unique<test::FakeDigitalOutput>();
+            Cover::Timing timing;
+            timing.travelMs = def.cover.travelMs;
+            timing.tiltMs = def.cover.tiltMs;
+            registry.add(std::make_unique<Cover>(def.type, def.id, def.room, *out, *down, timing));
+            outputs.push_back(std::move(down));
+        } else {
+            registry.add(std::make_unique<Relay>(def.type, def.id, def.room, *out));
+        }
         outputs.push_back(std::move(out));
     }
     for (const auto& def : config.sensors) {
@@ -73,7 +83,10 @@ std::string configWith(const char* bindings) {
           {"type": "light", "id": 29, "room": "kitchen", "backend": {"kind": "gpio", "pin": 2}},
           {"type": "outlet", "id": 600, "room": "kitchen", "backend": {"kind": "gpio", "pin": 6}},
           {"type": "heating_mat", "id": 401, "room": "kitchen",
-           "backend": {"kind": "gpio", "pin": 7}}
+           "backend": {"kind": "gpio", "pin": 7}},
+          {"type": "blinds", "id": 500, "room": "kitchen",
+           "backend": {"kind": "cover", "up": {"pin": 10}, "down": {"pin": 11}},
+           "options": {"travel_ms": 10000, "tilt_ms": 1000}}
         ],
         "sensors": [
           {"type": "pir", "id": 720, "room": "corridor", "pin": {"pin": 8}},
@@ -244,12 +257,36 @@ TEST_CASE("both switch kinds drive a plain light interchangeably") {
     CHECK_MESSAGE(result.built, result.error);
 }
 
-TEST_CASE("unimplemented rules name their milestone") {
-    const auto cover = build(configWith(R"([
-      {"name": "blind", "rule": "cover",
+TEST_CASE("a cover binding needs a momentary switch, because it is built on holding") {
+    // Button 30 is a latching rocker: it can do press_1 and press_2, but the
+    // grammar's move-while-held and run-to-the-end are out of its reach.
+    const auto rocker = build(configWith(R"([
+      {"name": "blind on a rocker", "rule": "cover",
+       "sources": [{"button": 30}], "targets": [{"type": "blinds", "id": 500}]}])"));
+    CHECK_FALSE(rocker.built);
+    CHECK(rocker.error.find("momentary") != std::string::npos);
+}
+
+TEST_CASE("a cover rule cannot drive a light, and a toggle rule cannot drive a blind") {
+    const auto lightTarget = build(configWith(R"([
+      {"name": "wrong way round", "rule": "cover",
+       "sources": [{"button": 29}], "targets": [{"type": "light", "id": 29}]}])"));
+    CHECK_FALSE(lightTarget.parsed);
+    CHECK(lightTarget.error.find("cover target must be blinds") != std::string::npos);
+
+    const auto blindTarget = build(configWith(R"([
+      {"name": "toggle a blind", "rule": "toggle",
        "sources": [{"button": 29}], "targets": [{"type": "blinds", "id": 500}]}])"));
-    CHECK_FALSE(cover.parsed);
-    CHECK(cover.error.find("M6") != std::string::npos);
+    CHECK_FALSE(blindTarget.parsed);
+    CHECK(blindTarget.error.find("light, outlet or damper") != std::string::npos);
+}
+
+TEST_CASE("curtains are deferred until their hardware is decided") {
+    const auto result = build(configWith(R"([
+      {"name": "curtain", "rule": "cover",
+       "sources": [{"button": 29}], "targets": [{"type": "curtains", "id": 550}]}])"));
+    CHECK_FALSE(result.parsed);
+    CHECK(result.error.find("not implemented yet") != std::string::npos);
 }
 
 TEST_CASE("a remote topic is a valid binding source (cross-panel switch)") {

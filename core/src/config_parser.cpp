@@ -33,7 +33,15 @@ bool parseBackend(JsonObjectConst obj, ActuatorDef& actuator, std::string& error
     } else if (kind == "pwm") {
         return fail(error, "backend 'pwm': dimming is not implemented yet (M10)");
     } else if (kind == "cover") {
-        return fail(error, "backend 'cover': covers are not implemented yet (M6)");
+        actuator.backend = BackendKind::Cover;
+        JsonObjectConst up = obj["up"].as<JsonObjectConst>();
+        JsonObjectConst down = obj["down"].as<JsonObjectConst>();
+        if (up.isNull() || down.isNull()) {
+            return fail(error, "backend 'cover': needs an 'up' and a 'down' pin");
+        }
+        parsePin(up, actuator.pin);
+        parsePin(down, actuator.pinDown);
+        return true;
     } else if (kind == "modbus") {
         return fail(error, "backend 'modbus': Modbus is not implemented yet (M8)");
     } else {
@@ -78,7 +86,6 @@ bool parseRule(std::string_view name, RuleKind& rule, std::string& error) {
         rule = RuleKind::Motion;
     } else if (name == "cover") {
         rule = RuleKind::Cover;
-        return fail(error, "rule 'cover' is not implemented yet (M6)");
     } else {
         return fail(error,
                     "unknown rule (local bindings are toggle, motion and cover; anything "
@@ -102,8 +109,11 @@ bool checkTargetType(RuleKind rule, DeviceType type, std::string& error) {
             return fail(error, std::string("motion target must be a light, got ") +
                                    std::string(toSegment(type)));
         case RuleKind::Cover:
-            if (type == DeviceType::Blinds || type == DeviceType::Curtains) return true;
-            return fail(error, "cover target must be blinds or curtains");
+            if (type == DeviceType::Blinds) return true;
+            if (type == DeviceType::Curtains) {
+                return fail(error, "curtains are not implemented yet (undecided hardware)");
+            }
+            return fail(error, "cover target must be blinds");
     }
     return fail(error, "unknown rule");
 }
@@ -274,6 +284,39 @@ bool parse(std::string_view json, App& out, std::string& error) {
         JsonObjectConst backend = obj["backend"].as<JsonObjectConst>();
         if (backend.isNull()) return fail(error, "actuator: missing backend");
         if (!parseBackend(backend, actuator, error)) return false;
+
+        if (actuator.backend == BackendKind::Cover) {
+            if (actuator.type == DeviceType::Curtains) {
+                return fail(error, "curtains are not implemented yet: how they are driven and "
+                                   "parked is still undecided, so only blinds may use the cover "
+                                   "backend");
+            }
+            if (actuator.type != DeviceType::Blinds) {
+                return fail(error, "backend 'cover' is only for blinds");
+            }
+            JsonObjectConst options = obj["options"].as<JsonObjectConst>();
+            if (options.isNull()) return fail(error, "cover: missing options.travel_ms");
+            actuator.cover.travelMs = options["travel_ms"] | 0u;
+            actuator.cover.tiltMs = options["tilt_ms"] | 0u;
+            actuator.cover.stepMs = options["step_ms"] | 500u;
+            actuator.cover.reverseDelayMs = options["reverse_delay_ms"] | 500u;
+
+            const std::string_view boot = options["boot_position"] | "open";
+            if (boot == "open") {
+                actuator.cover.bootOpen = true;
+            } else if (boot == "closed") {
+                actuator.cover.bootOpen = false;
+            } else {
+                return fail(error, "cover: boot_position must be \"open\" or \"closed\"");
+            }
+
+            if (actuator.cover.travelMs == 0) {
+                return fail(error, "cover: options.travel_ms must be measured and set");
+            }
+            if (actuator.cover.tiltMs >= actuator.cover.travelMs) {
+                return fail(error, "cover: tilt_ms must be shorter than travel_ms");
+            }
+        }
         out.actuators.push_back(std::move(actuator));
     }
 
@@ -340,6 +383,13 @@ bool parse(std::string_view json, App& out, std::string& error) {
     for (const ActuatorDef& actuator : out.actuators) {
         const std::string what =
             std::string(toSegment(actuator.type)) + "/" + std::to_string(actuator.id);
+        if (actuator.backend == BackendKind::Cover) {
+            // A cover's two pins carry their own expander field each, so either
+            // relay may live on the controller or on an expander.
+            if (!checkPin(actuator.pin, what + " (up)")) return false;
+            if (!checkPin(actuator.pinDown, what + " (down)")) return false;
+            continue;
+        }
         if ((actuator.backend == BackendKind::Mcp) != (actuator.pin.expander >= 0)) {
             return fail(error, what + ": backend 'mcp' needs an expander, 'gpio' must not have one");
         }

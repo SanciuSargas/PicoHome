@@ -45,14 +45,28 @@ public:
     virtual void setNightMode(bool on) = 0;
 };
 
-// Covers: blinds and curtains (position 0..100 %, optional tilt).
-// The cover gesture grammar is added on top of this with M6.
+// Covers: blinds and curtains. Position and tilt are 0..100 %, 0 = closed.
+//
+// Beyond the absolute commands, a cover carries the wall-switch grammar the old
+// Arduino shade code established: it remembers which way it is "currently
+// going", so a switch with one button can drive a two-direction motor.
 class IPositionActuator {
 public:
     virtual ~IPositionActuator() = default;
+
+    // Absolute commands (MQTT / high level).
     virtual void setPosition(uint8_t percent) = 0;
     virtual void setTilt(uint8_t percent) = 0;
     virtual void stop() = 0;
+    virtual uint8_t position() const = 0;
+    virtual bool isMoving() const = 0;
+
+    // Wall-switch grammar (the cover rule).
+    virtual void stepAlongDirection() = 0;   // press_1 while idle: nudge
+    virtual void toggleDirection() = 0;      // press_2: reverse
+    virtual void moveAlongDirection() = 0;   // hold: move while held
+    virtual void moveToEnd() = 0;            // hold_long: commit to the end
+    virtual void releaseHold() = 0;          // hold released
 };
 
 }  // namespace picohome

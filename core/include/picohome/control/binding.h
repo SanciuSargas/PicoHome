@@ -106,4 +106,20 @@ private:
     bool on_ = false;
 };
 
+// Covers. This is the one rule that consumes the whole gesture grammar rather
+// than a single filtered gesture, because one wall switch has to express five
+// intentions for a two-direction motor. The mapping is the one the old Arduino
+// shade code established, and it is why cover bindings require a momentary
+// switch: a latching rocker cannot produce a hold.
+class CoverRule : public Binding {
+public:
+    CoverRule(std::string name, std::vector<IPositionActuator*> targets);
+
+protected:
+    void handle(const SourceEvent& event, std::size_t sourceIndex) override;
+
+private:
+    std::vector<IPositionActuator*> targets_;
+};
+
 }  // namespace picohome

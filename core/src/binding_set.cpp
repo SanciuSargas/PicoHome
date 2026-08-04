@@ -57,6 +57,13 @@ bool attachSources(const config::BindingDef& def, const config::App& config, Bin
                             " does not exist";
                     return false;
                 }
+                // The cover grammar is built on holding the switch, so a
+                // latching rocker can only ever reach half of it.
+                if (def.rule == config::RuleKind::Cover && !producesHoldGestures(button->kind)) {
+                    error = describe(def) + ": button " + std::to_string(source.buttonId) +
+                            " is a toggle switch, but a cover needs a momentary one to be held";
+                    return false;
+                }
                 // A latching rocker cannot be held, so a binding waiting for a
                 // hold from one would never fire. Catch it at boot rather than
                 // leaving someone pressing a switch that does nothing.
@@ -69,6 +76,10 @@ bool attachSources(const config::BindingDef& def, const config::App& config, Bin
                 }
                 filter.key = SourceKey::button(source.buttonId);
                 filter.gesture = source.gesture;
+                // The cover rule reads the whole grammar — press, double press,
+                // hold, long hold, release — so it must not be handed a single
+                // filtered gesture the way toggle bindings are.
+                filter.anyGesture = def.rule == config::RuleKind::Cover;
                 break;
             }
             case config::SourceType::Sensor: {
@@ -146,9 +157,21 @@ bool BindingSet::build(const config::App& config, DeviceRegistry& registry, Even
                                                        def.offDelayMs);
                 break;
             }
-            case config::RuleKind::Cover:
-                error = describe(def) + ": cover rule is not implemented yet (M6)";
-                return false;
+            case config::RuleKind::Cover: {
+                std::vector<IPositionActuator*> covers;
+                for (Device* device : targets) {
+                    IPositionActuator* cover = device->asPosition();
+                    if (cover == nullptr) {
+                        error = describe(def) + ": target " +
+                                std::string(toSegment(device->type())) + "/" +
+                                std::to_string(device->id()) + " cannot be positioned";
+                        return false;
+                    }
+                    covers.push_back(cover);
+                }
+                binding = std::make_unique<CoverRule>(def.name, std::move(covers));
+                break;
+            }
         }
 
         if (!attachSources(def, config, *binding, router, remoteSources, error)) return false;

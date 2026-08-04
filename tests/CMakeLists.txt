@@ -9,6 +9,7 @@ add_executable(picohome_tests
     test_binding_validation.cpp
     test_mqtt_plumbing.cpp
     test_mcp23017.cpp
+    test_cover.cpp
     test_shipped_config.cpp
 )
 

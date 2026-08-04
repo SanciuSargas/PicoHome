@@ -45,7 +45,20 @@
 
       // Relay on PA1. Use "active_high": false for a low-trigger relay board.
       {"type": "light", "id": 30, "room": "corridor",
-       "backend": {"kind": "mcp", "expander": 0, "pin": 1, "active_high": true}}
+       "backend": {"kind": "mcp", "expander": 0, "pin": 1, "active_high": true}},
+
+      // A blind: two relays, one per direction. Position has no feedback, so
+      // travel_ms and tilt_ms *are* the scale — measure them with a stopwatch
+      // on the real blind. tilt_ms is the full slat sweep: 0..90 deg on
+      // exterior blinds, 0..180 on interior ones (open halfway).
+      // boot_position says where to assume it is at power-up.
+      {"type": "blinds", "id": 500, "room": "kitchen",
+       "backend": {"kind": "cover",
+                   "up":   {"pin": 6},
+                   "down": {"pin": 8}},
+       "options": {"travel_ms": 10000, "tilt_ms": 1500,
+                   "step_ms": 500, "reverse_delay_ms": 500,
+                   "boot_position": "open"}}
     ],
 
     "buttons": [
@@ -61,7 +74,12 @@
       // Every flip is one press_1, in either direction — its resting position
       // at power-up is adopted silently, so nothing switches on boot.
       {"id": 30, "room": "corridor", "kind": "toggle",
-       "pin": {"expander": 0, "pin": 2, "active_high": false, "pull_up": true}}
+       "pin": {"expander": 0, "pin": 2, "active_high": false, "pull_up": true}},
+
+      // Blind switch. Must be momentary: the cover grammar is built on holding
+      // it, which a latching rocker can never do (rejected at boot if it is).
+      {"id": 500, "room": "kitchen", "kind": "momentary",
+       "pin": {"pin": 9, "active_high": false, "pull_up": true}}
     ]
   },
 
@@ -73,6 +91,15 @@
     // Same rule, same device classes — only the pins live somewhere else.
     {"name": "corridor light (on expander)", "rule": "toggle",
      "sources": [{"button": 29}],
-     "targets": [{"type": "light", "id": 30}]}
+     "targets": [{"type": "light", "id": 30}]},
+
+    // The cover rule reads the whole gesture grammar from one switch:
+    //   press      stop if moving, otherwise nudge the slats
+    //   press x2   reverse
+    //   hold       move while held
+    //   hold 3 s   commit: run to the end even after letting go
+    {"name": "kitchen blind", "rule": "cover",
+     "sources": [{"button": 500}],
+     "targets": [{"type": "blinds", "id": 500}]}
   ]
 }
