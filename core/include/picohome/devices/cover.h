@@ -16,6 +16,12 @@
 // exactly what a blind switch is expected to do — and why a blind sitting at
 // the bottom opens its slats first, letting light in without raising.
 //
+// The one asymmetry: **at the very top the slats stack up and have no angle**,
+// so the tilt packs away to 0 on arrival. A descent from there starts moving
+// immediately rather than spending tilt_ms rotating slats that cannot rotate,
+// which would otherwise leave the blind that much too low. The bottom is not
+// the same case — down there the slats hang, and rotating them is real.
+//
 // `tilt_ms` is simply how long the motor takes to traverse the whole angle
 // range, which is the only difference between the two kinds fitted here:
 //   * exterior blinds sweep 0..90 deg, so the far end is "fully open";

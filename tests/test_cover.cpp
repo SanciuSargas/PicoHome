@@ -284,6 +284,63 @@ TEST_CASE("set_position drives the right way and stops on arrival") {
     CHECK(bench.cover->position() == 90);
 }
 
+TEST_CASE("descending from the top starts immediately: the slats are packed") {
+    // Reported from the bench: set_position 50 landed correctly from the
+    // bottom but too low from the top. Going up ends with the slats stacked
+    // away, so a descent has no slat sweep to work through first — charging
+    // one would drive the blind tilt_ms too far.
+    Bench bench(/*bootOpen=*/true);
+    REQUIRE(bench.cover->position() == 100);
+    REQUIRE(bench.cover->tilt() == 0);
+
+    bench.cover->setPosition(50);
+    bench.run(4900);
+    CHECK(bench.cover->isMoving());  // still going at 4.9 s...
+    bench.run(200);
+    CHECK_FALSE(bench.cover->isMoving());  // ...and done just after 5 s
+    CHECK(bench.cover->position() == 50);
+}
+
+TEST_CASE("climbing from the bottom still works through the slats first") {
+    // The mirror case is genuinely different: down there the slats are hanging
+    // and really do rotate before the blind lifts.
+    Bench bench(/*bootOpen=*/false);
+    bench.cover->setPosition(50);
+
+    bench.run(5100);
+    CHECK(bench.cover->isMoving());  // the 1 s sweep pushed the finish out
+    bench.run(1000);
+    CHECK_FALSE(bench.cover->isMoving());
+    CHECK(bench.cover->position() == 50);
+    CHECK(bench.cover->tilt() == 100);  // open, as it is on the way up
+}
+
+TEST_CASE("reaching the top packs the slats away") {
+    Bench bench(/*bootOpen=*/false);
+    bench.cover->moveToEnd();  // all the way up
+    bench.run(12000);
+
+    CHECK(bench.cover->position() == 100);
+    CHECK(bench.cover->tilt() == 0);  // no angle to speak of up there
+}
+
+TEST_CASE("a reversal part-way still works through the slats") {
+    // Only the very top packs them; anywhere else the blind is deployed and
+    // the lost motion in the tilt is real.
+    Bench bench(/*bootOpen=*/false);
+    bench.cover->setPosition(50);
+    bench.run(6100);
+    REQUIRE(bench.cover->tilt() == 100);
+    bench.run(600);
+
+    bench.cover->setPosition(40);
+    bench.run(900);
+    CHECK(bench.cover->position() == 50);  // still closing the slats
+    CHECK(bench.cover->tilt() < 100);
+    bench.run(1500);
+    CHECK(bench.cover->position() < 50);   // only now descending
+}
+
 TEST_CASE("the slats still move when the blind is already at the bottom") {
     // Reported from the bench: set_tilt 50 opened the slats, set_tilt 0 did
     // nothing at all. Closing them is a *downward* movement, and the height was
@@ -307,20 +364,39 @@ TEST_CASE("the slats still move when the blind is already at the bottom") {
     CHECK_FALSE(bench.bothEnergised);
 }
 
-TEST_CASE("the slats still move when the blind is already at the top") {
-    // The mirror case: at the top the slats are open, and closing them is a
-    // downward movement that must not be refused either.
+TEST_CASE("the slats move freely once the blind is off the top stop") {
+    // Anywhere below the very top the slats are hanging rather than stacked,
+    // so both directions of tilt work without touching the height.
     Bench bench(/*bootOpen=*/true);
-    bench.cover->setTilt(100);
-    bench.run(2000);
-    REQUIRE(bench.cover->position() == 100);
-    REQUIRE(bench.cover->tilt() == 100);
-
+    bench.cover->setPosition(90);
+    bench.run(1500);
+    REQUIRE(bench.cover->position() == 90);
     bench.run(600);
+
+    bench.cover->setTilt(100);
+    bench.run(1200);
+    CHECK(bench.cover->tilt() == 100);
+    CHECK(bench.cover->position() == 90);  // opened without moving
+    bench.run(600);
+
     bench.cover->setTilt(0);
+    CHECK(bench.down.value);
     bench.run(1200);
     CHECK(bench.cover->tilt() == 0);
-    CHECK(bench.cover->position() == 100);  // still up, just shaded
+    CHECK(bench.cover->position() == 90);  // and closed again, still at 90
+}
+
+TEST_CASE("tilting a blind that is fully up has nothing to act on") {
+    // Stacked slats cannot be angled; the motor would only strain against the
+    // top stop. Lower it first, as the test above does.
+    Bench bench(/*bootOpen=*/true);
+    REQUIRE(bench.cover->position() == 100);
+
+    bench.cover->setTilt(50);
+    bench.run(3000);
+    CHECK(bench.cover->tilt() == 0);
+    CHECK(bench.cover->position() == 100);
+    CHECK_FALSE(bench.cover->isMoving());
 }
 
 TEST_CASE("holding down at the bottom closes the slats, then stops for good") {

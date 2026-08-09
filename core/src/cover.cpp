@@ -208,6 +208,14 @@ void Cover::stop() {
     // Arduino shade code had, and what makes a one-button switch workable.
     if (positionMs_ >= timing_.travelUpMs) {
         positionMs_ = timing_.travelUpMs;
+        // The slats stack up at the top and there is no angle left to speak of,
+        // so the tilt packs away with them. This is what stops the *next*
+        // descent from spending tilt_ms rotating slats that cannot rotate —
+        // charging that time to tilt would leave the blind tilt_ms too low,
+        // about 17 % of the range on an 8.5 s descent with a 1.5 s sweep.
+        // (The limit check above has already run, so zeroing here cannot make
+        // an upward movement miss its own limit.)
+        tiltMs_ = 0;
         direction_ = Direction::Down;
     } else if (positionMs_ == 0) {
         direction_ = Direction::Up;

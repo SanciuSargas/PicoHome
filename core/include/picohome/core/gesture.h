@@ -87,8 +87,8 @@ public:
     struct Timing {
         uint32_t debounceMs = 30;
         uint32_t multiPressGapMs = 300;
-        uint32_t holdMs = 500;      // momentary only
-        uint32_t holdLongMs = 3000; // momentary only, covers
+        uint32_t holdMs = 400;      // momentary only
+        uint32_t holdLongMs = 1000; // momentary only, covers
     };
 
     // A toggle switch gets a shorter multi-press window (values carried over

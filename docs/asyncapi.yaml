@@ -135,6 +135,9 @@ channels:
       means differs by blind and is left to high level: an exterior blind
       sweeps 0–90°, so the far end is fully open, while an interior one sweeps
       0–180° and is open half way, closed again at 100.
+
+      A **fully raised** blind has stacked its slats and has no angle to set,
+      so this does nothing until the blind is lowered off its top stop.
     parameters:
       building: { $ref: '#/components/parameters/building' }
       room: { $ref: '#/components/parameters/room' }
