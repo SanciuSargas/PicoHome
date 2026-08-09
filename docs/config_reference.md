@@ -303,7 +303,7 @@ For reference while writing bindings — the full scheme is in `CLAUDE.md`.
 |---|---|---|
 | `light` | `set_binary`, `set_night_mode` | `state`, `night_mode` |
 | `outlet`, `damper`, `heating_mat` | `set_binary` | `state` |
-| `blinds` | `set_position`, `set_tilt`, `stop` | `state` (position), `tilt` |
+| `blinds` | `set_position`, `set_tilt`, `stop` | `state` = **position 0–100**, `0` fully down/closed and `100` fully up/open; `tilt` = slat angle 0–100 |
 | sensors | — | `state` (binary) or `measurement` (numeric) |
 | `button` | — | `event` — not retained; a gesture is a moment, not a state |
 | controller | — | `status/0/alive` (LWT), `status/0/error` (empty = nothing wrong) |

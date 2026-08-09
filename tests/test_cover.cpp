@@ -284,6 +284,78 @@ TEST_CASE("set_position drives the right way and stops on arrival") {
     CHECK(bench.cover->position() == 90);
 }
 
+TEST_CASE("the slats still move when the blind is already at the bottom") {
+    // Reported from the bench: set_tilt 50 opened the slats, set_tilt 0 did
+    // nothing at all. Closing them is a *downward* movement, and the height was
+    // already at its limit — but the slats were not.
+    Bench bench(/*bootOpen=*/false);
+    REQUIRE(bench.cover->position() == 0);
+    REQUIRE(bench.cover->tilt() == 0);
+
+    bench.cover->setTilt(50);
+    bench.run(1000);
+    CHECK(bench.cover->tilt() == 50);
+    CHECK(bench.cover->position() == 0);  // never left the floor
+
+    bench.run(600);  // motor rest
+    bench.cover->setTilt(0);
+    CHECK(bench.down.value);  // it must actually drive this time
+    bench.run(1000);
+    CHECK(bench.cover->tilt() == 0);
+    CHECK(bench.cover->position() == 0);
+    CHECK_FALSE(bench.cover->isMoving());
+    CHECK_FALSE(bench.bothEnergised);
+}
+
+TEST_CASE("the slats still move when the blind is already at the top") {
+    // The mirror case: at the top the slats are open, and closing them is a
+    // downward movement that must not be refused either.
+    Bench bench(/*bootOpen=*/true);
+    bench.cover->setTilt(100);
+    bench.run(2000);
+    REQUIRE(bench.cover->position() == 100);
+    REQUIRE(bench.cover->tilt() == 100);
+
+    bench.run(600);
+    bench.cover->setTilt(0);
+    bench.run(1200);
+    CHECK(bench.cover->tilt() == 0);
+    CHECK(bench.cover->position() == 100);  // still up, just shaded
+}
+
+TEST_CASE("holding down at the bottom closes the slats, then stops for good") {
+    Bench bench(/*bootOpen=*/false);
+    bench.cover->setTilt(100);
+    bench.run(1500);
+    REQUIRE(bench.cover->tilt() == 100);
+    bench.run(600);
+
+    bench.cover->toggleDirection();  // now pointing down
+    bench.cover->moveAlongDirection();
+    bench.run(2000);
+
+    CHECK(bench.cover->tilt() == 0);
+    CHECK(bench.cover->position() == 0);
+    CHECK_FALSE(bench.cover->isMoving());  // both axes exhausted: really done
+    CHECK_FALSE(bench.down.value);
+}
+
+TEST_CASE("a cover with no tilt still stops dead at the height limit") {
+    Bench bench(/*bootOpen=*/false, /*tiltMs=*/0);
+    bench.cover->moveToEnd();  // upward, to the top
+    bench.run(11000);
+    REQUIRE(bench.cover->position() == 100);
+    CHECK_FALSE(bench.cover->isMoving());
+
+    // Reaching the top already turned it around, so this drives back down.
+    REQUIRE(bench.cover->direction() == Cover::Direction::Down);
+    bench.run(600);
+    bench.cover->moveAlongDirection();
+    bench.run(11000);
+    CHECK(bench.cover->position() == 0);
+    CHECK_FALSE(bench.cover->isMoving());
+}
+
 TEST_CASE("set_tilt moves only the slats") {
     Bench bench(/*bootOpen=*/false);
     CHECK(bench.cover->handleCommand("set_tilt", "100"));

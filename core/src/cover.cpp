@@ -83,8 +83,14 @@ void Cover::update(uint32_t nowMs) {
 
     integrate(elapsed);
 
-    const bool atLimit = (direction_ == Direction::Up && positionMs_ >= timing_.travelUpMs) ||
-                         (direction_ == Direction::Down && positionMs_ == 0);
+    // There is nothing left to do only when *both* axes are exhausted in this
+    // direction. The slats move before the height, so a blind sitting at the
+    // bottom still has a slat sweep left to close, and one at the top still has
+    // one to open — checking the height alone would refuse to move them.
+    const bool atLimit =
+        direction_ == Direction::Up
+            ? (positionMs_ >= timing_.travelUpMs && tiltMs_ >= timing_.tiltMs)
+            : (positionMs_ == 0 && tiltMs_ == 0);
     if (atLimit || targetReached()) {
         stop();
         return;

@@ -158,6 +158,11 @@ channels:
     address: '{building}/{room}/{coverType}/{deviceId}/state'
     title: Cover position
     description: |
+      **Height, not open/closed**: `0` is fully down, `100` fully up. A cover
+      uses the same `state` topic every other device does, so the value is a
+      number rather than a word — in Home Assistant this is the cover's
+      `position_topic`, with `tilt` as its `tilt_status_topic`.
+
       Republished about once a second while travelling, so a slider follows an
       82-second blind instead of appearing frozen.
 

@@ -69,7 +69,7 @@
        "backend": {"kind": "cover",
                    "up":   {"expander": 0, "pin": 2, "active_high": true},
                    "down": {"expander": 0, "pin": 3, "active_high": true}},
-       "options": {"travel_up_ms": 79000, "travel_down_ms": 73800, "tilt_ms": 1600,
+       "options": {"travel_up_ms": 79000, "travel_down_ms": 73800, "tilt_ms": 1550,
                    "step_ms": 300, "reverse_delay_ms": 300,
                    "boot_position": "open", "home_at_boot": true}}
     ],
