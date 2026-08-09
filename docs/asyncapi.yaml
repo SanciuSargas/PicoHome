@@ -1,0 +1,557 @@
+asyncapi: 3.0.0
+
+info:
+  title: PicoHome Controller
+  version: '2.0.0'
+  description: |
+    MQTT interface of a PicoHome building controller (RP2040 + W5100), as
+    implemented — the topic layout lives in one place in the firmware
+    (`core/src/topic.cpp`) and the command vocabulary in another
+    (`core/include/picohome/core/commands.h`); this document mirrors both.
+
+    **Topic scheme.** Exactly five segments, always:
+
+        <building>/<room>/<device_type>/<device_id>/<command>
+
+    The fixed depth is what makes wildcards useful: `utility/+/light/+/state`
+    is every light state in a building. A controller subscribes with one
+    wildcard per command verb, so the number of subscriptions stays constant
+    however many devices a building gains.
+
+    **Device ids are electrical-plan numbers** (`light/29`), the same ones on
+    the wiring drawing and the panel labels, so an identifier traces through
+    every artifact of the system. They are unique per building, which makes
+    `<building>_<type>_<id>` a globally unique key.
+
+    **Every device publishes its state and accepts commands** — even ones that
+    exist only to serve a local binding. The cost is a few topics; the payoff
+    is that any automation can observe and actuate anything without a firmware
+    change.
+
+    **The network is never in the control path.** Wall switch to relay is a
+    direct in-memory call on the control core; MQTT runs on the other core.
+    Pull the Ethernet cable and the switches behave identically — commands and
+    states simply stop flowing until it is back, when every retained state is
+    republished.
+
+    **Payloads are plain scalars** (`1`, `75`, `21.4`), never JSON, so Home
+    Assistant can consume them without templates.
+
+  license:
+    name: Project documentation
+    url: https://github.com/SanciuSargas/PicoHome
+
+defaultContentType: text/plain
+
+servers:
+  broker:
+    host: '192.168.5.2:1883'
+    protocol: mqtt
+    protocolVersion: '3.1.1'
+    description: |
+      The house broker (Mosquitto), reached over wired Ethernet with a static
+      address from the SD-card config — there is no DNS, so `network.broker`
+      must be an IPv4 address.
+
+      Session: clean session, keepalive 30 s, client id `<building>_controller`,
+      and a Last Will registered on `<building>/controller/status/0/alive` so
+      the broker announces a controller's death on its behalf.
+
+channels:
+  binaryActuatorCommand:
+    address: '{building}/{room}/{binaryType}/{deviceId}/set_binary'
+    title: Switch a binary actuator
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      binaryType: { $ref: '#/components/parameters/binaryType' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      setBinary: { $ref: '#/components/messages/binaryCommand' }
+
+  binaryActuatorState:
+    address: '{building}/{room}/{binaryType}/{deviceId}/state'
+    title: Binary actuator state
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      binaryType: { $ref: '#/components/parameters/binaryType' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      state: { $ref: '#/components/messages/binaryState' }
+
+  lightNightModeCommand:
+    address: '{building}/{room}/{lightType}/{deviceId}/set_night_mode'
+    title: Set a light's motion gate
+    description: |
+      Whether a `motion` binding may switch this light **on**. Home Assistant
+      decides what "night" means — sunset, lux, house mode, per room — and the
+      controller owns only the mechanism.
+
+      **Publish this retained.** It is the one command topic that is: the
+      controller has no clock, so after a power cut at 15:00 it would otherwise
+      sit in night mode until someone noticed. Retained, the broker replays the
+      current value the moment the controller subscribes. Never retain
+      `set_binary` this way — a replayed "turn on" at every reconnect would
+      fight the wall switch.
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      lightType: { $ref: '#/components/parameters/lightType' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      setNightMode: { $ref: '#/components/messages/binaryCommand' }
+
+  lightNightModeState:
+    address: '{building}/{room}/{lightType}/{deviceId}/night_mode'
+    title: A light's motion gate
+    description: |
+      Defaults to `1`, so a controller that has never reached the broker still
+      lights corridors at night.
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      lightType: { $ref: '#/components/parameters/lightType' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      nightMode: { $ref: '#/components/messages/binaryState' }
+
+  coverSetPosition:
+    address: '{building}/{room}/{coverType}/{deviceId}/set_position'
+    title: Send a cover to a position
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      coverType: { $ref: '#/components/parameters/coverType' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      setPosition: { $ref: '#/components/messages/percentCommand' }
+
+  coverSetTilt:
+    address: '{building}/{room}/{coverType}/{deviceId}/set_tilt'
+    title: Set a cover's slat angle
+    description: |
+      `0` is closed and `100` the far end of the mechanical sweep. What that
+      means differs by blind and is left to high level: an exterior blind
+      sweeps 0–90°, so the far end is fully open, while an interior one sweeps
+      0–180° and is open half way, closed again at 100.
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      coverType: { $ref: '#/components/parameters/coverType' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      setTilt: { $ref: '#/components/messages/percentCommand' }
+
+  coverStop:
+    address: '{building}/{room}/{coverType}/{deviceId}/stop'
+    title: Halt a cover where it is
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      coverType: { $ref: '#/components/parameters/coverType' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      stop: { $ref: '#/components/messages/stopCommand' }
+
+  coverPositionState:
+    address: '{building}/{room}/{coverType}/{deviceId}/state'
+    title: Cover position
+    description: |
+      Republished about once a second while travelling, so a slider follows an
+      82-second blind instead of appearing frozen.
+
+      The value is an estimate integrated from motor run time — there is no
+      position feedback — and is re-synchronised whenever the cover reaches a
+      limit.
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      coverType: { $ref: '#/components/parameters/coverType' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      position: { $ref: '#/components/messages/percentState' }
+
+  coverTiltState:
+    address: '{building}/{room}/{coverType}/{deviceId}/tilt'
+    title: Cover slat angle
+    description: Published only by covers configured with a slat sweep.
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      coverType: { $ref: '#/components/parameters/coverType' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      tilt: { $ref: '#/components/messages/percentState' }
+
+  buttonEvent:
+    address: '{building}/{room}/button/{deviceId}/event'
+    title: Wall switch gesture
+    description: |
+      Wall switches are devices too. A button carries the plan number of the
+      device it primarily controls, and several physical switches of one group
+      share an id — they are one logical button in several places.
+
+      **Not retained**: a gesture is a moment, not a state, and replaying it to
+      a late subscriber would re-trigger whatever it drives.
+
+      Which gestures a switch can produce depends on its configuration. A
+      switch left in the default instant mode only ever emits `press_1`, on the
+      actuating edge, because waiting out the multi-press window is felt as lag
+      on a plain light switch. A latching rocker never emits hold gestures at
+      all — it cannot be held.
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      event: { $ref: '#/components/messages/gestureEvent' }
+
+  binarySensorState:
+    address: '{building}/{room}/{binarySensorType}/{deviceId}/state'
+    title: Binary sensor state
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      binarySensorType: { $ref: '#/components/parameters/binarySensorType' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      state: { $ref: '#/components/messages/binaryState' }
+
+  sensorMeasurement:
+    address: '{building}/{room}/{numericSensorType}/{deviceId}/measurement'
+    title: Numeric sensor reading
+    description: |
+      Values from the RS485 room nodes. QoS 0 — a lost sample is replaced by
+      the next one, so it is not worth a round trip.
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+      room: { $ref: '#/components/parameters/room' }
+      numericSensorType: { $ref: '#/components/parameters/numericSensorType' }
+      deviceId: { $ref: '#/components/parameters/deviceId' }
+    messages:
+      measurement: { $ref: '#/components/messages/measurement' }
+
+  controllerAlive:
+    address: '{building}/controller/status/0/alive'
+    title: Controller availability
+    description: |
+      `online` is published on connect; `offline` is the Last Will, published
+      by the **broker** when the connection drops. A controller that crashes or
+      loses power cannot announce it itself, which is the whole point.
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+    messages:
+      alive: { $ref: '#/components/messages/availability' }
+
+  controllerError:
+    address: '{building}/controller/status/0/error'
+    title: Controller fault
+    description: |
+      A fault that survived into runtime — a config that parsed but could not
+      be built, for instance. Published retained on connect.
+
+      **An empty payload means there is nothing wrong.** A zero-length retained
+      message is how MQTT deletes a retained value, so a fault reported before
+      a reboot cannot linger forever. `mosquitto_sub` renders that as `(null)`.
+    parameters:
+      building: { $ref: '#/components/parameters/building' }
+    messages:
+      error: { $ref: '#/components/messages/errorText' }
+
+operations:
+  onSetBinary:
+    action: receive
+    channel: { $ref: '#/channels/binaryActuatorCommand' }
+    summary: Switch a light, outlet, damper or heating mat.
+    description: |
+      An MQTT command and a wall switch are equal citizens acting on the same
+      device; neither takes precedence. A command carrying the value the device
+      already holds is applied silently, so a repeated assertion costs no
+      traffic back.
+    bindings:
+      mqtt: { qos: 1, retain: false, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/binaryActuatorCommand/messages/setBinary'
+
+  publishBinaryState:
+    action: send
+    channel: { $ref: '#/channels/binaryActuatorState' }
+    summary: Report a binary actuator, however it was switched.
+    bindings:
+      mqtt: { qos: 1, retain: true, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/binaryActuatorState/messages/state'
+
+  onSetNightMode:
+    action: receive
+    channel: { $ref: '#/channels/lightNightModeCommand' }
+    summary: Open or close a light's motion gate.
+    bindings:
+      mqtt: { qos: 1, retain: true, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/lightNightModeCommand/messages/setNightMode'
+
+  publishNightMode:
+    action: send
+    channel: { $ref: '#/channels/lightNightModeState' }
+    bindings:
+      mqtt: { qos: 1, retain: true, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/lightNightModeState/messages/nightMode'
+
+  onSetPosition:
+    action: receive
+    channel: { $ref: '#/channels/coverSetPosition' }
+    bindings:
+      mqtt: { qos: 1, retain: false, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/coverSetPosition/messages/setPosition'
+
+  onSetTilt:
+    action: receive
+    channel: { $ref: '#/channels/coverSetTilt' }
+    bindings:
+      mqtt: { qos: 1, retain: false, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/coverSetTilt/messages/setTilt'
+
+  onStop:
+    action: receive
+    channel: { $ref: '#/channels/coverStop' }
+    bindings:
+      mqtt: { qos: 1, retain: false, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/coverStop/messages/stop'
+
+  publishCoverPosition:
+    action: send
+    channel: { $ref: '#/channels/coverPositionState' }
+    bindings:
+      mqtt: { qos: 1, retain: true, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/coverPositionState/messages/position'
+
+  publishCoverTilt:
+    action: send
+    channel: { $ref: '#/channels/coverTiltState' }
+    bindings:
+      mqtt: { qos: 1, retain: true, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/coverTiltState/messages/tilt'
+
+  publishButtonEvent:
+    action: send
+    channel: { $ref: '#/channels/buttonEvent' }
+    summary: Announce a gesture from a switch wired to this controller.
+    bindings:
+      mqtt: { qos: 1, retain: false, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/buttonEvent/messages/event'
+
+  onRemoteButtonEvent:
+    action: receive
+    channel: { $ref: '#/channels/buttonEvent' }
+    summary: React to a switch wired to a *different* controller.
+    description: |
+      Cross-panel switch groups. The corridor 30PJ/31PJ switches sit on the
+      closet panel while their relays are on the utility panel, so the utility
+      controller subscribes to the closet button's event topic and treats it as
+      an ordinary local press.
+
+      These subscriptions are not wildcards — they are the exact topics named
+      by `{"topic": ..., "payload": ...}` binding sources in the SD config, and
+      the payload must match exactly.
+    bindings:
+      mqtt: { qos: 1, retain: false, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/buttonEvent/messages/event'
+
+  publishSensorState:
+    action: send
+    channel: { $ref: '#/channels/binarySensorState' }
+    bindings:
+      mqtt: { qos: 1, retain: true, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/binarySensorState/messages/state'
+
+  onRemoteSensorState:
+    action: receive
+    channel: { $ref: '#/channels/binarySensorState' }
+    summary: Drive a local motion binding from a sensor on another controller.
+    description: |
+      A remote sensor reports a state rather than an action, so a binding names
+      both edges — defaulting to the `1`/`0` this firmware publishes, which is
+      why binding a PicoHome sensor on another panel needs no payloads at all.
+      Foreign devices (Zigbee2MQTT `true`/`false`, …) spell theirs out.
+    bindings:
+      mqtt: { qos: 1, retain: true, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/binarySensorState/messages/state'
+
+  publishMeasurement:
+    action: send
+    channel: { $ref: '#/channels/sensorMeasurement' }
+    bindings:
+      mqtt: { qos: 0, retain: true, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/sensorMeasurement/messages/measurement'
+
+  publishAlive:
+    action: send
+    channel: { $ref: '#/channels/controllerAlive' }
+    bindings:
+      mqtt: { qos: 1, retain: true, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/controllerAlive/messages/alive'
+
+  publishError:
+    action: send
+    channel: { $ref: '#/channels/controllerError' }
+    bindings:
+      mqtt: { qos: 1, retain: true, bindingVersion: 0.2.0 }
+    messages:
+      - $ref: '#/channels/controllerError/messages/error'
+
+components:
+  parameters:
+    building:
+      description: |
+        The panel a device belongs to. One controller per building, each with
+        its own SD card; the firmware binary is identical across all three.
+      enum: [utility, closet, sauna, testbench]
+
+    room:
+      description: |
+        Room name in English, ASCII, snake_case. The Lithuanian-to-English
+        mapping table is in `docs/hardware.md`. `controller` is reserved for
+        the controller's own status topics.
+      examples: [kitchen, living_room, corridor, kids_toilet, parents_bedroom, office, sauna]
+
+    deviceId:
+      description: |
+        The electrical-plan number, as written on the drawing and the panel —
+        lights 20–106 and 201–203, heating mat 401, and assigned ranges for
+        devices that had no number (blinds 500s, outlets 600s, sensors 700s).
+        See `docs/device_numbering.md`. Unique per building.
+      examples: ['29', '500', '720']
+
+    binaryType:
+      description: Device classes driven by a single relay.
+      enum: [light, dimmable_light, outlet, damper, heating_mat]
+
+    lightType:
+      description: Only lights carry the night_mode gate.
+      enum: [light, dimmable_light]
+
+    coverType:
+      description: |
+        `curtains` is reserved but not implemented — how they are driven and
+        parked is still undecided, and a config using them is refused at boot.
+      enum: [blinds, curtains]
+
+    binarySensorType:
+      enum: [reed, water_leak, pir, presence]
+
+    numericSensorType:
+      enum: [temperature, humidity, co2, smoke, light_level]
+
+  messages:
+    binaryCommand:
+      name: binaryCommand
+      title: On or off
+      contentType: text/plain
+      payload: { $ref: '#/components/schemas/binary' }
+      examples:
+        - name: turnOn
+          payload: '1'
+        - name: turnOff
+          payload: '0'
+
+    binaryState:
+      name: binaryState
+      title: On or off
+      contentType: text/plain
+      payload: { $ref: '#/components/schemas/binary' }
+
+    percentCommand:
+      name: percentCommand
+      title: A percentage, 0 closed to 100 open
+      contentType: text/plain
+      payload: { $ref: '#/components/schemas/percent' }
+      examples:
+        - name: half
+          payload: '50'
+
+    percentState:
+      name: percentState
+      title: A percentage, 0 closed to 100 open
+      contentType: text/plain
+      payload: { $ref: '#/components/schemas/percent' }
+
+    stopCommand:
+      name: stopCommand
+      title: Stop
+      summary: The payload is ignored; the arrival of the message is the command.
+      contentType: text/plain
+      payload:
+        type: string
+
+    gestureEvent:
+      name: gestureEvent
+      title: A switch gesture
+      contentType: text/plain
+      payload: { $ref: '#/components/schemas/gesture' }
+      examples:
+        - name: singlePress
+          payload: press_1
+
+    measurement:
+      name: measurement
+      title: A numeric reading
+      contentType: text/plain
+      summary: Decimal, in the sensor's natural unit — °C, %RH, ppm, raw counts.
+      payload:
+        type: string
+        pattern: '^-?[0-9]+(\.[0-9]+)?$'
+      examples:
+        - name: temperature
+          payload: '21.4'
+
+    availability:
+      name: availability
+      contentType: text/plain
+      payload:
+        type: string
+        enum: [online, offline]
+
+    errorText:
+      name: errorText
+      contentType: text/plain
+      summary: Free text, or empty when there is no fault.
+      payload:
+        type: string
+      examples:
+        - name: noFault
+          payload: ''
+        - name: badBinding
+          payload: "bindings: binding 'kitchen blind': button 500 cannot produce hold_start — set \"gestures\": true on that button"
+
+  schemas:
+    binary:
+      type: string
+      enum: ['0', '1']
+
+    percent:
+      type: string
+      pattern: '^(100|[0-9]{1,2})$'
+      description: Whole percent, 0 to 100. A value outside the range is refused.
+
+    gesture:
+      type: string
+      enum: [press_1, press_2, press_3, hold_start, hold_long, hold_end]
+      description: |
+        `hold_start` fires after about 0.5 s and `hold_long` after 3 s, while
+        the switch is still held; `hold_end` on release. Multi-press values
+        arrive only after the multi-press window closes, which is why a switch
+        that does not need them is configured not to wait.
