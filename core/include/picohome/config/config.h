@@ -56,11 +56,14 @@ struct ExpanderDef {
 // Timing calibration for a cover, all in milliseconds of motor run — there is
 // no position feedback, so these numbers *are* the position scale.
 struct CoverTiming {
-    uint32_t travelMs = 0;          // full closed -> open, required
+    // A blind falls faster than it climbs, so both directions are measured.
+    uint32_t travelUpMs = 0;        // full closed -> open, required
+    uint32_t travelDownMs = 0;      // full open -> closed, required
     uint32_t tiltMs = 0;            // whole slat sweep (0..90 deg outside, 0..180 inside)
     uint32_t stepMs = 500;          // press_1 nudge
     uint32_t reverseDelayMs = 500;  // motor rest before reversing
     bool bootOpen = true;           // where to assume it is at power-up
+    bool homeAtBoot = false;        // or: drive to the top once and know instead
 };
 
 struct ActuatorDef {

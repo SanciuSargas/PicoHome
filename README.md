@@ -4,6 +4,10 @@ Home automation firmware for RP2040 (YD-RP2040) building controllers — three b
 each driven by one controller configured from a JSON file on SD card, exposed over MQTT
 (Home Assistant on top). Room co-processor nodes report over RS485/Modbus RTU.
 
+- Config reference (every option, per device type): [`docs/config_reference.md`](docs/config_reference.md)
+- MQTT interface, AsyncAPI 3.0: [`docs/asyncapi.yaml`](docs/asyncapi.yaml) — render it with
+  `npx @asyncapi/cli start studio docs/asyncapi.yaml`, or paste it into
+  [studio.asyncapi.com](https://studio.asyncapi.com)
 - Design rationale (the concepts behind every decision): [`docs/design_rationale.md`](docs/design_rationale.md)
 - Hardware reference, BOM, dimmer options: [`docs/hardware.md`](docs/hardware.md)
 - Device number assignments: [`docs/device_numbering.md`](docs/device_numbering.md)

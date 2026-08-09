@@ -33,13 +33,24 @@ namespace picohome {
 class Cover : public Device, public IPositionActuator {
 public:
     struct Timing {
-        uint32_t travelMs = 0;          // full closed -> open, required
+        // A blind falls faster than it climbs, so the two directions are timed
+        // separately. Position is kept on the *up* scale and downward movement
+        // is converted with a carried remainder, so the asymmetry costs no
+        // accuracy and a symmetric cover behaves exactly as before.
+        uint32_t travelUpMs = 0;        // full closed -> open, required
+        uint32_t travelDownMs = 0;      // full open -> closed, required
         uint32_t tiltMs = 0;            // whole angle sweep; 0 = no tilt
         uint32_t stepMs = 500;          // press_1 nudge
         uint32_t reverseDelayMs = 500;  // motor rest before reversing
         // Blinds normally sit raised, so that is the default assumption; the
         // first gesture then lowers them.
         bool bootOpen = true;
+        // Stop assuming and find out: start from "closed" and drive to the top,
+        // which takes a full travel however far the blind really had to go, so
+        // it ends against its top stop with an estimate that is now measured
+        // rather than guessed. Off by default — it also means every power cut
+        // raises every blind in the house.
+        bool homeAtBoot = false;
     };
 
     enum class Direction : uint8_t { Down, Up };
@@ -77,6 +88,8 @@ private:
     bool rested(uint32_t nowMs) const;
     void energize(Direction dir);  // opposite winding dropped first, always
     void integrate(uint32_t elapsedMs);
+    // Real milliseconds of downward run -> milliseconds on the up scale.
+    uint32_t downTravelToScale(uint32_t realMs);
     bool targetReached() const;
     void publishIfDue(bool force);
 
@@ -84,8 +97,13 @@ private:
     hal::IDigitalOutput& down_;
     Timing timing_;
 
-    uint32_t positionMs_ = 0;  // 0 = closed (down)
+    // 0 = closed (down) .. travelUpMs = open. The up-travel time is the
+    // canonical scale simply because one of the two had to be.
+    uint32_t positionMs_ = 0;
     uint32_t tiltMs_ = 0;      // 0 = slats closed; the sweep opens them going up
+    // Fraction of a scale-millisecond left over when converting downward
+    // travel, carried into the next iteration so nothing is lost to rounding.
+    uint32_t downCarry_ = 0;
 
     Direction direction_ = Direction::Down;
     Direction pendingDirection_ = Direction::Down;

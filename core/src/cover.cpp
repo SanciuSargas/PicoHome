@@ -47,18 +47,26 @@ void Cover::initialize() {
     reversing_ = false;
     target_ = Target::None;
 
-    // Nothing can be asked about where the blind is, so it is assumed and the
-    // first run to a limit re-synchronises it. The slats are packed at either
-    // limit, hence tilt 0; the direction points at the useful next move.
-    positionMs_ = timing_.bootOpen ? timing_.travelMs : 0;
+    // Nothing can be asked about where the blind is. Either it is assumed (and
+    // the first run to a limit re-synchronises it), or homing starts from
+    // "fully closed" so that driving to the top is a guaranteed full traverse.
+    // The slats are packed at either limit, hence tilt 0; the direction points
+    // at the useful next move.
+    const bool assumeOpen = timing_.bootOpen && !timing_.homeAtBoot;
+    positionMs_ = assumeOpen ? timing_.travelUpMs : 0;
     tiltMs_ = 0;
-    direction_ = timing_.bootOpen ? Direction::Down : Direction::Up;
+    direction_ = assumeOpen ? Direction::Down : Direction::Up;
 }
 
 void Cover::update(uint32_t nowMs) {
     if (!started_) {
         started_ = true;
         nowMs_ = nowMs;
+        if (timing_.homeAtBoot) {
+            // The estimate says "closed", so this is a full traverse whatever
+            // the blind was really doing — it ends held against the top stop.
+            setPosition(100);
+        }
         return;
     }
     const uint32_t elapsed = nowMs - nowMs_;
@@ -75,13 +83,27 @@ void Cover::update(uint32_t nowMs) {
 
     integrate(elapsed);
 
-    const bool atLimit = (direction_ == Direction::Up && positionMs_ >= timing_.travelMs) ||
+    const bool atLimit = (direction_ == Direction::Up && positionMs_ >= timing_.travelUpMs) ||
                          (direction_ == Direction::Down && positionMs_ == 0);
     if (atLimit || targetReached()) {
         stop();
         return;
     }
     publishIfDue(false);
+}
+
+uint32_t Cover::downTravelToScale(uint32_t realMs) {
+    if (realMs == 0) return 0;
+    if (timing_.travelDownMs == timing_.travelUpMs) return realMs;  // symmetric: 1:1
+
+    // Going down covers the same distance in less time, so each real
+    // millisecond is worth more of the scale. The remainder is carried rather
+    // than truncated — dropping it would lose ~14 % of the travel on a blind
+    // that falls 82 s / climbs 71 s, which is the whole point of measuring both.
+    const uint64_t scaled =
+        static_cast<uint64_t>(realMs) * timing_.travelUpMs + downCarry_;
+    downCarry_ = static_cast<uint32_t>(scaled % timing_.travelDownMs);
+    return static_cast<uint32_t>(scaled / timing_.travelDownMs);
 }
 
 void Cover::integrate(uint32_t elapsedMs) {
@@ -93,12 +115,13 @@ void Cover::integrate(uint32_t elapsedMs) {
         const uint32_t toTilt = elapsedMs < tiltRoom ? elapsedMs : tiltRoom;
         tiltMs_ += toTilt;
         const uint32_t rest = elapsedMs - toTilt;
-        positionMs_ = positionMs_ + rest >= timing_.travelMs ? timing_.travelMs : positionMs_ + rest;
+        positionMs_ =
+            positionMs_ + rest >= timing_.travelUpMs ? timing_.travelUpMs : positionMs_ + rest;
     } else {
         // Slats close before the blind lowers.
         const uint32_t toTilt = elapsedMs < tiltMs_ ? elapsedMs : tiltMs_;
         tiltMs_ -= toTilt;
-        const uint32_t rest = elapsedMs - toTilt;
+        const uint32_t rest = downTravelToScale(elapsedMs - toTilt);
         positionMs_ = rest >= positionMs_ ? 0 : positionMs_ - rest;
     }
 }
@@ -177,8 +200,8 @@ void Cover::stop() {
     // Reaching a limit both re-calibrates the estimate and means the only
     // useful thing left to do is go the other way — the behaviour the old
     // Arduino shade code had, and what makes a one-button switch workable.
-    if (positionMs_ >= timing_.travelMs) {
-        positionMs_ = timing_.travelMs;
+    if (positionMs_ >= timing_.travelUpMs) {
+        positionMs_ = timing_.travelUpMs;
         direction_ = Direction::Down;
     } else if (positionMs_ == 0) {
         direction_ = Direction::Up;
@@ -211,7 +234,7 @@ void Cover::moveAlongDirection() {
 
 void Cover::moveToEnd() {
     target_ = Target::Position;
-    targetPositionMs_ = direction_ == Direction::Up ? timing_.travelMs : 0;
+    targetPositionMs_ = direction_ == Direction::Up ? timing_.travelUpMs : 0;
     committedToEnd_ = true;
     requestMove(direction_);
 }
@@ -224,7 +247,7 @@ void Cover::releaseHold() {
 }
 
 void Cover::setPosition(uint8_t percent) {
-    const uint32_t target = percentToMs(percent, timing_.travelMs);
+    const uint32_t target = percentToMs(percent, timing_.travelUpMs);
     if (target == positionMs_) return;
     target_ = Target::Position;
     targetPositionMs_ = target;
@@ -244,7 +267,7 @@ void Cover::setTilt(uint8_t percent) {
 }
 
 uint8_t Cover::position() const {
-    return static_cast<uint8_t>(scaleToPercent(positionMs_, timing_.travelMs));
+    return static_cast<uint8_t>(scaleToPercent(positionMs_, timing_.travelUpMs));
 }
 
 uint8_t Cover::tilt() const {

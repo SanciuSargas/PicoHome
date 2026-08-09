@@ -1,0 +1,126 @@
+{
+  // PicoHome bench-test config (schema v2): devices are declared first, then
+  // bindings say what controls what. Copy to the SD card as /config.json.
+  //
+  // Light 29 / button 29 sit on controller GPIOs and light 30 / button 30 on an
+  // MCP23017. They are deliberately the same device classes on both: the pair
+  // behaves identically, which is what the HAL exists to guarantee.
+  //
+  // The bindings below exercise the control model in both directions at once:
+  //  - fan-out: button 29 drives light 29 (GPIO) and light 30 (expander)
+  //  - fan-in:  buttons 29 and 30 both drive light 29 — a P-group mixing a
+  //             momentary pushbutton with a latching rocker, and a controller
+  //             pin with an expander pin
+  //
+  // More to try without touching firmware:
+  //  - add a pir sensor and a "motion" binding -> motion lighting, gated by the
+  //    light's night_mode (which Home Assistant sets; defaults to on)
+  //  - add a {"topic": ..., "payload": "press_1"} source -> a switch on another
+  //    controller drives these lights (cross-panel group)
+  "schema_version": 2,
+  "building": "testbench",
+  "network": {
+    "mac": [18, 237, 103, 234, 84, 237],
+    "ip": "192.168.5.20",
+    "netmask": "255.255.255.0",
+    "gateway": "192.168.5.1",
+    "broker": "192.168.5.2",
+    "broker_port": 1883
+  },
+
+  "devices": {
+    // MCP23017 on the panel I2C bus (SDA=GPIO4, SCL=GPIO5 — see board_config.h).
+    // "index" is what a pin's "expander" field refers to; it is written out so
+    // reordering this list cannot silently remap pins. Address 0x20 = A0/A1/A2
+    // all tied low. INT is active low and needs a pull-up (the controller
+    // enables its own on that GPIO).
+    // Pin numbering: 0-7 are PA0-PA7, 8-15 are PB0-PB7.
+    "expanders": [
+      {"index": 0, "address": "0x20", "int_pin": 15}
+    ],
+
+    "actuators": [
+      {"type": "light", "id": 29, "room": "kitchen",
+       "backend": {"kind": "mcp", "expander": 0, "pin": 0, "active_high": false}},
+
+      // Relay on PA1. Use "active_high": false for a low-trigger relay board.
+      {"type": "light", "id": 30, "room": "corridor",
+       "backend": {"kind": "mcp", "expander": 0, "pin": 1, "active_high": false}},
+
+      // A blind: two relays, one per direction. "up" and "down" are ordinary
+      // pins — the same fields as anywhere else, so a low-trigger relay board
+      // takes "active_high": false and either direction can sit on an expander
+      // ("expander": 0). Both default to active_high true, as below.
+      //
+      // Position has no feedback, so travel_ms and tilt_ms *are* the scale —
+      // measure them with a stopwatch on the real blind — separately in each
+      // direction, since a blind falls faster than it climbs. "travel_ms" sets
+      // both at once where that does not matter. tilt_ms is the full
+      // slat sweep: 0..90 deg on exterior blinds, 0..180 on interior ones
+      // (open halfway).
+      //
+      // A blind's real position at power-up is unknowable, so either assume it
+      // ("boot_position") or measure it ("home_at_boot": true, which starts the
+      // estimate at "closed" and drives to the top — a full travel from
+      // anywhere, so it ends against the top stop with a position that is now
+      // known). Homing costs one traverse per power-up and makes boot_position
+      // irrelevant.
+      {"type": "blinds", "id": 500, "room": "kitchen",
+       "backend": {"kind": "cover",
+                   "up":   {"expander": 0, "pin": 2, "active_high": true},
+                   "down": {"expander": 0, "pin": 3, "active_high": true}},
+       "options": {"travel_up_ms": 79000, "travel_down_ms": 73800, "tilt_ms": 1600,
+                   "step_ms": 300, "reverse_delay_ms": 300,
+                   "boot_position": "open", "home_at_boot": true}}
+    ],
+
+    "buttons": [
+      // Wall switch between GPIO3 and GND, internal pull-up -> active low.
+      // Carries the plan number of the light it primarily controls.
+      // "kind": "momentary" = spring-return pushbutton,
+      //         "toggle"    = latching rocker (every flip is one press).
+      // Required — a wrong guess fails silently on a live panel.
+      //
+      // "gestures" defaults to false: the switch acts on the edge itself, which
+      // is what makes a plain light switch feel instant. Turning it on buys
+      // press_2/press_3/hold at the cost of waiting out the multi-press window
+      // (~300 ms) before *any* press acts — worth it only where the grammar is
+      // actually used, as on the blind switch below.
+      {"id": 29, "room": "kitchen", "kind": "toggle",
+       "pin": {"pin": 3, "active_high": false, "pull_up": true}},
+
+      // Latching rocker between PA2 and GND, using the chip's own pull-up.
+      // Every flip is one press_1, in either direction — its resting position
+      // at power-up is adopted silently, so nothing switches on boot.
+      {"id": 30, "room": "corridor", "kind": "toggle",
+       "pin": {"pin": 2, "active_high": false, "pull_up": true}},
+
+      // Blind switch. Must be momentary *and* declare "gestures": true — the
+      // cover grammar is built on double presses and holding, which a latching
+      // rocker can never do and an instant switch never waits for. Both cases
+      // are rejected at boot rather than half-working.
+      {"id": 500, "room": "kitchen", "kind": "momentary", "gestures": true,
+       "pin": {"pin": 6, "active_high": false, "pull_up": true}}
+    ]
+  },
+
+  "bindings": [
+    {"name": "kitchen light", "rule": "toggle",
+     "sources": [{"button": 29}],
+     "targets": [{"type": "light", "id": 29}]},
+
+    // Same rule, same device classes — only the pins live somewhere else.
+    {"name": "corridor light (on expander)", "rule": "toggle",
+     "sources": [{"button": 30}],
+     "targets": [{"type": "light", "id": 30}]},
+
+    // The cover rule reads the whole gesture grammar from one switch:
+    //   press      stop if moving, otherwise nudge the slats
+    //   press x2   reverse
+    //   hold       move while held
+    //   hold 3 s   commit: run to the end even after letting go
+    {"name": "kitchen blind", "rule": "cover",
+     "sources": [{"button": 500}],
+     "targets": [{"type": "blinds", "id": 500}]}
+  ]
+}

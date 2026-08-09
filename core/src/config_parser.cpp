@@ -296,10 +296,17 @@ bool parse(std::string_view json, App& out, std::string& error) {
             }
             JsonObjectConst options = obj["options"].as<JsonObjectConst>();
             if (options.isNull()) return fail(error, "cover: missing options.travel_ms");
-            actuator.cover.travelMs = options["travel_ms"] | 0u;
+            // A blind falls faster than it climbs. `travel_ms` sets both
+            // directions for a cover where that does not matter; measuring the
+            // two separately is what `travel_up_ms`/`travel_down_ms` are for.
+            const uint32_t travelBoth = options["travel_ms"] | 0u;
+            actuator.cover.travelUpMs = options["travel_up_ms"] | travelBoth;
+            actuator.cover.travelDownMs = options["travel_down_ms"] | travelBoth;
             actuator.cover.tiltMs = options["tilt_ms"] | 0u;
             actuator.cover.stepMs = options["step_ms"] | 500u;
             actuator.cover.reverseDelayMs = options["reverse_delay_ms"] | 500u;
+
+            actuator.cover.homeAtBoot = options["home_at_boot"] | false;
 
             const std::string_view boot = options["boot_position"] | "open";
             if (boot == "open") {
@@ -310,11 +317,15 @@ bool parse(std::string_view json, App& out, std::string& error) {
                 return fail(error, "cover: boot_position must be \"open\" or \"closed\"");
             }
 
-            if (actuator.cover.travelMs == 0) {
-                return fail(error, "cover: options.travel_ms must be measured and set");
+            if (actuator.cover.travelUpMs == 0 || actuator.cover.travelDownMs == 0) {
+                return fail(error, "cover: measure the travel — set options.travel_ms, or "
+                                   "travel_up_ms and travel_down_ms");
             }
-            if (actuator.cover.tiltMs >= actuator.cover.travelMs) {
-                return fail(error, "cover: tilt_ms must be shorter than travel_ms");
+            const uint32_t shorterTravel = actuator.cover.travelUpMs < actuator.cover.travelDownMs
+                                               ? actuator.cover.travelUpMs
+                                               : actuator.cover.travelDownMs;
+            if (actuator.cover.tiltMs >= shorterTravel) {
+                return fail(error, "cover: tilt_ms must be shorter than the travel");
             }
         }
         out.actuators.push_back(std::move(actuator));

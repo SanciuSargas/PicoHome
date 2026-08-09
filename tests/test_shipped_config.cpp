@@ -73,7 +73,8 @@ TEST_CASE("the shipped bench config parses and describes a buildable system") {
         if (def.backend == config::BackendKind::Cover) {
             auto down = std::make_unique<test::FakeDigitalOutput>();
             Cover::Timing timing;
-            timing.travelMs = def.cover.travelMs;
+            timing.travelUpMs = def.cover.travelUpMs;
+            timing.travelDownMs = def.cover.travelDownMs;
             timing.tiltMs = def.cover.tiltMs;
             timing.stepMs = def.cover.stepMs;
             timing.reverseDelayMs = def.cover.reverseDelayMs;

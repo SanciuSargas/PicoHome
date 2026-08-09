@@ -45,7 +45,8 @@ BuildResult build(const std::string& json) {
         if (def.backend == config::BackendKind::Cover) {
             auto down = std::make_unique<test::FakeDigitalOutput>();
             Cover::Timing timing;
-            timing.travelMs = def.cover.travelMs;
+            timing.travelUpMs = def.cover.travelUpMs;
+            timing.travelDownMs = def.cover.travelDownMs;
             timing.tiltMs = def.cover.tiltMs;
             registry.add(std::make_unique<Cover>(def.type, def.id, def.room, *out, *down, timing));
             outputs.push_back(std::move(down));

@@ -111,11 +111,13 @@ bool buildDevices(const picohome::config::App& config, picohome::DeviceRegistry&
             auto up = makeOutput(def.pin);
             auto down = makeOutput(def.pinDown);
             Cover::Timing timing;
-            timing.travelMs = def.cover.travelMs;
+            timing.travelUpMs = def.cover.travelUpMs;
+            timing.travelDownMs = def.cover.travelDownMs;
             timing.tiltMs = def.cover.tiltMs;
             timing.stepMs = def.cover.stepMs;
             timing.reverseDelayMs = def.cover.reverseDelayMs;
             timing.bootOpen = def.cover.bootOpen;
+            timing.homeAtBoot = def.cover.homeAtBoot;
             registry.add(std::make_unique<Cover>(def.type, def.id, def.room, *up, *down, timing));
             gOutputs.push_back(std::move(up));
             gOutputs.push_back(std::move(down));

@@ -21,13 +21,16 @@ struct Bench {
     std::unique_ptr<Cover> cover;
     uint32_t now = 0;
 
-    explicit Bench(bool bootOpen = true, uint32_t tiltMs = 1000) {
+    explicit Bench(bool bootOpen = true, uint32_t tiltMs = 1000, bool homeAtBoot = false,
+                   uint32_t downMs = 0) {
         Cover::Timing timing;
-        timing.travelMs = 10000;
+        timing.travelUpMs = 10000;
+        timing.travelDownMs = downMs == 0 ? 10000 : downMs;
         timing.tiltMs = tiltMs;
         timing.stepMs = 500;
         timing.reverseDelayMs = 500;
         timing.bootOpen = bootOpen;
+        timing.homeAtBoot = homeAtBoot;
         cover = std::make_unique<Cover>(DeviceType::Blinds, 500, "kitchen", up, down, timing);
         cover->initialize();
         cover->update(now);  // first update just anchors the clock
@@ -313,6 +316,114 @@ TEST_CASE("a curtain-style cover with no tilt moves height only") {
 
     bench.cover->stop();
     bench.cover->setTilt(50);  // and tilt commands are simply inert
+    CHECK_FALSE(bench.cover->isMoving());
+}
+
+TEST_CASE("a blind that falls faster than it climbs is timed per direction") {
+    // Climbs in 10 s, falls in 5 s — an exaggerated version of the real 82 s
+    // up / 71 s down, so the arithmetic is easy to read.
+    Bench bench(/*bootOpen=*/true, /*tiltMs=*/0, /*homeAtBoot=*/false, /*downMs=*/5000);
+    REQUIRE(bench.cover->position() == 100);
+
+    // Down: half the travel in half of *five* seconds.
+    bench.cover->moveAlongDirection();
+    bench.run(2500);
+    CHECK(bench.cover->position() == 50);
+
+    bench.cover->stop();
+    bench.run(600);  // motor rest
+    bench.cover->toggleDirection();
+    bench.cover->moveAlongDirection();
+
+    // Up: the same half of the travel now takes half of *ten* seconds.
+    bench.run(2500);
+    CHECK(bench.cover->position() == 75);
+    bench.run(2500);
+    CHECK(bench.cover->position() == 100);
+}
+
+TEST_CASE("a full descent takes exactly the down travel, with no rounding drift") {
+    // The conversion between the two scales carries its remainder; truncating
+    // it would lose ~14 % of the travel on a real blind.
+    Bench bench(/*bootOpen=*/true, /*tiltMs=*/0, /*homeAtBoot=*/false, /*downMs=*/7080);
+    bench.cover->moveToEnd();
+
+    bench.run(7000);
+    CHECK(bench.cover->position() > 0);  // not there quite yet
+    CHECK(bench.down.value);
+
+    bench.run(200);
+    CHECK(bench.cover->position() == 0);
+    CHECK_FALSE(bench.cover->isMoving());
+}
+
+TEST_CASE("set_position accounts for the direction it has to travel") {
+    Bench bench(/*bootOpen=*/true, /*tiltMs=*/0, /*homeAtBoot=*/false, /*downMs=*/5000);
+
+    bench.cover->setPosition(20);  // 80 % of the range, downwards: 4 s
+    bench.run(3900);
+    CHECK(bench.cover->isMoving());
+    bench.run(200);
+    CHECK_FALSE(bench.cover->isMoving());
+    CHECK(bench.cover->position() == 20);
+
+    bench.run(600);                 // motor rest
+    bench.cover->setPosition(100);  // 80 % of the range, upwards: 8 s
+    bench.run(7900);
+    CHECK(bench.cover->isMoving());
+    bench.run(200);
+    CHECK(bench.cover->position() == 100);
+}
+
+TEST_CASE("homing at boot drives to the top for a full traverse") {
+    // A blind's real position at power-up is unknown. Homing starts the
+    // estimate at "closed" and asks for the top, so the run lasts a whole
+    // travel — long enough to reach the stop from anywhere — and the estimate
+    // is measured at the end rather than assumed.
+    Bench bench(/*bootOpen=*/true, /*tiltMs=*/1000, /*homeAtBoot=*/true);
+
+    CHECK(bench.up.value);  // moving up from the first iteration
+    CHECK_FALSE(bench.down.value);
+    CHECK(bench.cover->position() == 0);  // the estimate it starts from
+
+    // Still running well past where a wrong guess would have stopped it.
+    bench.run(9000);
+    CHECK(bench.up.value);
+
+    // The full traverse is the slat sweep plus the height: 1 s + 10 s here.
+    bench.run(2100);
+    CHECK_FALSE(bench.up.value);
+    CHECK_FALSE(bench.cover->isMoving());
+    CHECK(bench.cover->position() == 100);
+    CHECK(bench.cover->direction() == Cover::Direction::Down);  // next gesture lowers
+    CHECK_FALSE(bench.bothEnergised);
+}
+
+TEST_CASE("homing overrides the boot_position guess, and is off by default") {
+    // Without homing the blind takes the assumption and stays put...
+    Bench idle(/*bootOpen=*/true);
+    idle.run(500);
+    CHECK_FALSE(idle.up.value);
+    CHECK_FALSE(idle.down.value);
+    CHECK(idle.cover->position() == 100);
+
+    // ...with it, boot_position no longer matters: homing always starts from
+    // "closed" so that the drive to the top is a guaranteed full travel.
+    Bench homing(/*bootOpen=*/true, /*tiltMs=*/1000, /*homeAtBoot=*/true);
+    CHECK(homing.cover->position() == 0);
+    CHECK(homing.up.value);
+}
+
+TEST_CASE("a homing run can be interrupted by the wall switch") {
+    // It is a normal movement, so the usual grammar still applies — nobody
+    // should be stuck watching a blind they did not ask to move.
+    Bench bench(/*bootOpen=*/true, /*tiltMs=*/1000, /*homeAtBoot=*/true);
+    bench.run(2000);
+    REQUIRE(bench.up.value);
+
+    bench.cover->stop();
+    CHECK_FALSE(bench.up.value);
+    bench.run(5000);
     CHECK_FALSE(bench.cover->isMoving());
 }
 

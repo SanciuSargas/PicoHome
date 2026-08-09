@@ -53,16 +53,25 @@
       // ("expander": 0). Both default to active_high true, as below.
       //
       // Position has no feedback, so travel_ms and tilt_ms *are* the scale —
-      // measure them with a stopwatch on the real blind. tilt_ms is the full
+      // measure them with a stopwatch on the real blind — separately in each
+      // direction, since a blind falls faster than it climbs. "travel_ms" sets
+      // both at once where that does not matter. tilt_ms is the full
       // slat sweep: 0..90 deg on exterior blinds, 0..180 on interior ones
-      // (open halfway). boot_position says where to assume it is at power-up.
+      // (open halfway).
+      //
+      // A blind's real position at power-up is unknowable, so either assume it
+      // ("boot_position") or measure it ("home_at_boot": true, which starts the
+      // estimate at "closed" and drives to the top — a full travel from
+      // anywhere, so it ends against the top stop with a position that is now
+      // known). Homing costs one traverse per power-up and makes boot_position
+      // irrelevant.
       {"type": "blinds", "id": 500, "room": "kitchen",
        "backend": {"kind": "cover",
                    "up":   {"pin": 6, "active_high": true},
                    "down": {"pin": 8, "active_high": true}},
-       "options": {"travel_ms": 10000, "tilt_ms": 1500,
+       "options": {"travel_up_ms": 10000, "travel_down_ms": 8500, "tilt_ms": 1500,
                    "step_ms": 500, "reverse_delay_ms": 500,
-                   "boot_position": "open"}}
+                   "boot_position": "open", "home_at_boot": false}}
     ],
 
     "buttons": [
