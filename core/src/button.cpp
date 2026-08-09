@@ -4,16 +4,17 @@
 
 namespace picohome {
 
-Button::Button(uint16_t id, std::string room, hal::IDigitalInput& input, SwitchKind kind)
+Button::Button(uint16_t id, std::string room, hal::IDigitalInput& input, SwitchKind kind,
+               GestureMode mode)
     : Device(DeviceType::Button, id, std::move(room)),
       input_(input),
-      detector_(*this, kind) {}
+      detector_(*this, kind, mode) {}
 
 Button::Button(uint16_t id, std::string room, hal::IDigitalInput& input, SwitchKind kind,
-               GestureDetector::Timing timing)
+               GestureMode mode, GestureDetector::Timing timing)
     : Device(DeviceType::Button, id, std::move(room)),
       input_(input),
-      detector_(*this, kind, timing) {}
+      detector_(*this, kind, mode, timing) {}
 
 void Button::initialize() {
     // Adopt the switch's boot position silently. Without this a toggle switch

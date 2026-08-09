@@ -73,6 +73,9 @@ private:
     enum class Target : uint8_t { None, Position, Tilt, Duration };
 
     void requestMove(Direction direction);
+    void releaseRelays();          // drop both windings, and note when
+    bool rested(uint32_t nowMs) const;
+    void energize(Direction dir);  // opposite winding dropped first, always
     void integrate(uint32_t elapsedMs);
     bool targetReached() const;
     void publishIfDue(bool force);
@@ -88,7 +91,11 @@ private:
     Direction pendingDirection_ = Direction::Down;
     bool moving_ = false;
     bool reversing_ = false;
-    uint32_t reverseStartMs_ = 0;
+    // When the windings last dropped out. Every start is held off until the
+    // motor has rested this long, however it came to be stopped — at power-up
+    // there is nothing to rest from, hence the flag.
+    uint32_t lastOffMs_ = 0;
+    bool everEnergised_ = false;
 
     Target target_ = Target::None;
     uint32_t targetPositionMs_ = 0;

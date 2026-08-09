@@ -89,6 +89,14 @@ struct ButtonDef {
     // read as momentary never completes a press, so its light simply never
     // responds), and the house has both kinds fitted.
     SwitchKind kind = SwitchKind::Momentary;
+
+    // Defaults to Instant, because most switches in the house are plain light
+    // switches and the multi-press window is felt as lag on every single press.
+    // A switch that needs press_2/press_3/hold — covers, dimmers, or anything
+    // Home Assistant wants multi-press from — declares `"gestures": true`, and
+    // a binding asking for what an Instant switch cannot produce is refused at
+    // boot rather than never firing.
+    GestureMode gestures = GestureMode::Instant;
 };
 
 struct DeviceRef {

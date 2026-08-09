@@ -4,6 +4,7 @@
 #include <string>
 
 #include "mocks/fakes.h"
+#include "picohome/config/config.h"
 #include "picohome/devices/cover.h"
 
 using namespace picohome;
@@ -33,8 +34,16 @@ struct Bench {
     }
 
     void run(uint32_t ms) {
-        for (uint32_t i = 0; i < ms; ++i) cover->update(++now);
+        for (uint32_t i = 0; i < ms; ++i) {
+            cover->update(++now);
+            // Checked after every single millisecond rather than at the end of
+            // a movement: energising both windings at once is the one failure
+            // that damages the motor, so no window of any width is acceptable.
+            if (up.value && down.value) bothEnergised = true;
+        }
     }
+
+    bool bothEnergised = false;
 };
 
 }  // namespace
@@ -138,6 +147,88 @@ TEST_CASE("reversing never energises both relays and rests the motor first") {
     CHECK_FALSE(bench.down.value);
 }
 
+TEST_CASE("the motor rests before reversing even when it was stopped first") {
+    // The dangerous sequence: a blind that has just stopped is asked to go the
+    // other way. Nothing is "moving" any more, but the relay that was live a
+    // millisecond ago is still physically opening.
+    Bench bench;
+    bench.cover->moveAlongDirection();
+    bench.run(1000);
+    REQUIRE(bench.down.value);
+
+    bench.cover->stop();
+    CHECK_FALSE(bench.down.value);
+
+    bench.cover->toggleDirection();
+    bench.cover->moveAlongDirection();
+    CHECK_FALSE(bench.up.value);  // must not start straight away
+    bench.run(400);
+    CHECK_FALSE(bench.up.value);
+    bench.run(200);
+    CHECK(bench.up.value);        // only after the rest period
+    CHECK_FALSE(bench.bothEnergised);
+}
+
+TEST_CASE("reaching a limit also counts as recently live") {
+    // Hitting the bottom stops the motor and flips the direction, so the very
+    // next gesture drives the other way — the rest period must still apply.
+    Bench bench;
+    bench.cover->moveToEnd();
+    while (bench.cover->isMoving() && bench.now < 30000) bench.run(1);
+    REQUIRE(bench.cover->position() == 0);
+    REQUIRE(bench.cover->direction() == Cover::Direction::Up);
+
+    // Acting on the same millisecond the motor dropped out.
+    bench.cover->moveAlongDirection();
+    CHECK_FALSE(bench.up.value);
+    bench.run(400);
+    CHECK_FALSE(bench.up.value);
+    bench.run(200);
+    CHECK(bench.up.value);
+    CHECK_FALSE(bench.bothEnergised);
+}
+
+TEST_CASE("a cover left idle starts without waiting") {
+    // The rest period protects the motor; it must not become latency on a
+    // blind that has been sitting still.
+    Bench bench;
+    bench.run(5000);
+    bench.cover->moveAlongDirection();
+    CHECK(bench.down.value);  // immediately
+}
+
+TEST_CASE("both relays are never energised together, whatever the sequence") {
+    Bench bench;
+    // A deliberately abusive mix of gestures and commands, including reversals
+    // at speed, stops mid-travel and commands arriving during the motor rest.
+    for (int round = 0; round < 3; ++round) {
+        bench.cover->moveAlongDirection();
+        bench.run(300);
+        bench.cover->toggleDirection();
+        bench.run(50);
+        bench.cover->toggleDirection();  // change of mind during the rest
+        bench.run(100);
+        bench.cover->stop();
+        bench.cover->moveAlongDirection();
+        bench.run(20);
+        bench.cover->setPosition(100);
+        bench.run(200);
+        bench.cover->setPosition(0);
+        bench.run(200);
+        bench.cover->setTilt(100);
+        bench.run(100);
+        bench.cover->moveToEnd();
+        bench.run(400);
+        bench.cover->stepAlongDirection();
+        bench.run(30);
+        bench.cover->releaseHold();
+        bench.run(10);
+    }
+    bench.run(30000);  // and let everything run itself out
+
+    CHECK_FALSE(bench.bothEnergised);
+}
+
 TEST_CASE("hold moves while held and stops on release") {
     Bench bench;
     bench.cover->moveAlongDirection();
@@ -223,6 +314,34 @@ TEST_CASE("a curtain-style cover with no tilt moves height only") {
     bench.cover->stop();
     bench.cover->setTilt(50);  // and tilt commands are simply inert
     CHECK_FALSE(bench.cover->isMoving());
+}
+
+TEST_CASE("cover relays take active_high like any other pin, and may differ per direction") {
+    // Nothing about a cover pin is special: "up" and "down" go through the same
+    // parser as a light's pin, so a low-trigger relay board is configured the
+    // same way — and the two directions need not match, since they can even be
+    // on different backends.
+    config::App app;
+    std::string error;
+    REQUIRE_MESSAGE(config::parse(R"({
+      "schema_version": 2, "building": "t",
+      "devices": {
+        "expanders": [{"index": 0, "address": "0x20", "int_pin": 7}],
+        "actuators": [{"type": "blinds", "id": 500, "room": "kitchen",
+                       "backend": {"kind": "cover",
+                                   "up":   {"pin": 6, "active_high": false},
+                                   "down": {"expander": 0, "pin": 3}},
+                       "options": {"travel_ms": 10000, "tilt_ms": 1500}}]},
+      "bindings": []})",
+                                  app, error),
+                    error);
+
+    REQUIRE(app.actuators.size() == 1);
+    CHECK(app.actuators[0].backend == config::BackendKind::Cover);
+    CHECK(app.actuators[0].pin.pin == 6);
+    CHECK_FALSE(app.actuators[0].pin.activeHigh);   // low-trigger board
+    CHECK(app.actuators[0].pinDown.expander == 0);  // and on the expander
+    CHECK(app.actuators[0].pinDown.activeHigh);     // defaults to high-trigger
 }
 
 TEST_CASE("position and tilt are published retained") {

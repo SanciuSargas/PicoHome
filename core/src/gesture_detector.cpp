@@ -33,13 +33,14 @@ GestureDetector::Timing GestureDetector::timingFor(SwitchKind kind) {
 }
 
 GestureDetector::GestureDetector(IGestureListener& listener)
-    : GestureDetector(listener, SwitchKind::Momentary) {}
+    : GestureDetector(listener, SwitchKind::Momentary, GestureMode::Full) {}
 
-GestureDetector::GestureDetector(IGestureListener& listener, SwitchKind kind)
-    : GestureDetector(listener, kind, timingFor(kind)) {}
+GestureDetector::GestureDetector(IGestureListener& listener, SwitchKind kind, GestureMode mode)
+    : GestureDetector(listener, kind, mode, timingFor(kind)) {}
 
-GestureDetector::GestureDetector(IGestureListener& listener, SwitchKind kind, Timing timing)
-    : listener_(listener), kind_(kind), timing_(timing) {}
+GestureDetector::GestureDetector(IGestureListener& listener, SwitchKind kind, GestureMode mode,
+                                 Timing timing)
+    : listener_(listener), kind_(kind), mode_(mode), timing_(timing) {}
 
 void GestureDetector::prime(bool rawState) {
     rawLast_ = rawState;
@@ -55,7 +56,21 @@ void GestureDetector::update(bool rawPressed, uint32_t nowMs) {
         rawLast_ = rawPressed;
         rawChangeMs_ = nowMs;
     }
-    if (rawPressed != stable_ && nowMs - rawChangeMs_ >= timing_.debounceMs) {
+    const bool edge = rawPressed != stable_ && nowMs - rawChangeMs_ >= timing_.debounceMs;
+
+    if (mode_ == GestureMode::Instant) {
+        // Nothing to wait for: no second press to rule out and no hold to time,
+        // so the switch acts on the edge and debounce is the only delay left.
+        // A rocker counts either direction; a pushbutton acts on the press
+        // itself rather than on the finger coming off.
+        if (edge) {
+            stable_ = rawPressed;
+            if (kind_ == SwitchKind::Toggle || stable_) listener_.onGesture(Gesture::Press1);
+        }
+        return;
+    }
+
+    if (edge) {
         stable_ = rawPressed;
         if (kind_ == SwitchKind::Toggle) {
             // Either direction is one flip of the rocker, so both count.

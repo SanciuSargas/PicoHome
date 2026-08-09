@@ -57,21 +57,22 @@ bool attachSources(const config::BindingDef& def, const config::App& config, Bin
                             " does not exist";
                     return false;
                 }
-                // The cover grammar is built on holding the switch, so a
-                // latching rocker can only ever reach half of it.
-                if (def.rule == config::RuleKind::Cover && !producesHoldGestures(button->kind)) {
+                // A binding must not sit waiting for something its switch can
+                // never produce: a latching rocker cannot be held, and a switch
+                // configured for instant response only ever reports press_1.
+                // The cover rule needs the whole grammar, so it is checked
+                // against its most demanding gesture.
+                const Gesture needed = def.rule == config::RuleKind::Cover ? Gesture::HoldStart
+                                                                           : source.gesture;
+                if (!producesGesture(button->kind, button->gestures, needed)) {
+                    // Point at the fix that would actually work: no amount of
+                    // configuration lets a latching rocker be held.
+                    const char* fix =
+                        isHoldGesture(needed) && !producesHoldGestures(button->kind)
+                            ? " — a latching rocker cannot be held, so this needs a momentary switch"
+                            : " — set \"gestures\": true on that button";
                     error = describe(def) + ": button " + std::to_string(source.buttonId) +
-                            " is a toggle switch, but a cover needs a momentary one to be held";
-                    return false;
-                }
-                // A latching rocker cannot be held, so a binding waiting for a
-                // hold from one would never fire. Catch it at boot rather than
-                // leaving someone pressing a switch that does nothing.
-                if (isHoldGesture(source.gesture) && !producesHoldGestures(button->kind)) {
-                    error = describe(def) + ": button " + std::to_string(source.buttonId) +
-                            " is a toggle switch and cannot produce " +
-                            std::string(toPayload(source.gesture)) +
-                            " — a momentary switch is needed for hold gestures";
+                            " cannot produce " + std::string(toPayload(needed)) + fix;
                     return false;
                 }
                 filter.key = SourceKey::button(source.buttonId);

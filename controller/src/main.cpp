@@ -141,7 +141,7 @@ bool buildDevices(const picohome::config::App& config, picohome::DeviceRegistry&
 
     for (const auto& def : config.buttons) {
         auto input = makeInput(def.pin);
-        auto button = std::make_unique<Button>(def.id, def.room, *input, def.kind);
+        auto button = std::make_unique<Button>(def.id, def.room, *input, def.kind, def.gestures);
         button->attachRouter(&router);
         registry.add(std::move(button));
         gInputs.push_back(std::move(input));
@@ -237,6 +237,7 @@ int main() {
 
     picohome::pico_hal::PicoClock clock;
     uint32_t lastBlinkMs = 0;
+    uint32_t lastUnrouted = 0;
     bool ledOn = false;
 
     while (true) {
@@ -252,6 +253,13 @@ int main() {
         picohome::InboundMessage inbound;
         for (int budget = 8; budget > 0 && picohome::net::popInbound(inbound); --budget) {
             commands.handle(inbound);
+        }
+        // A command that reached the right device but was refused (wrong verb
+        // for that device type, unparseable payload) is otherwise invisible.
+        if (commands.unroutedCount() != lastUnrouted) {
+            lastUnrouted = commands.unroutedCount();
+            std::printf("control: %u command(s) reached no device\n",
+                        static_cast<unsigned>(lastUnrouted));
         }
 
         // Inputs emit events into the router, which dispatches to bindings

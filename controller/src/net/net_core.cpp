@@ -82,9 +82,13 @@ void onMessage(MessageData* data) {
     }
 
     ParsedTopic parsed;
-    if (!parseTopic(topic, parsed)) return;
-    if (parsed.building != gConfig->building) return;      // someone else's building
-    if (parsed.command.rfind("set_", 0) != 0) return;      // our own state echo, ignore
+    if (!parseTopic(topic, parsed) || parsed.building != gConfig->building ||
+        !commands::isCommandVerb(parsed.command)) {
+        // Say so rather than dropping it in silence: a command that reaches the
+        // broker but never reaches a device is otherwise invisible.
+        std::printf("net: ignoring '%.*s'\n", static_cast<int>(topic.size()), topic.data());
+        return;
+    }
 
     InboundMessage message;
     message.kind = InboundKind::DeviceCommand;

@@ -65,13 +65,9 @@ void Cover::update(uint32_t nowMs) {
     nowMs_ = nowMs;
 
     if (reversing_) {
-        // Both relays are already off; the motor is resting before it reverses.
-        if (nowMs - reverseStartMs_ < timing_.reverseDelayMs) return;
-        reversing_ = false;
-        direction_ = pendingDirection_;
-        moving_ = true;
-        up_.write(direction_ == Direction::Up);
-        down_.write(direction_ == Direction::Down);
+        // Both relays are off; the motor is resting before it is driven again.
+        if (!rested(nowMs)) return;
+        energize(pendingDirection_);
         return;
     }
 
@@ -122,31 +118,57 @@ bool Cover::targetReached() const {
     return false;
 }
 
-void Cover::requestMove(Direction direction) {
-    if (moving_ && direction_ != direction) {
-        // Never energise both windings, and give the motor a moment to stop
-        // before it is asked to run the other way.
-        up_.write(false);
+void Cover::releaseRelays() {
+    up_.write(false);
+    down_.write(false);
+    // The moment the windings dropped out is what the rest period is measured
+    // from — not the moment a command arrived.
+    lastOffMs_ = nowMs_;
+}
+
+bool Cover::rested(uint32_t nowMs) const {
+    return static_cast<int32_t>(nowMs - lastOffMs_) >= static_cast<int32_t>(timing_.reverseDelayMs);
+}
+
+void Cover::energize(Direction direction) {
+    everEnergised_ = true;
+    // Drop the opposite winding *before* raising this one. On a GPIO backend
+    // these are two separate register writes, so the order is the difference
+    // between "never both on" and "both on for a microsecond".
+    if (direction == Direction::Up) {
         down_.write(false);
-        moving_ = false;
-        reversing_ = true;
-        pendingDirection_ = direction;
-        reverseStartMs_ = nowMs_;
-        return;
-    }
-    if (reversing_) {
-        pendingDirection_ = direction;
-        return;
+        up_.write(true);
+    } else {
+        up_.write(false);
+        down_.write(true);
     }
     direction_ = direction;
     moving_ = true;
-    up_.write(direction == Direction::Up);
-    down_.write(direction == Direction::Down);
+    reversing_ = false;
+}
+
+void Cover::requestMove(Direction direction) {
+    if (moving_ && direction_ == direction) return;  // already going that way
+
+    if (moving_) {
+        releaseRelays();
+        moving_ = false;
+    }
+
+    // Wait out the motor rest whenever the windings were live recently — which
+    // includes having just been stopped by a press, a target, or a limit, not
+    // only a reversal while running. A relay takes milliseconds to open, so
+    // energising the other one straight away can have both closed at once.
+    pendingDirection_ = direction;
+    if (!everEnergised_ || rested(nowMs_)) {
+        energize(direction);  // nothing to rest from at power-up
+    } else {
+        reversing_ = true;
+    }
 }
 
 void Cover::stop() {
-    up_.write(false);
-    down_.write(false);
+    releaseRelays();
     moving_ = false;
     reversing_ = false;
     target_ = Target::None;

@@ -15,6 +15,7 @@
 #include "picohome/net/command_router.h"
 #include "picohome/net/publisher.h"
 #include "picohome/net/remote_sources.h"
+#include "picohome/core/commands.h"
 #include "picohome/net/topic.h"
 
 using namespace picohome;
@@ -98,6 +99,26 @@ TEST_CASE("inbound set_binary reaches the device; unknown devices are counted") 
 
     commands.handle(deviceCommand(DeviceType::Light, 999, "set_binary", "1"));
     CHECK(commands.unroutedCount() == 1);
+}
+
+TEST_CASE("every verb the controller subscribes to is one it also recognises") {
+    // These two lists drifting apart is exactly how `stop` came to be
+    // subscribed to and then discarded: it is the only command that does not
+    // begin with "set_", so a prefix test silently threw it away.
+    for (const std::string_view verb : commands::kCommandVerbs) {
+        CHECK(commands::isCommandVerb(verb));
+    }
+    CHECK(commands::isCommandVerb("stop"));
+    CHECK_FALSE(commands::isCommandVerb("state"));  // our own output, not a command
+    CHECK_FALSE(commands::isCommandVerb("event"));
+
+    const auto subs = buildSubscriptions("utility", {});
+    REQUIRE(subs.size() == std::size(commands::kCommandVerbs));
+    for (const std::string& filter : subs) {
+        const auto slash = filter.rfind('/');
+        REQUIRE(slash != std::string::npos);
+        CHECK(commands::isCommandVerb(filter.substr(slash + 1)));
+    }
 }
 
 TEST_CASE("a command carrying the value a device already has says nothing") {

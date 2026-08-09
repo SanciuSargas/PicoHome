@@ -8,8 +8,11 @@ namespace picohome::pico_hal {
 GpioDigitalOutput::GpioDigitalOutput(uint8_t gpio, bool activeHigh)
     : gpio_(gpio), activeHigh_(activeHigh) {
     gpio_init(gpio_);
+    // Load the inactive level *before* the pin starts driving: a pin switched
+    // to output first would drive low for a few cycles, which is the energised
+    // level for a low-trigger relay board.
+    gpio_put(gpio_, !activeHigh_);
     gpio_set_dir(gpio_, GPIO_OUT);
-    write(false);
 }
 
 void GpioDigitalOutput::write(bool active) { gpio_put(gpio_, active == activeHigh_); }

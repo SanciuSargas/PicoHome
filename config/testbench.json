@@ -47,15 +47,19 @@
       {"type": "light", "id": 30, "room": "corridor",
        "backend": {"kind": "mcp", "expander": 0, "pin": 1, "active_high": true}},
 
-      // A blind: two relays, one per direction. Position has no feedback, so
-      // travel_ms and tilt_ms *are* the scale — measure them with a stopwatch
-      // on the real blind. tilt_ms is the full slat sweep: 0..90 deg on
-      // exterior blinds, 0..180 on interior ones (open halfway).
-      // boot_position says where to assume it is at power-up.
+      // A blind: two relays, one per direction. "up" and "down" are ordinary
+      // pins — the same fields as anywhere else, so a low-trigger relay board
+      // takes "active_high": false and either direction can sit on an expander
+      // ("expander": 0). Both default to active_high true, as below.
+      //
+      // Position has no feedback, so travel_ms and tilt_ms *are* the scale —
+      // measure them with a stopwatch on the real blind. tilt_ms is the full
+      // slat sweep: 0..90 deg on exterior blinds, 0..180 on interior ones
+      // (open halfway). boot_position says where to assume it is at power-up.
       {"type": "blinds", "id": 500, "room": "kitchen",
        "backend": {"kind": "cover",
-                   "up":   {"pin": 6},
-                   "down": {"pin": 8}},
+                   "up":   {"pin": 6, "active_high": true},
+                   "down": {"pin": 8, "active_high": true}},
        "options": {"travel_ms": 10000, "tilt_ms": 1500,
                    "step_ms": 500, "reverse_delay_ms": 500,
                    "boot_position": "open"}}
@@ -64,9 +68,15 @@
     "buttons": [
       // Wall switch between GPIO3 and GND, internal pull-up -> active low.
       // Carries the plan number of the light it primarily controls.
-      // "kind": "momentary" = spring-return pushbutton (full gesture grammar),
-      //         "toggle"    = latching rocker (every flip is one press_1).
+      // "kind": "momentary" = spring-return pushbutton,
+      //         "toggle"    = latching rocker (every flip is one press).
       // Required — a wrong guess fails silently on a live panel.
+      //
+      // "gestures" defaults to false: the switch acts on the edge itself, which
+      // is what makes a plain light switch feel instant. Turning it on buys
+      // press_2/press_3/hold at the cost of waiting out the multi-press window
+      // (~300 ms) before *any* press acts — worth it only where the grammar is
+      // actually used, as on the blind switch below.
       {"id": 29, "room": "kitchen", "kind": "momentary",
        "pin": {"pin": 3, "active_high": false, "pull_up": true}},
 
@@ -76,9 +86,11 @@
       {"id": 30, "room": "corridor", "kind": "toggle",
        "pin": {"expander": 0, "pin": 2, "active_high": false, "pull_up": true}},
 
-      // Blind switch. Must be momentary: the cover grammar is built on holding
-      // it, which a latching rocker can never do (rejected at boot if it is).
-      {"id": 500, "room": "kitchen", "kind": "momentary",
+      // Blind switch. Must be momentary *and* declare "gestures": true — the
+      // cover grammar is built on double presses and holding, which a latching
+      // rocker can never do and an instant switch never waits for. Both cases
+      // are rejected at boot rather than half-working.
+      {"id": 500, "room": "kitchen", "kind": "momentary", "gestures": true,
        "pin": {"pin": 9, "active_high": false, "pull_up": true}}
     ]
   },

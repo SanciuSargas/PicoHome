@@ -112,6 +112,9 @@ broker by themselves.
       toggle (latching rocker) — the config requires `"kind"` per button and there is no
       safe default. Devices needing hold gestures (dimmable lights, blinds, curtains, air
       dampers) want momentary ones
+- [ ] Note which switches need multi-press or hold (blinds, dimmers, or anything Home
+      Assistant should get `press_2` from) — those set `"gestures": true`. Everything else
+      keeps the default and acts on the press itself, ~300 ms sooner
 
 ### Development machine
 - [x] Install compilers (done 2026-07-17; host tests and firmware both build)

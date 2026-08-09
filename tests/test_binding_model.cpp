@@ -58,7 +58,7 @@ struct System {
         }
         for (const auto& def : config.buttons) {
             auto in = std::make_unique<FakeDigitalInput>();
-            auto button = std::make_unique<Button>(def.id, def.room, *in, def.kind);
+            auto button = std::make_unique<Button>(def.id, def.room, *in, def.kind, def.gestures);
             button->attachRouter(&router);
             registry.add(std::move(button));
             buttonInputs[def.id] = in.get();
@@ -115,8 +115,9 @@ std::string makeConfig(const char* bindingsJson, const char* extraSensors = "") 
            sensors +
            R"json(
         "buttons": [
-          {"id": 29, "room": "kitchen", "kind": "momentary", "pin": {"pin": 3}},
-          {"id": 30, "room": "corridor", "kind": "toggle", "pin": {"pin": 5}}
+          {"id": 29, "room": "kitchen", "kind": "momentary", "gestures": true, "pin": {"pin": 3}},
+          {"id": 30, "room": "corridor", "kind": "toggle", "pin": {"pin": 5}},
+          {"id": 31, "room": "kitchen", "kind": "momentary", "pin": {"pin": 7}}
         ]
       },
       "bindings": )json" +
@@ -206,6 +207,91 @@ TEST_CASE("gesture filter selects which press acts; press_1 is the default") {
     sys.buttonInputs[29]->value = false;
     sys.run(450);
     CHECK(sys.relays[29]->isOn());
+}
+
+TEST_CASE("an instant switch acts on the press itself, a gesture switch waits") {
+    System sys;
+    REQUIRE_MESSAGE(sys.load(makeConfig(R"([
+      {"name": "instant", "rule": "toggle",
+       "sources": [{"button": 31}], "targets": [{"type": "light", "id": 29}]},
+      {"name": "full grammar", "rule": "toggle",
+       "sources": [{"button": 29}], "targets": [{"type": "light", "id": 30}]}
+    ])")),
+                    sys.error);
+
+    // Button 31 is still held down here — it has already acted, because there
+    // is no second press to rule out.
+    sys.buttonInputs[31]->value = true;
+    sys.run(40);
+    CHECK(sys.relays[29]->isOn());
+
+    // Button 29 decodes the whole grammar, so at the same point it is still
+    // waiting to find out what the user meant.
+    sys.buttonInputs[29]->value = true;
+    sys.run(40);
+    CHECK_FALSE(sys.relays[30]->isOn());
+
+    sys.buttonInputs[29]->value = false;
+    sys.run(60);
+    CHECK_FALSE(sys.relays[30]->isOn());  // released, still inside the window
+    sys.run(300);
+    CHECK(sys.relays[30]->isOn());        // window closed: press_1 at last
+}
+
+TEST_CASE("an instant switch reports one press per press, not per edge") {
+    System sys;
+    REQUIRE_MESSAGE(sys.load(makeConfig(R"([
+      {"name": "instant", "rule": "toggle",
+       "sources": [{"button": 31}], "targets": [{"type": "light", "id": 29}]}
+    ])")),
+                    sys.error);
+
+    // Press and release: the release must not toggle it back.
+    sys.buttonInputs[31]->value = true;
+    sys.run(40);
+    CHECK(sys.relays[29]->isOn());
+    sys.buttonInputs[31]->value = false;
+    sys.run(200);
+    CHECK(sys.relays[29]->isOn());
+
+    sys.buttonInputs[31]->value = true;
+    sys.run(40);
+    CHECK_FALSE(sys.relays[29]->isOn());
+}
+
+TEST_CASE("an instant switch still debounces") {
+    System sys;
+    REQUIRE_MESSAGE(sys.load(makeConfig(R"([
+      {"name": "instant", "rule": "toggle",
+       "sources": [{"button": 31}], "targets": [{"type": "light", "id": 29}]}
+    ])")),
+                    sys.error);
+
+    // Contact chatter shorter than the debounce window is not a press.
+    for (int i = 0; i < 5; ++i) {
+        sys.buttonInputs[31]->value = true;
+        sys.run(5);
+        sys.buttonInputs[31]->value = false;
+        sys.run(5);
+    }
+    CHECK_FALSE(sys.relays[29]->isOn());
+}
+
+TEST_CASE("an instant rocker acts on either flip, and not at boot") {
+    System sys;
+    REQUIRE_MESSAGE(sys.load(makeConfig(R"([
+      {"name": "rocker", "rule": "toggle",
+       "sources": [{"button": 30}], "targets": [{"type": "light", "id": 29}]}
+    ])")),
+                    sys.error);
+
+    sys.buttonInputs[30]->value = true;
+    sys.run(40);
+    CHECK(sys.relays[29]->isOn());
+
+    sys.buttonInputs[30]->value = false;  // flipping back is another action
+    sys.run(40);
+    CHECK_FALSE(sys.relays[29]->isOn());
 }
 
 TEST_CASE("motion: two sensors hold the light, off-delay runs after both go quiet") {

@@ -87,6 +87,88 @@ TEST_CASE("press shorter than debounce is ignored") {
     CHECK(d.recorder.gestures.empty());
 }
 
+// --- instant mode ---------------------------------------------------------
+//
+// The full grammar cannot act until it knows no second press is coming, so a
+// plain light switch pays ~300 ms of latency for a feature it never uses.
+// Instant mode drops the grammar and acts on the edge instead.
+
+namespace {
+
+struct InstantDriver {
+    GestureRecorder recorder;
+    GestureDetector detector{recorder, picohome::SwitchKind::Momentary,
+                             picohome::GestureMode::Instant};
+    uint32_t now = 0;
+
+    void step(bool pressed, uint32_t durationMs) {
+        for (uint32_t i = 0; i < durationMs; ++i) detector.update(pressed, ++now);
+    }
+};
+
+}  // namespace
+
+TEST_CASE("instant momentary: press_1 lands while the button is still down") {
+    InstantDriver d;
+    d.step(false, 10);
+    d.step(true, 40);  // just past debounce, finger still on the button
+
+    REQUIRE(d.recorder.gestures.size() == 1);
+    CHECK(d.recorder.gestures[0] == Gesture::Press1);
+}
+
+TEST_CASE("instant momentary: releasing reports nothing more") {
+    InstantDriver d;
+    d.step(false, 10);
+    d.step(true, 100);
+    d.step(false, 500);
+    CHECK(d.recorder.gestures.size() == 1);
+}
+
+TEST_CASE("instant momentary: holding produces no hold gestures at all") {
+    InstantDriver d;
+    d.step(false, 10);
+    d.step(true, 10000);
+    CHECK(d.recorder.gestures.size() == 1);
+    CHECK(d.recorder.gestures[0] == Gesture::Press1);
+}
+
+TEST_CASE("instant momentary: two quick presses are two press_1, not a press_2") {
+    InstantDriver d;
+    d.step(false, 10);
+    d.step(true, 40);
+    d.step(false, 40);
+    d.step(true, 40);
+
+    REQUIRE(d.recorder.gestures.size() == 2);
+    CHECK(d.recorder.gestures[0] == Gesture::Press1);
+    CHECK(d.recorder.gestures[1] == Gesture::Press1);
+}
+
+TEST_CASE("instant momentary: bounce is still filtered") {
+    InstantDriver d;
+    d.step(false, 10);
+    for (int i = 0; i < 6; ++i) {
+        d.step(true, 5);
+        d.step(false, 5);
+    }
+    CHECK(d.recorder.gestures.empty());
+}
+
+TEST_CASE("instant mode reports only press_1, whatever the switch kind") {
+    using picohome::GestureMode;
+    using picohome::SwitchKind;
+    for (const SwitchKind kind : {SwitchKind::Momentary, SwitchKind::Toggle}) {
+        CHECK(producesGesture(kind, GestureMode::Instant, Gesture::Press1));
+        CHECK_FALSE(producesGesture(kind, GestureMode::Instant, Gesture::Press2));
+        CHECK_FALSE(producesGesture(kind, GestureMode::Instant, Gesture::HoldStart));
+    }
+    // With the grammar on, only the physical limitation remains.
+    CHECK(producesGesture(SwitchKind::Momentary, GestureMode::Full, Gesture::HoldStart));
+    CHECK(producesGesture(SwitchKind::Toggle, GestureMode::Full, Gesture::Press3));
+    CHECK_FALSE(producesGesture(SwitchKind::Toggle, GestureMode::Full, Gesture::HoldStart));
+}
+
 // --- toggle (latching rocker) switches ------------------------------------
 //
 // A toggle switch stays where it is put, so its position stops tracking the

@@ -21,4 +21,19 @@ inline constexpr std::string_view kEvent = "event";
 inline constexpr std::string_view kAlive = "alive";
 inline constexpr std::string_view kError = "error";
 
+// The verbs a controller accepts. One list, used both to build the MQTT
+// subscriptions and to recognise an inbound message — keeping them apart is
+// how `stop` came to be subscribed to and then silently discarded, because it
+// is the one command that does not start with "set_".
+inline constexpr std::string_view kCommandVerbs[] = {
+    kSetBinary, kSetNightMode, kSetPosition, kSetTilt, kStop,
+};
+
+inline bool isCommandVerb(std::string_view command) {
+    for (const std::string_view verb : kCommandVerbs) {
+        if (verb == command) return true;
+    }
+    return false;
+}
+
 }  // namespace picohome::commands

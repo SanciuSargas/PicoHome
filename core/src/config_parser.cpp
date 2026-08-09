@@ -355,6 +355,9 @@ bool parse(std::string_view json, App& out, std::string& error) {
                                    "\"toggle\" (latching rocker)");
         }
 
+        // Opt in to the full grammar; plain switches act on the edge instead.
+        button.gestures = (obj["gestures"] | false) ? GestureMode::Full : GestureMode::Instant;
+
         JsonObjectConst pin = obj["pin"].as<JsonObjectConst>();
         if (pin.isNull()) return fail(error, "button: missing pin");
         parsePin(pin, button.pin);

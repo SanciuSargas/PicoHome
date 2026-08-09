@@ -24,14 +24,9 @@ bool buildTopic(char* buffer, std::size_t size, std::string_view building,
 
 std::vector<std::string> buildSubscriptions(std::string_view building,
                                             const std::vector<std::string>& remoteTopics) {
-    // Command verbs this firmware accepts today; M10 adds set_range.
-    constexpr std::string_view kVerbs[] = {commands::kSetBinary, commands::kSetNightMode,
-                                           commands::kSetPosition, commands::kSetTilt,
-                                           commands::kStop};
-
     std::vector<std::string> subscriptions;
-    subscriptions.reserve(std::size(kVerbs) + remoteTopics.size());
-    for (const std::string_view verb : kVerbs) {
+    subscriptions.reserve(std::size(commands::kCommandVerbs) + remoteTopics.size());
+    for (const std::string_view verb : commands::kCommandVerbs) {
         subscriptions.emplace_back(std::string(building) + "/+/+/+/" + std::string(verb));
     }
     for (const std::string& topic : remoteTopics) subscriptions.push_back(topic);

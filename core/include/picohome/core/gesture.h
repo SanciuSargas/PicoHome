@@ -45,6 +45,32 @@ enum class SwitchKind : uint8_t { Momentary, Toggle };
 
 inline bool producesHoldGestures(SwitchKind kind) { return kind == SwitchKind::Momentary; }
 
+// How much of the grammar a given switch is asked to decode. This is separate
+// from SwitchKind because it is about intent, not wiring, and both kinds
+// support both modes.
+//
+// The full grammar cannot act on a press until it knows no second press is
+// coming, so every single press pays the multi-press window as latency —
+// ~330 ms on a momentary switch, ~230 ms on a rocker. A plain light switch
+// never uses press_2, press_3 or hold, so that wait buys it nothing and is
+// simply felt as lag.
+//
+//  - Instant: act on the actuating edge itself (the press, or either flip of a
+//    rocker) and emit press_1 straight away. Debounce is the only delay left.
+//    Nothing else is ever emitted.
+//  - Full: the whole grammar — multi-press and, on momentary switches, hold.
+//    Needed by covers and dimmers, and by anything using press_2/press_3
+//    locally or from Home Assistant.
+enum class GestureMode : uint8_t { Instant, Full };
+
+// Whether a switch so configured can ever produce a given gesture. Used at boot
+// to refuse a binding that would sit there waiting for something impossible.
+inline bool producesGesture(SwitchKind kind, GestureMode mode, Gesture gesture) {
+    if (mode == GestureMode::Instant) return gesture == Gesture::Press1;
+    if (isHoldGesture(gesture)) return producesHoldGestures(kind);
+    return true;
+}
+
 class IGestureListener {
 public:
     virtual ~IGestureListener() = default;
@@ -73,10 +99,12 @@ public:
     static Timing timingFor(SwitchKind kind);
 
     explicit GestureDetector(IGestureListener& listener);
-    GestureDetector(IGestureListener& listener, SwitchKind kind);
-    GestureDetector(IGestureListener& listener, SwitchKind kind, Timing timing);
+    GestureDetector(IGestureListener& listener, SwitchKind kind,
+                    GestureMode mode = GestureMode::Full);
+    GestureDetector(IGestureListener& listener, SwitchKind kind, GestureMode mode, Timing timing);
 
     SwitchKind kind() const { return kind_; }
+    GestureMode mode() const { return mode_; }
 
     // Adopt the switch's current position without reporting it. Called at boot
     // so a toggle switch resting in the "on" position does not look like a flip
@@ -94,6 +122,7 @@ private:
 
     IGestureListener& listener_;
     SwitchKind kind_;
+    GestureMode mode_;
     Timing timing_;
 
     bool rawLast_ = false;

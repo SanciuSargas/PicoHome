@@ -87,7 +87,7 @@ TEST_CASE("the shipped bench config parses and describes a buildable system") {
     }
     for (const auto& def : app.buttons) {
         auto in = std::make_unique<test::FakeDigitalInput>();
-        auto button = std::make_unique<Button>(def.id, def.room, *in, def.kind);
+        auto button = std::make_unique<Button>(def.id, def.room, *in, def.kind, def.gestures);
         button->attachRouter(&router);
         registry.add(std::move(button));
         inputs.push_back(std::move(in));

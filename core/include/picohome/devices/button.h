@@ -19,13 +19,14 @@ namespace picohome {
 class Button : public Device, private IGestureListener {
 public:
     Button(uint16_t id, std::string room, hal::IDigitalInput& input,
-           SwitchKind kind = SwitchKind::Momentary);
+           SwitchKind kind = SwitchKind::Momentary, GestureMode mode = GestureMode::Full);
     Button(uint16_t id, std::string room, hal::IDigitalInput& input, SwitchKind kind,
-           GestureDetector::Timing timing);
+           GestureMode mode, GestureDetector::Timing timing);
 
     void attachRouter(EventRouter* router) { router_ = router; }
 
     SwitchKind switchKind() const { return detector_.kind(); }
+    GestureMode gestureMode() const { return detector_.mode(); }
 
     void initialize() override;
     void update(uint32_t nowMs) override;

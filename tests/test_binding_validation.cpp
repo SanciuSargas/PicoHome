@@ -64,7 +64,7 @@ BuildResult build(const std::string& json) {
     }
     for (const auto& def : config.buttons) {
         auto in = std::make_unique<test::FakeDigitalInput>();
-        auto button = std::make_unique<Button>(def.id, def.room, *in, def.kind);
+        auto button = std::make_unique<Button>(def.id, def.room, *in, def.kind, def.gestures);
         button->attachRouter(&router);
         registry.add(std::move(button));
         inputs.push_back(std::move(in));
@@ -93,7 +93,11 @@ std::string configWith(const char* bindings) {
           {"type": "reed", "id": 700, "room": "kitchen", "pin": {"pin": 9}}
         ],
         "buttons": [{"id": 29, "room": "kitchen", "kind": "momentary", "pin": {"pin": 3}},
-                    {"id": 30, "room": "corridor", "kind": "toggle", "pin": {"pin": 5}}]
+                    {"id": 30, "room": "corridor", "kind": "toggle", "pin": {"pin": 5}},
+                    {"id": 501, "room": "kitchen", "kind": "momentary", "gestures": true,
+                     "pin": {"pin": 12}},
+                    {"id": 502, "room": "kitchen", "kind": "toggle", "gestures": true,
+                     "pin": {"pin": 13}}]
       },
       "bindings": )json") +
            bindings + "}";
@@ -241,12 +245,49 @@ TEST_CASE("a toggle switch bound to a hold gesture is rejected at boot") {
     CHECK(result.error.find("cannot produce hold_start") != std::string::npos);
 }
 
-TEST_CASE("a momentary switch may be bound to a hold gesture") {
+TEST_CASE("a momentary switch that decodes gestures may be bound to a hold") {
     const auto result = build(configWith(R"([
       {"name": "hold a pushbutton", "rule": "toggle",
-       "sources": [{"button": 29, "gesture": "hold_start"}],
+       "sources": [{"button": 501, "gesture": "hold_start"}],
        "targets": [{"type": "light", "id": 29}]}])"));
     CHECK_MESSAGE(result.built, result.error);
+}
+
+TEST_CASE("an instant switch is refused anything beyond press_1, with the fix named") {
+    // Button 29 takes the default: it acts on the edge and never waits to find
+    // out whether a second press is coming, so press_2 would never arrive.
+    for (const char* gesture : {"press_2", "press_3", "hold_start"}) {
+        std::string json = R"([{"name": "x", "rule": "toggle",
+          "sources": [{"button": 29, "gesture": ")";
+        json += gesture;
+        json += R"("}], "targets": [{"type": "light", "id": 29}]}])";
+        const auto result = build(configWith(json.c_str()));
+        REQUIRE(result.parsed);
+        CHECK_FALSE(result.built);
+        CHECK(result.error.find("\"gestures\": true") != std::string::npos);
+    }
+
+    // press_1 is exactly what an instant switch does produce.
+    const auto ok = build(configWith(R"([
+      {"name": "plain", "rule": "toggle",
+       "sources": [{"button": 29, "gesture": "press_1"}],
+       "targets": [{"type": "light", "id": 29}]}])"));
+    CHECK_MESSAGE(ok.built, ok.error);
+}
+
+TEST_CASE("a toggle switch with gestures on can still do multi-press, but never hold") {
+    const auto multi = build(configWith(R"([
+      {"name": "double flip", "rule": "toggle",
+       "sources": [{"button": 502, "gesture": "press_2"}],
+       "targets": [{"type": "light", "id": 29}]}])"));
+    CHECK_MESSAGE(multi.built, multi.error);
+
+    const auto hold = build(configWith(R"([
+      {"name": "hold a rocker", "rule": "toggle",
+       "sources": [{"button": 502, "gesture": "hold_start"}],
+       "targets": [{"type": "light", "id": 29}]}])"));
+    CHECK_FALSE(hold.built);
+    CHECK(hold.error.find("rocker cannot be held") != std::string::npos);
 }
 
 TEST_CASE("both switch kinds drive a plain light interchangeably") {
@@ -257,14 +298,26 @@ TEST_CASE("both switch kinds drive a plain light interchangeably") {
     CHECK_MESSAGE(result.built, result.error);
 }
 
-TEST_CASE("a cover binding needs a momentary switch, because it is built on holding") {
-    // Button 30 is a latching rocker: it can do press_1 and press_2, but the
-    // grammar's move-while-held and run-to-the-end are out of its reach.
+TEST_CASE("a cover binding needs a momentary switch that decodes gestures") {
+    // A latching rocker can do press_1 and press_2, but move-while-held and
+    // run-to-the-end are out of its reach whatever the config says.
     const auto rocker = build(configWith(R"([
       {"name": "blind on a rocker", "rule": "cover",
-       "sources": [{"button": 30}], "targets": [{"type": "blinds", "id": 500}]}])"));
+       "sources": [{"button": 502}], "targets": [{"type": "blinds", "id": 500}]}])"));
     CHECK_FALSE(rocker.built);
     CHECK(rocker.error.find("momentary") != std::string::npos);
+
+    // The right switch, but told not to bother decoding gestures.
+    const auto instant = build(configWith(R"([
+      {"name": "blind on an instant switch", "rule": "cover",
+       "sources": [{"button": 29}], "targets": [{"type": "blinds", "id": 500}]}])"));
+    CHECK_FALSE(instant.built);
+    CHECK(instant.error.find("\"gestures\": true") != std::string::npos);
+
+    const auto ok = build(configWith(R"([
+      {"name": "blind", "rule": "cover",
+       "sources": [{"button": 501}], "targets": [{"type": "blinds", "id": 500}]}])"));
+    CHECK_MESSAGE(ok.built, ok.error);
 }
 
 TEST_CASE("a cover rule cannot drive a light, and a toggle rule cannot drive a blind") {
