@@ -115,7 +115,7 @@ bool buildDevices(const picohome::config::App& config, picohome::DeviceRegistry&
             timing.travelDownMs = def.cover.travelDownMs;
             timing.tiltMs = def.cover.tiltMs;
             timing.stepMs = def.cover.stepMs;
-            timing.reverseDelayMs = def.cover.reverseDelayMs;
+            timing.motorRestMs = def.cover.motorRestMs;
             timing.bootOpen = def.cover.bootOpen;
             timing.homeAtBoot = def.cover.homeAtBoot;
             registry.add(std::make_unique<Cover>(def.type, def.id, def.room, *up, *down, timing));

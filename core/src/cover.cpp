@@ -156,7 +156,7 @@ void Cover::releaseRelays() {
 }
 
 bool Cover::rested(uint32_t nowMs) const {
-    return static_cast<int32_t>(nowMs - lastOffMs_) >= static_cast<int32_t>(timing_.reverseDelayMs);
+    return static_cast<int32_t>(nowMs - lastOffMs_) >= static_cast<int32_t>(timing_.motorRestMs);
 }
 
 void Cover::energize(Direction direction) {

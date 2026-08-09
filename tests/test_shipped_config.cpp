@@ -77,7 +77,7 @@ TEST_CASE("the shipped bench config parses and describes a buildable system") {
             timing.travelDownMs = def.cover.travelDownMs;
             timing.tiltMs = def.cover.tiltMs;
             timing.stepMs = def.cover.stepMs;
-            timing.reverseDelayMs = def.cover.reverseDelayMs;
+            timing.motorRestMs = def.cover.motorRestMs;
             timing.bootOpen = def.cover.bootOpen;
             registry.add(std::make_unique<Cover>(def.type, def.id, def.room, *out, *down, timing));
             outputs.push_back(std::move(down));

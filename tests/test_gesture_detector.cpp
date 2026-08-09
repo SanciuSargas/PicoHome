@@ -52,7 +52,7 @@ TEST_CASE("triple press emits press_3 immediately on the third release") {
 
 TEST_CASE("hold emits hold_start then hold_end") {
     Driver d;
-    d.step(true, 700);  // stable at ~30 ms, hold threshold 500 ms later
+    d.step(true, 700);  // stable at ~30 ms, hold threshold 400 ms later
     d.step(false, 50);
     REQUIRE(d.recorder.gestures.size() == 2);
     CHECK(d.recorder.gestures[0] == Gesture::HoldStart);

@@ -70,7 +70,7 @@
                    "up":   {"expander": 0, "pin": 2, "active_high": true},
                    "down": {"expander": 0, "pin": 3, "active_high": true}},
        "options": {"travel_up_ms": 80100, "travel_down_ms": 73800, "tilt_ms": 1550,
-                   "step_ms": 300, "reverse_delay_ms": 500,
+                   "step_ms": 300, "motor_rest_ms": 500,
                    "boot_position": "open", "home_at_boot": true}}
     ],
 
@@ -118,7 +118,7 @@
     //   press      stop if moving, otherwise nudge the slats
     //   press x2   reverse
     //   hold       move while held
-    //   hold 3 s   commit: run to the end even after letting go
+    //   hold 1 s   commit: run to the end even after letting go
     {"name": "kitchen blind", "rule": "cover",
      "sources": [{"button": 500}],
      "targets": [{"type": "blinds", "id": 500}]}

@@ -28,7 +28,7 @@ struct Bench {
         timing.travelDownMs = downMs == 0 ? 10000 : downMs;
         timing.tiltMs = tiltMs;
         timing.stepMs = 500;
-        timing.reverseDelayMs = 500;
+        timing.motorRestMs = 500;
         timing.bootOpen = bootOpen;
         timing.homeAtBoot = homeAtBoot;
         cover = std::make_unique<Cover>(DeviceType::Blinds, 500, "kitchen", up, down, timing);
@@ -573,6 +573,47 @@ TEST_CASE("a homing run can be interrupted by the wall switch") {
     CHECK_FALSE(bench.up.value);
     bench.run(5000);
     CHECK_FALSE(bench.cover->isMoving());
+}
+
+TEST_CASE("the old reverse_delay_ms name is refused, not quietly ignored") {
+    // Renamed to motor_rest_ms because the rest applies to any restart. A
+    // config using the old spelling would otherwise silently fall back to the
+    // default, which is exactly the kind of quiet surprise this loader avoids.
+    config::App app;
+    std::string error;
+    CHECK_FALSE(config::parse(R"({
+      "schema_version": 2, "building": "t",
+      "devices": {"actuators": [{"type": "blinds", "id": 500, "room": "k",
+                    "backend": {"kind": "cover", "up": {"pin": 6}, "down": {"pin": 8}},
+                    "options": {"travel_ms": 10000, "reverse_delay_ms": 800}}]},
+      "bindings": []})",
+                              app, error));
+    CHECK(error.find("motor_rest_ms") != std::string::npos);
+}
+
+TEST_CASE("motor_rest_ms is read from the config") {
+    config::App app;
+    std::string error;
+    REQUIRE_MESSAGE(config::parse(R"({
+      "schema_version": 2, "building": "t",
+      "devices": {"actuators": [{"type": "blinds", "id": 500, "room": "k",
+                    "backend": {"kind": "cover", "up": {"pin": 6}, "down": {"pin": 8}},
+                    "options": {"travel_ms": 10000, "motor_rest_ms": 800}}]},
+      "bindings": []})",
+                                  app, error),
+                    error);
+    CHECK(app.actuators[0].cover.motorRestMs == 800);
+
+    // ...and defaults when left out.
+    config::App plain;
+    REQUIRE(config::parse(R"({
+      "schema_version": 2, "building": "t",
+      "devices": {"actuators": [{"type": "blinds", "id": 500, "room": "k",
+                    "backend": {"kind": "cover", "up": {"pin": 6}, "down": {"pin": 8}},
+                    "options": {"travel_ms": 10000}}]},
+      "bindings": []})",
+                          plain, error));
+    CHECK(plain.actuators[0].cover.motorRestMs == 500);
 }
 
 TEST_CASE("cover relays take active_high like any other pin, and may differ per direction") {

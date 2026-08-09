@@ -61,7 +61,7 @@ struct CoverTiming {
     uint32_t travelDownMs = 0;      // full open -> closed, required
     uint32_t tiltMs = 0;            // whole slat sweep (0..90 deg outside, 0..180 inside)
     uint32_t stepMs = 500;          // press_1 nudge
-    uint32_t reverseDelayMs = 500;  // motor rest before reversing
+    uint32_t motorRestMs = 500;  // motor rest before reversing
     bool bootOpen = true;           // where to assume it is at power-up
     bool homeAtBoot = false;        // or: drive to the top once and know instead
 };

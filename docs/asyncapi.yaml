@@ -559,7 +559,7 @@ components:
       type: string
       enum: [press_1, press_2, press_3, hold_start, hold_long, hold_end]
       description: |
-        `hold_start` fires after about 0.5 s and `hold_long` after 3 s, while
+        `hold_start` fires after about 0.4 s and `hold_long` after 1 s, while
         the switch is still held; `hold_end` on release. Multi-press values
         arrive only after the multi-press window closes, which is why a switch
         that does not need them is configured not to wait.

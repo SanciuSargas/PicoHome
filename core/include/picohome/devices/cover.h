@@ -47,7 +47,11 @@ public:
         uint32_t travelDownMs = 0;      // full open -> closed, required
         uint32_t tiltMs = 0;            // whole angle sweep; 0 = no tilt
         uint32_t stepMs = 500;          // press_1 nudge
-        uint32_t reverseDelayMs = 500;  // motor rest before reversing
+        // How long the windings must stay dropped out before either is driven
+        // again — a mechanical relay takes milliseconds to open, and a motor
+        // that is still turning should not be asked to run the other way.
+        // Applies to any restart, not only a reversal while running.
+        uint32_t motorRestMs = 500;
         // Blinds normally sit raised, so that is the default assumption; the
         // first gesture then lowers them.
         bool bootOpen = true;

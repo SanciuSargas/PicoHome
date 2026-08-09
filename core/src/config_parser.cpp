@@ -304,7 +304,12 @@ bool parse(std::string_view json, App& out, std::string& error) {
             actuator.cover.travelDownMs = options["travel_down_ms"] | travelBoth;
             actuator.cover.tiltMs = options["tilt_ms"] | 0u;
             actuator.cover.stepMs = options["step_ms"] | 500u;
-            actuator.cover.reverseDelayMs = options["reverse_delay_ms"] | 500u;
+            if (!options["reverse_delay_ms"].isNull()) {
+                // Renamed 2026-08-09: the rest applies to any restart, not only
+                // a reversal. Say so rather than quietly using the default.
+                return fail(error, "cover: 'reverse_delay_ms' is now 'motor_rest_ms'");
+            }
+            actuator.cover.motorRestMs = options["motor_rest_ms"] | 500u;
 
             actuator.cover.homeAtBoot = options["home_at_boot"] | false;
 

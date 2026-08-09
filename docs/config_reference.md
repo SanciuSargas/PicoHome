@@ -146,7 +146,7 @@ motor reaches its stop (blind motors are built to sit against their limits).
 | `travel_ms` | — | — | \*Shorthand setting both directions at once, for a cover where the difference does not matter. Either it, or both of the pair above, must be non-zero. |
 | `tilt_ms` | no | `0` | Full slat sweep, and must be shorter than the shorter travel. `0` = no tilt. Exterior blinds sweep 0–90° (far end = open); interior ones 0–180° (open halfway, closed again at the end). The sweep is short enough that its own up/down asymmetry is not worth configuring. |
 | `step_ms` | no | `500` | How far a single press nudges. Because the angle moves first, this nudges the slats. |
-| `reverse_delay_ms` | no | `500` | Motor rest before driving again, measured from when the relays actually dropped out. |
+| `motor_rest_ms` | no | `500` | How long the windings stay dropped out before either is driven again, measured from the moment the relays actually released — so it applies to **any** restart, not only a reversal while running: after a press-to-stop, after reaching a limit, after a target completes. Power-up does not wait. A *minimum with margin*, not a value to tune: the relay needs tens of ms to open, the motor needs a few hundred to stop turning before being driven the other way. Check the motor's datasheet first (often 0.5 s); otherwise raise it until a reversal sounds like a clean stop-then-start rather than a clunk. Its only cost is felt latency when reversing. Does not affect position — the rest is not counted as travel. |
 | `boot_position` | no | `"open"` | `"open"` or `"closed"` — what to assume at power-up. |
 | `home_at_boot` | no | `false` | Stop assuming: start from "closed" and drive to the top, which takes a full travel from anywhere and ends against the stop with a position that is *measured*. Costs one traverse per power-up, and makes `boot_position` irrelevant. |
 
@@ -263,7 +263,7 @@ switch, so it requires `kind: "momentary"` **and** `gestures: true`:
 | press | stop if moving, otherwise nudge (which moves the slats, since the angle goes first) |
 | press ×2 | reverse |
 | hold | move while held |
-| hold 3 s | commit: run to the end even after letting go |
+| hold 1 s | commit: run to the end even after letting go |
 
 ### Binding `options`
 
