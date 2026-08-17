@@ -1,7 +1,8 @@
 // PicoHome room node — placeholder firmware.
 // Becomes a Modbus RTU slave (nanomodbus) on an RP2040-Zero, reading I2C
-// sensors (temperature/humidity/CO2) plus the analog smoke/light inputs and
-// exposing them through the register map in shared/.
+// sensors (temperature/humidity/CO2), the photoresistor's analog input and the
+// smoke detector's digital one, exposing them through the register map in
+// shared/.
 
 #include "pico/stdlib.h"
 

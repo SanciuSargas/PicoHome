@@ -19,8 +19,10 @@ void BinarySensor::update(uint32_t nowMs) {
     if (raw != rawLast_) {
         rawLast_ = raw;
         rawChangeMs_ = nowMs;
-        return;
     }
+    // A sensor with nothing to debounce — a PIR or presence module drives a
+    // clean logic output — must act in this same iteration: that latency is the
+    // one thing motion lighting is judged on.
     if (raw == stable_ || nowMs - rawChangeMs_ < debounceMs_) return;
 
     stable_ = raw;

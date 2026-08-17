@@ -7,6 +7,7 @@ add_executable(picohome_tests
     test_relay_button_binding.cpp
     test_binding_model.cpp
     test_binding_validation.cpp
+    test_binary_sensor.cpp
     test_mqtt_plumbing.cpp
     test_mcp23017.cpp
     test_cover.cpp

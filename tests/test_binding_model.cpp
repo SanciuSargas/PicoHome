@@ -27,6 +27,7 @@ struct System {
     BindingSet bindings;
     RemoteSourceTable remoteSources;
     config::App config;
+    test::RecordingPublisher publisher;
     std::string error;
 
     std::vector<std::unique_ptr<FakeDigitalOutput>> outputs;
@@ -65,8 +66,18 @@ struct System {
             inputs.push_back(std::move(in));
         }
         if (!bindings.build(config, registry, router, remoteSources, error)) return false;
+        registry.attachPublisher(&publisher);
         registry.initializeAll();
         return true;
+    }
+
+    // What a device last said on one of its topics, as Home Assistant would
+    // see it.
+    std::string lastPublished(DeviceType type, uint16_t id, const std::string& command) const {
+        for (auto it = publisher.messages.rbegin(); it != publisher.messages.rend(); ++it) {
+            if (it->type == type && it->id == id && it->command == command) return it->payload;
+        }
+        return "<none>";
     }
 
     void run(uint32_t ms) {
@@ -436,4 +447,46 @@ TEST_CASE("a wall switch still works while motion controls the same light") {
 
     sys.setSensor(720, true);
     CHECK(sys.relays[29]->isOn());
+}
+
+TEST_CASE("M7: a PIR and a presence sensor light a corridor, and both are visible in MQTT") {
+    // The milestone's "done when", start to finish: nothing here is firmware —
+    // the sensors, the rule and the delay are all config, and the sensors are
+    // fully observable even though the light is driven locally.
+    System sys;
+    REQUIRE_MESSAGE(
+        sys.load(makeConfig(R"([
+      {"name": "corridor motion", "rule": "motion",
+       "sources": [{"sensor": {"type": "pir", "id": 720}},
+                   {"sensor": {"type": "presence", "id": 730}}],
+       "targets": [{"type": "light", "id": 30}],
+       "options": {"off_delay_ms": 5000}}])",
+                        R"({"type": "pir", "id": 720, "room": "corridor", "pin": {"pin": 8}},
+                           {"type": "presence", "id": 730, "room": "corridor", "pin": {"pin": 9}})")),
+        sys.error);
+
+    // Every device announces itself at boot, sensors included.
+    CHECK(sys.lastPublished(DeviceType::Pir, 720, "state") == "0");
+    CHECK(sys.lastPublished(DeviceType::Presence, 730, "state") == "0");
+
+    // Walking in: the PIR fires first, and with no debounce to serve it does so
+    // within a loop iteration.
+    sys.sensorInputs[720]->value = true;
+    sys.run(1);
+    CHECK(sys.relays[30]->isOn());
+    CHECK(sys.lastPublished(DeviceType::Pir, 720, "state") == "1");
+
+    // Sitting still: the PIR drops but the LD2410C holds the room occupied.
+    sys.setSensor(730, true);
+    sys.setSensor(720, false);
+    sys.run(20000);
+    CHECK(sys.relays[30]->isOn());
+    CHECK(sys.lastPublished(DeviceType::Pir, 720, "state") == "0");
+    CHECK(sys.lastPublished(DeviceType::Presence, 730, "state") == "1");
+
+    // Leaving: the room goes quiet and the off-delay takes the light.
+    sys.setSensor(730, false);
+    sys.run(6000);
+    CHECK_FALSE(sys.relays[30]->isOn());
+    CHECK(sys.lastPublished(DeviceType::Presence, 730, "state") == "0");
 }

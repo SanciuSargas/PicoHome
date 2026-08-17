@@ -218,6 +218,11 @@ channels:
   binarySensorState:
     address: '{building}/{room}/{binarySensorType}/{deviceId}/state'
     title: Binary sensor state
+    description: |
+      Retained, published on every debounced change. A sensor also publishes
+      once at boot, adopting whatever its pin reads without acting on it — a PIR
+      that happens to be active during a power cut must not switch lights on
+      before the retained set_night_mode has arrived.
     parameters:
       building: { $ref: '#/components/parameters/building' }
       room: { $ref: '#/components/parameters/room' }
@@ -459,10 +464,17 @@ components:
       enum: [blinds, curtains]
 
     binarySensorType:
-      enum: [reed, water_leak, pir, presence]
+      description: |
+        Sensors read as one on/off pin on a panel. `smoke` belongs here since
+        2026-08-09: the detectors being fitted have a digital output, so to the
+        controller they are indistinguishable from a reed contact.
+        Only `pir` and `presence` may additionally drive a local binding; the
+        rest publish their state and leave any logic to Home Assistant.
+      enum: [reed, water_leak, smoke, pir, presence]
 
     numericSensorType:
-      enum: [temperature, humidity, co2, smoke, light_level]
+      description: Read by the RS485 room nodes, not from a panel pin.
+      enum: [temperature, humidity, co2, light_level]
 
   messages:
     binaryCommand:

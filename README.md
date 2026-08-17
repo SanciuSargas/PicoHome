@@ -129,6 +129,11 @@ broker by themselves.
       resistors for dividers, 5 V→3.3 V regulators
 - [ ] Verify the relay boards trigger reliably from 3.3 V logic (prefer low-trigger opto
       boards; add transistor stage if not)
+- [ ] Check what kind of digital output the smoke detectors have. A dry contact or
+      open-collector wires straight to a pin with a pull-up, like a reed switch; a driven
+      **5 V push-pull** output needs a divider or level shifter (RP2040 GPIO is not 5 V
+      tolerant and the MCP23017s run at 3.3 V). Easy to overlook now that it is "just a
+      digital input"
 - [ ] Provide the exact model/datasheet of the RS485 Modbus relay module (serial params +
       register map needed for the Modbus master config)
 - [ ] Confirm MQTT broker details (old code used 192.168.1.200:1883) and that
@@ -136,8 +141,10 @@ broker by themselves.
 - [ ] When HA is set up (M13): the entity driving each light's `set_night_mode` must
       publish with `retain: true`, so a rebooted controller picks up the current
       day/night value from the broker instead of defaulting to night
-- [ ] Get 3 SD cards: **SDHC, 4–32 GB, FAT32** (SDSC ≤2 GB is rejected by the driver,
-      SDXC ≥64 GB ships exFAT — see `docs/hardware.md`)
+- [ ] Get 3 SD cards: **SDHC, 4–32 GB, FAT32** — the tested combination. The only hard
+      rule is **not SDSC (≤2 GB)**, which the driver rejects; a bigger SDXC card with its
+      factory exFAT should also work but has never been run on the bench
+      (see `docs/hardware.md`)
 
 ### Later / background
 - [ ] Watering system scope (future 4th controller — cellar + 2 underground points)

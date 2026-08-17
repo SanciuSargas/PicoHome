@@ -65,10 +65,19 @@ on an outlet, logic same as plain light · **PJ** = P + J.
 - Outdoor PIR (closet building)
 - ~~Distance sensor (atstumo sensorius, kids' toilet)~~ — dropped, no longer needed (2026-07-17)
 
+- Smoke detectors — **digital high/low** (2026-08-09, user). Not the analog output first
+  planned, so to the firmware they are ordinary binary sensors, wired and configured
+  exactly like a reed contact. **Check the output type before wiring:** a dry contact or
+  open-collector goes straight to a pin with a pull-up, but a *driven 5 V push-pull*
+  output needs a divider or level shifter — RP2040 GPIO is not 5 V tolerant and the
+  MCP23017s here run at 3.3 V.
+
 **On room nodes (kompiuteriukas, RS485)**
 - I2C: temperature, humidity, CO2
-- Analog: smoke detector (5 V out → divider), photoresistor (run divider at 3.3 V)
-- Wiring confirms analog smoke/light signals terminate at room nodes, not panels
+- Analog: photoresistor (run divider at 3.3 V)
+- Wiring confirms the light-level signal terminates at room nodes, not panels. Smoke may
+  terminate at either now that it is digital — a room node's pin and a panel pin read it
+  identically.
 
 ## Proposed plan-number ranges for unnumbered devices (TBC by user)
 
@@ -114,14 +123,31 @@ PWM-to-0-10V converter modules; the plan's relay handles on/off. No DAC needed.
 
 ## SD cards (config storage)
 
-**Must be SDHC, 4–32 GB, formatted FAT32** — one per controller.
+**Recommended: SDHC, 4–32 GB, formatted FAT32** — one per controller. That is the tested
+path, and a config file is a few kB, so capacity buys nothing.
 
-- **SDSC (Standard Capacity, ≤2 GB) does not work.** The card initializes fine but the
-  no-OS-FatFS driver supports only block-addressed cards and rejects byte-addressed SDSC
-  (`sd_card_spi_init: SD Standard Capacity Memory Card unsupported` → `f_mount` returns
-  FR_NOT_READY). Verified on the bench 2026-07-25.
-- **SDXC (≥64 GB) is accepted by the driver but ships exFAT**, which this FatFs build does
-  not support → `FR_NO_FILESYSTEM`. Reformat as FAT32 if such a card must be used.
+What the driver actually enforces is the card *class*, not its size (checked against the
+vendored sources 2026-08-09):
+
+- **SDSC (Standard Capacity, ≤2 GB) does not work — this is the hard floor.** The card
+  initializes fine, but `sd_card_spi_init()` accepts only block-addressed cards: it
+  requires the OCR's CCS bit, which SDSC leaves clear
+  (`sd_card_spi.c:1630`, `SD Standard Capacity Memory Card unsupported` → `f_mount`
+  returns FR_NOT_READY). Verified on the bench 2026-07-25. Since SDSC stops at 2 GB, the
+  smallest usable card is 4 GB.
+- **SDXC (>32 GB) is not excluded, and neither is exFAT.** CCS is set by SDHC and SDXC
+  alike, so both take the same code path, and this FatFs build has `FF_FS_EXFAT 1` and
+  `FF_LBA64 1` (`src/include/ffconf.h`, with `ff15/source/!ffconf.h` renamed out of the
+  way so it cannot shadow it; no `-DFF_*` overrides in the build). Confirmed at the
+  binary level: the exFAT-only `load_xdir`/`store_xdir` are linked into `controller.uf2`.
+  So a 64 GB card should mount as it ships. **Untested on the bench** — only the 2 GB SDSC
+  (rejected) and a 16 GB SDHC (works) have actually been run.
+  The "FAT32 only up to 32 GB" rule is a Windows *formatting* limit, not a FatFs one.
+- **Ceiling just under 2 TB**, from `CSD_sectors()` (`sd_regs.h:123`) returning the sector
+  count as a `uint32_t`: `C_SIZE` is 22 bits, so a full 2 TB card yields exactly 2^32
+  sectors and wraps to 0, which the init treats as a failure. SDUC (>2 TB, CSD v3) is not
+  decoded at all and returns 0. Neither is a real concern; both are noted so the number
+  is not mistaken for a driver bug later.
 - Config file goes in the card root as `config.json`.
 
 ## Electrical / level-shifting rules
@@ -131,8 +157,10 @@ PWM-to-0-10V converter modules; the plan's relay handles on/off. No DAC needed.
   to GND — no shifting needed even on long runs. Relay boards driven at 3.3 V logic: verify
   each board triggers reliably; prefer low-trigger opto boards, add transistor stage if not.
 - The 5 V rail in the wiring powers sensors (PIR, LD2410C, smoke). Check each *output*:
-  HC-SR501 OUT = 3.3 V ✓, LD2410C OUT = 3.3 V ✓, analog smoke out swings to 5 V → resistor
-  divider before any ADC.
+  HC-SR501 OUT = 3.3 V ✓, LD2410C OUT = 3.3 V ✓, smoke detector **depends on the model** —
+  a dry contact or open-collector is safe (pull up to 3.3 V), a 5 V push-pull output needs
+  a divider or level shifter. Being digital now makes this easier to overlook than when it
+  was an ADC input, so confirm it per detector.
 - I2C stays panel-local (MCP23017 expanders); anything leaving the panel goes RS485.
   Up to eight chips share one bus at addresses 0x20–0x27, set by their A0–A2 pins, so no
   I2C mux is needed (**PCA9548A dropped 2026-07-26**). Each chip's INT goes to its own

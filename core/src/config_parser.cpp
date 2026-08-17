@@ -136,7 +136,7 @@ bool parseSource(JsonObjectConst obj, RuleKind rule, SourceDef& source, std::str
                             "binding source sensor", error)) {
             return false;
         }
-        if (source.sensor.type != DeviceType::Pir && source.sensor.type != DeviceType::Presence) {
+        if (!isOccupancySensor(source.sensor.type)) {
             return fail(error,
                         "binding source sensor must be pir or presence (other sensors publish "
                         "their state for Home Assistant instead of driving local bindings)");
@@ -218,6 +218,32 @@ bool parseBinding(JsonObjectConst obj, BindingDef& binding, std::string& error) 
 }
 
 }  // namespace
+
+uint32_t defaultDebounceMs(DeviceType type) {
+    switch (type) {
+        case DeviceType::Pir:
+        case DeviceType::Presence:
+            // Neither has anything to debounce: both drive a clean logic output
+            // and hold it for their own on-board delay. Filtering here would
+            // only add latency to the one path where it is felt — the light
+            // should be on before you have finished walking in.
+            return 0;
+        case DeviceType::Smoke:
+            // A driven digital output, so nothing bounces; the reason to wait
+            // at all is the long cable run from the room to the panel, where
+            // mains wiring alongside it can induce a spike. Milliseconds of
+            // margin cover that, and a fire does not need sub-second reporting.
+            return 300;
+        case DeviceType::WaterLeak:
+            // A conductive probe sits right at its threshold and can chatter
+            // for seconds on a thin film. A leak never goes away in one second
+            // and a false alarm may shut a valve, so this one waits to be sure.
+            return 1000;
+        default:
+            // A magnetic reed contact bounces like any other mechanical switch.
+            return 50;
+    }
+}
 
 bool parse(std::string_view json, App& out, std::string& error) {
     JsonDocument doc;
@@ -342,9 +368,20 @@ bool parse(std::string_view json, App& out, std::string& error) {
         sensor.type = typeFromSegment(obj["type"] | "");
         sensor.id = obj["id"] | static_cast<uint16_t>(0);
         sensor.room = obj["room"] | "";
-        sensor.debounceMs = obj["debounce_ms"] | 50u;
         if (sensor.type == DeviceType::Unknown) return fail(error, "sensor: unknown type");
+        // devices.sensors describes the panel's own wiring: one pin, one state.
+        if (!isBinarySensor(sensor.type)) {
+            const std::string what = "'" + std::string(toSegment(sensor.type)) + "'";
+            if (isMeasurement(sensor.type)) {
+                return fail(error, "sensor " + what +
+                                       ": measurements are read by room nodes over Modbus, not "
+                                       "from a panel pin (M9)");
+            }
+            return fail(error, what + " is not a sensor type — devices.sensors takes reed, "
+                                      "water_leak, smoke, pir or presence");
+        }
         if (sensor.id == 0 || sensor.room.empty()) return fail(error, "sensor: needs id and room");
+        sensor.debounceMs = obj["debounce_ms"] | defaultDebounceMs(sensor.type);
         JsonObjectConst pin = obj["pin"].as<JsonObjectConst>();
         if (pin.isNull()) return fail(error, "sensor: missing pin");
         parsePin(pin, sensor.pin);
@@ -422,6 +459,77 @@ bool parse(std::string_view json, App& out, std::string& error) {
     }
     for (const ButtonDef& button : out.buttons) {
         if (!checkPin(button.pin, "button/" + std::to_string(button.id))) return false;
+    }
+
+    // MQTT addresses a device as <type>/<id>, so two of them sharing that name
+    // means commands only ever reach the first while the second still drives
+    // its pin. Buttons are exempt on purpose: a P-group is several physical
+    // switches carrying one logical id, which is exactly how a switch group in
+    // two rooms is declared.
+    std::vector<DeviceRef> declared;
+    const auto claimName = [&](DeviceType type, uint16_t id) {
+        for (const DeviceRef& taken : declared) {
+            if (taken.type == type && taken.id == id) {
+                return fail(error, std::string(toSegment(type)) + "/" + std::to_string(id) +
+                                       " is declared twice");
+            }
+        }
+        declared.push_back(DeviceRef{type, id});
+        return true;
+    };
+    for (const ActuatorDef& actuator : out.actuators) {
+        if (!claimName(actuator.type, actuator.id)) return false;
+    }
+    for (const SensorDef& sensor : out.sensors) {
+        if (!claimName(sensor.type, sensor.id)) return false;
+    }
+
+    // Two devices on one pin is a wiring mistake the firmware would otherwise
+    // act out: an input and an output fighting over the same line, or one relay
+    // silently shadowing another. The lists are short, so a plain scan is
+    // enough — and this runs once, at boot.
+    struct ClaimedPin {
+        int8_t expander;
+        uint8_t pin;
+        std::string owner;
+    };
+    std::vector<ClaimedPin> pins;
+    const auto claimPin = [&](const PinRef& pin, const std::string& owner) {
+        for (const ClaimedPin& taken : pins) {
+            if (taken.expander == pin.expander && taken.pin == pin.pin) {
+                const std::string where = pin.expander < 0
+                                              ? "GPIO " + std::to_string(pin.pin)
+                                              : "expander " + std::to_string(pin.expander) +
+                                                    " pin " + std::to_string(pin.pin);
+                return fail(error, where + " is claimed by both " + taken.owner + " and " + owner);
+            }
+        }
+        pins.push_back(ClaimedPin{pin.expander, pin.pin, owner});
+        return true;
+    };
+    for (const ExpanderDef& expander : out.expanders) {
+        PinRef intPin;
+        intPin.pin = expander.intPin;
+        if (!claimPin(intPin, "expander " + std::to_string(expander.index) + " INT")) return false;
+    }
+    for (const ActuatorDef& actuator : out.actuators) {
+        const std::string what =
+            std::string(toSegment(actuator.type)) + "/" + std::to_string(actuator.id);
+        if (actuator.backend == BackendKind::Cover) {
+            if (!claimPin(actuator.pin, what + " (up)")) return false;
+            if (!claimPin(actuator.pinDown, what + " (down)")) return false;
+            continue;
+        }
+        if (!claimPin(actuator.pin, what)) return false;
+    }
+    for (const SensorDef& sensor : out.sensors) {
+        if (!claimPin(sensor.pin,
+                      std::string(toSegment(sensor.type)) + "/" + std::to_string(sensor.id))) {
+            return false;
+        }
+    }
+    for (const ButtonDef& button : out.buttons) {
+        if (!claimPin(button.pin, "button/" + std::to_string(button.id))) return false;
     }
 
     return true;

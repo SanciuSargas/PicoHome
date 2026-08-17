@@ -74,6 +74,31 @@
                    "boot_position": "open", "home_at_boot": false}}
     ],
 
+    // Sensors are declared so they publish retained state for Home Assistant.
+    // Only pir and presence may additionally drive a local binding (the motion
+    // rule below); a reed, water_leak or smoke contact is published and left to
+    // high level, which is where that logic belongs.
+    //
+    // "debounce_ms" defaults per type and rarely needs setting: 0 for pir and
+    // presence (both drive a clean output, and waiting only delays the light),
+    // 50 for a reed contact, 300 for smoke, 1000 for a water probe. Raise it on
+    // a sensor that flickers — on a PIR that costs exactly the responsiveness
+    // the sensor exists for, so prefer letting off_delay_ms absorb it.
+    "sensors": [
+      // HC-SR501-class PIR, 5 V supply, 3.3 V OUT — safe direct to a pin.
+      {"type": "pir", "id": 720, "room": "corridor",
+       "pin": {"pin": 11, "active_high": true, "pull_up": false}},
+
+      // HLK-LD2410C presence, OUT pin only: high the whole time someone is in
+      // the room, including sitting still. 5 V supply, 3.3 V OUT.
+      {"type": "presence", "id": 730, "room": "corridor",
+       "pin": {"pin": 12, "active_high": true, "pull_up": false}},
+
+      // Reed contact to GND with the internal pull-up, exactly like a switch.
+      {"type": "reed", "id": 700, "room": "kitchen",
+       "pin": {"expander": 0, "pin": 3, "active_high": false, "pull_up": true}}
+    ],
+
     "buttons": [
       // Wall switch between GPIO3 and GND, internal pull-up -> active low.
       // Carries the plan number of the light it primarily controls.
@@ -121,6 +146,20 @@
     //   hold 1 s   commit: run to the end even after letting go
     {"name": "kitchen blind", "rule": "cover",
      "sources": [{"button": 500}],
-     "targets": [{"type": "blinds", "id": 500}]}
+     "targets": [{"type": "blinds", "id": 500}]},
+
+    // Motion (the J suffix on the plan): any number of pir/presence sensors
+    // driving any number of lights. The PIR retriggers the delay as someone
+    // walks past; the presence sensor holds the light on while they sit still.
+    // Each target is gated by its own night_mode — on by default, so this works
+    // before the broker has ever been reached, and Home Assistant switches it
+    // off during the day with a retained set_night_mode. The rule only ever
+    // switches off what it switched on, so light 30 toggled by hand from the
+    // rocker above is never taken away by the timer.
+    {"name": "corridor motion", "rule": "motion",
+     "sources": [{"sensor": {"type": "pir", "id": 720}},
+                 {"sensor": {"type": "presence", "id": 730}}],
+     "targets": [{"type": "light", "id": 30}],
+     "options": {"off_delay_ms": 20000}}
   ]
 }

@@ -152,19 +152,42 @@ motor reaches its stop (blind motors are built to sit against their limits).
 
 ## `devices.sensors`
 
-Declaring a sensor makes it publish retained state for Home Assistant. Only `pir` and
-`presence` may additionally drive a local binding.
+On/off contacts wired to a panel pin. Declaring one makes it publish retained `state`
+("1"/"0") for Home Assistant; only `pir` and `presence` may additionally drive a local
+binding, and only the `motion` rule. A reed, water-leak or smoke contact is published and
+left alone — logic on top of it belongs in Home Assistant, which sees it anyway.
 
 | Key | Required | Default | Notes |
 |---|---|---|---|
-| `type` | yes | — | `pir`, `presence`, `reed`, `water_leak`, `smoke`, `light_level`, `temperature`, `humidity`, `co2` |
-| `id` | yes | — | Non-zero. |
+| `type` | yes | — | `pir`, `presence`, `reed`, `water_leak`, `smoke` |
+| `id` | yes | — | Non-zero, and unique together with `type`. |
 | `room` | yes | — | |
-| `pin` | yes | — | A pin object. |
-| `debounce_ms` | no | `50` | |
+| `pin` | yes | — | A pin object. Wire an inverted contact with `"active_high": false` rather than inverting anything in firmware. |
+| `debounce_ms` | no | per type, below | How long the pin must hold its new level before the change is believed. |
 
-Binary sensor device classes land with M7; the analog and Modbus-fed ones (`smoke`,
-`light_level`, `temperature`, `humidity`, `co2`) arrive over RS485 with M8/M9.
+Numeric sensors (`temperature`, `humidity`, `co2`, `light_level`) are **not** declared
+here: the wiring routes them to room nodes, so they reach the controller over Modbus
+(M9). A config naming one is rejected with that reason.
+
+**Debounce defaults are per type, because that number is the entire difference between
+the five kinds:**
+
+| Type | Default | Why |
+|---|---|---|
+| `pir` | `0` | An HC-SR501-class module drives a clean logic output and holds it for its own on-board delay. There is nothing to filter, and this is the one path where latency is felt — the light should be on before you have finished walking in. |
+| `presence` | `0` | Same for the LD2410C's OUT pin, which stays high the whole time the room is occupied. |
+| `smoke` | `300` | A driven digital output, so nothing bounces; the margin exists for the long cable run from the room to the panel, where mains wiring alongside it can induce a spike. |
+| `reed` | `50` | A magnetic contact bounces like any other mechanical switch. |
+| `water_leak` | `1000` | A conductive probe sits right at its threshold and can chatter for seconds on a thin film. A leak never goes away in one second, and a false alarm may shut a valve. |
+
+Raising `debounce_ms` is the cure for a sensor that flickers — but on a PIR it costs
+exactly the responsiveness the sensor exists for. Prefer letting the motion binding's
+`off_delay_ms` absorb the flicker locally, and Home Assistant's `for:` absorb it upstream.
+
+**Boot is silent.** Every sensor publishes its state at power-up but emits no event, so a
+PIR that happens to read active during a power cut does not switch lights on before the
+retained `set_night_mode` has arrived from the broker. Same reasoning as a rocker switch
+adopting its resting position.
 
 ## `devices.buttons`
 
@@ -291,6 +314,12 @@ Not an exhaustive list, but the checks worth knowing about:
 - a binding whose source button or sensor does not exist
 - a `motion` binding without `off_delay_ms`, or with a button as a source
 - a sensor source that is not `pir`/`presence`, or used by a rule other than `motion`
+- a numeric sensor type in `devices.sensors` (those come from room nodes, M9), or a
+  non-sensor type there at all
+- **the same `<type>/<id>` declared twice** — MQTT addresses a device by that name, so the
+  second one would be unreachable while still driving its pin. Buttons are exempt: a
+  P-group is several physical switches sharing one logical id
+- **two devices claiming the same pin**, including an expander's `int_pin`
 - **a binding asking a switch for a gesture it cannot produce** — the error names the fix:
   `set "gestures": true`, or "a latching rocker cannot be held" when no configuration
   would help
@@ -304,6 +333,7 @@ For reference while writing bindings — the full scheme is in `CLAUDE.md`.
 | `light` | `set_binary`, `set_night_mode` | `state`, `night_mode` |
 | `outlet`, `damper`, `heating_mat` | `set_binary` | `state` |
 | `blinds` | `set_position`, `set_tilt`, `stop` | `state` = **position 0–100**, `0` fully down/closed and `100` fully up/open; `tilt` = slat angle 0–100 |
-| sensors | — | `state` (binary) or `measurement` (numeric) |
+| `reed`, `water_leak`, `smoke`, `pir`, `presence` | — | `state` — `1` active, `0` idle |
+| `temperature`, `humidity`, `co2`, `light_level` | — | `measurement` — a decimal, not retained (M9) |
 | `button` | — | `event` — not retained; a gesture is a moment, not a state |
 | controller | — | `status/0/alive` (LWT), `status/0/error` (empty = nothing wrong) |

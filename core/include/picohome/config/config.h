@@ -76,12 +76,17 @@ struct ActuatorDef {
     CoverTiming cover;
 };
 
+// How long a binary sensor's pin must hold its new level before the change is
+// believed. This number is the entire difference between the sensor types, so
+// it is worth choosing per type rather than defaulting them all alike.
+uint32_t defaultDebounceMs(DeviceType type);
+
 struct SensorDef {
     DeviceType type = DeviceType::Pir;
     uint16_t id = 0;
     std::string room;
     PinRef pin;
-    uint32_t debounceMs = 50;
+    uint32_t debounceMs = 0;  // the parser fills in defaultDebounceMs(type)
 };
 
 struct ButtonDef {

@@ -6,17 +6,22 @@
 
 namespace picohome {
 
-// Debounced on/off sensor: reed contact, water leak detector, PIR, LD2410C
-// presence output. As with Relay, the DeviceType comes from config — the
-// behaviour is the same for all of them: publish retained state on change and
-// emit a SensorEdge event so bindings can react.
+// Debounced on/off sensor: reed contact, water leak probe, smoke detector, PIR,
+// LD2410C presence output. One class covers all five because they differ only
+// in how quickly their signal settles — see config::defaultDebounceMs. As with
+// Relay, the DeviceType comes from config and decides the MQTT topic; the
+// behaviour is identical: publish retained state on change, and emit a
+// SensorEdge event so a motion binding can react.
 //
-// M7 adds the sensor-specific extras (per-type debounce defaults, LD2410C
-// handling); the class itself is already the shape those need.
+// Boot is deliberately silent: initialize() adopts whatever the pin reads and
+// publishes it, but emits no event. A PIR that happens to read active at
+// power-up would otherwise switch lights on before the retained set_night_mode
+// has arrived from Home Assistant — a house lit at noon after a power cut. This
+// is the same reasoning as priming a rocker switch to its resting position.
 class BinarySensor : public Device {
 public:
     BinarySensor(DeviceType type, uint16_t id, std::string room, hal::IDigitalInput& input,
-                 uint32_t debounceMs = 50);
+                 uint32_t debounceMs);
 
     void attachRouter(EventRouter* router) { router_ = router; }
 

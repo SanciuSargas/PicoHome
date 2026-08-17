@@ -25,7 +25,7 @@ enum RoomNodeInputReg : uint16_t {
     kRegTemperatureC100,  // temperature * 100, signed (2534 = 25.34 °C)
     kRegHumidityPct100,   // relative humidity * 100
     kRegCo2Ppm,           // CO2 in ppm
-    kRegSmokeRaw,         // analog smoke detector, raw ADC counts 0..4095
+    kRegSmokeState,       // smoke detector: 0 clear, 1 alarm (digital output)
     kRegLightRaw,         // photoresistor, raw ADC counts 0..4095
     kRoomNodeInputRegCount,
 };

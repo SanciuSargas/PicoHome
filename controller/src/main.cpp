@@ -7,8 +7,8 @@
 // lock-free queues, so the wall switches keep working with the cable pulled.
 //
 // Next milestones:
-//  - MCP23017 expander pins behind the HAL interfaces (M3)
-//  - Covers (M6), Modbus RTU master (M8), dimming (M10)
+//  - Modbus RTU master and the relay module (M8), room nodes (M9)
+//  - Dimming (M10), WS2815 strips (M11)
 
 #include <cstdio>
 #include <memory>

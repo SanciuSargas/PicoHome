@@ -42,8 +42,8 @@ Wire/branch numbers in the "Spreadsheet ref" column refer to the cable numbering
 | 730 | presence | corridor | 18.1 — Būvio sensorius | LD2410C, OUT pin |
 | 731 | presence | kids_toilet | 18.2 — Būvio sensorius | LD2410C, OUT pin |
 | 732 | presence | ainius_room | wire 21.1 — Būvio sensorius | LD2410C, OUT pin |
-| 740 | smoke | kids_toilet | 18.2 — Dūmų sensorius | analog, via room node |
-| 741 | smoke | ainius_room | wire 21.1 — Dūmų sensorius | analog, via room node |
+| 740 | smoke | kids_toilet | 18.2 — Dūmų sensorius | digital, via room node |
+| 741 | smoke | ainius_room | wire 21.1 — Dūmų sensorius | digital, via room node |
 | 750 | light_level | corridor | 18.1 — Šviesumo sensorius | analog, via room node |
 | 751 | light_level | kids_toilet | 18.2 — Šviesumo sensorius | analog, via room node |
 | 752 | light_level | ainius_room | wire 21.1 — Šviesumo sensorius | analog, via room node |
@@ -109,12 +109,12 @@ Wire/branch numbers in the "Spreadsheet ref" column refer to the cable numbering
 | 733 | presence | smilte_room | 16.2 — Būvio sensorius | LD2410C, OUT pin |
 | 734 | presence | corridor | wire 18 — Būvio sensorius | LD2410C, OUT pin |
 | 735 | presence | office | 21.1 — Būvio sensorius | LD2410C, OUT pin |
-| 740 | smoke | parents_toilet | 2.1 — Dūmų sensorius | analog, via room node |
-| 741 | smoke | closet_room | wire 5 — Dūmų sensorius | analog, via room node |
-| 742 | smoke | parents_bedroom | 12.1 — Dūmų sensorius | analog, via room node |
-| 743 | smoke | smilte_room | 16.2 — Dūmų sensorius | analog, via room node |
-| 744 | smoke | corridor | wire 18 — Dūmų sensorius | analog, via room node |
-| 745 | smoke | office | 21.1 — Dūmų sensorius | analog, via room node |
+| 740 | smoke | parents_toilet | 2.1 — Dūmų sensorius | digital, via room node |
+| 741 | smoke | closet_room | wire 5 — Dūmų sensorius | digital, via room node |
+| 742 | smoke | parents_bedroom | 12.1 — Dūmų sensorius | digital, via room node |
+| 743 | smoke | smilte_room | 16.2 — Dūmų sensorius | digital, via room node |
+| 744 | smoke | corridor | wire 18 — Dūmų sensorius | digital, via room node |
+| 745 | smoke | office | 21.1 — Dūmų sensorius | digital, via room node |
 | 750 | light_level | parents_toilet | 2.1 — Šviesumo sensorius | via room node |
 | 751 | light_level | closet_room | wire 5 — Šviesumo sensorius | via room node |
 | 752 | light_level | parents_bedroom | 12.1 — Šviesumo sensorius | via room node |
@@ -153,7 +153,7 @@ Sheet looks incomplete (3 wires; old sauna sketch also had one blind) — **conf
 | 700 | reed | sauna | 2.2 — Pirties durų kontaktas | |
 | 730 | presence | sauna | wire 1 — Būvio sensorius (lubos) | LD2410C, OUT pin |
 | 731 | presence | shower | 1.1 — Būvio sensorius | **TBC** location |
-| 740 | smoke | sauna | wire 1 — Dūmų sensorius | analog, via room node |
+| 740 | smoke | sauna | wire 1 — Dūmų sensorius | digital, via room node |
 | 760 | temperature | sauna | room node — "Pirties temperatūra" | high-temp-rated sensor needed |
 | 770 | humidity | sauna | room node — "Pirties drėgmė" | |
 | 771 | humidity | shower | room node — "Dušo drėgmė" | |

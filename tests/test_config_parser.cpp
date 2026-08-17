@@ -31,7 +31,7 @@ constexpr char kSampleConfig[] = R"json({
     "buttons": [
       {"id": 29, "room": "kitchen", "kind": "momentary",
        "pin": {"pin": 3, "active_high": false, "pull_up": true}},
-      {"id": 30, "room": "corridor", "kind": "toggle", "pin": {"pin": 5}}
+      {"id": 30, "room": "corridor", "kind": "toggle", "pin": {"pin": 6}}
     ]
   },
   "bindings": [
@@ -171,4 +171,173 @@ TEST_CASE("rejects invalid json") {
     std::string error;
     CHECK_FALSE(config::parse("{not json", app, error));
     CHECK_FALSE(error.empty());
+}
+
+namespace {
+
+// A config with one declared sensor, so sensor rules can be exercised alone.
+std::string withSensors(const char* sensorsJson) {
+    return std::string(R"({"schema_version": 2, "building": "x",
+      "devices": {"sensors": [)") +
+           sensorsJson + R"(]}, "bindings": []})";
+}
+
+}  // namespace
+
+TEST_CASE("sensors take the debounce their signal needs, unless told otherwise") {
+    config::App app;
+    std::string error;
+    const std::string json = withSensors(R"(
+      {"type": "pir",        "id": 720, "room": "corridor", "pin": {"pin": 8}},
+      {"type": "reed",       "id": 700, "room": "kitchen",  "pin": {"pin": 9}},
+      {"type": "water_leak", "id": 710, "room": "boiler",   "pin": {"pin": 10}},
+      {"type": "smoke",      "id": 740, "room": "office",   "pin": {"pin": 11}},
+      {"type": "presence",   "id": 730, "room": "corridor", "pin": {"pin": 12},
+       "debounce_ms": 2000})");
+    REQUIRE_MESSAGE(config::parse(json, app, error), error);
+
+    REQUIRE(app.sensors.size() == 5);
+    CHECK(app.sensors[0].debounceMs == config::defaultDebounceMs(DeviceType::Pir));
+    CHECK(app.sensors[1].debounceMs == config::defaultDebounceMs(DeviceType::Reed));
+    CHECK(app.sensors[2].debounceMs == config::defaultDebounceMs(DeviceType::WaterLeak));
+    CHECK(app.sensors[3].debounceMs == config::defaultDebounceMs(DeviceType::Smoke));
+    CHECK(app.sensors[4].debounceMs == 2000);  // a flickering module, quietened by hand
+}
+
+TEST_CASE("a measurement cannot be declared on a panel pin") {
+    config::App app;
+    std::string error;
+    CHECK_FALSE(config::parse(
+        withSensors(R"({"type": "temperature", "id": 760, "room": "sauna", "pin": {"pin": 8}})"),
+        app, error));
+    CHECK(error.find("room node") != std::string::npos);
+    CHECK(error.find("M9") != std::string::npos);
+}
+
+TEST_CASE("devices.sensors refuses anything that is not a sensor") {
+    config::App app;
+    std::string error;
+    CHECK_FALSE(config::parse(
+        withSensors(R"({"type": "light", "id": 29, "room": "kitchen", "pin": {"pin": 8}})"), app,
+        error));
+    CHECK(error.find("not a sensor") != std::string::npos);
+}
+
+TEST_CASE("a digital smoke detector is an ordinary binary sensor") {
+    config::App app;
+    std::string error;
+    REQUIRE_MESSAGE(
+        config::parse(
+            withSensors(R"({"type": "smoke", "id": 740, "room": "office", "pin": {"pin": 8}})"),
+            app, error),
+        error);
+    REQUIRE(app.sensors.size() == 1);
+    CHECK(app.sensors[0].type == DeviceType::Smoke);
+}
+
+TEST_CASE("smoke and reed may be declared but never drive a local binding") {
+    // Smoke- and reed-triggered logic is Home Assistant's business; the
+    // controller's job is to make the state visible.
+    config::App app;
+    std::string error;
+    CHECK_FALSE(config::parse(R"({"schema_version": 2, "building": "x",
+      "devices": {
+        "actuators": [{"type": "light", "id": 1, "room": "a",
+                       "backend": {"kind": "gpio", "pin": 2}}],
+        "sensors": [{"type": "smoke", "id": 740, "room": "a", "pin": {"pin": 8}}]},
+      "bindings": [{"rule": "motion", "sources": [{"sensor": {"type": "smoke", "id": 740}}],
+                    "targets": [{"type": "light", "id": 1}],
+                    "options": {"off_delay_ms": 1000}}]})",
+                              app, error));
+    CHECK(error.find("pir or presence") != std::string::npos);
+}
+
+TEST_CASE("the same device name cannot be declared twice") {
+    config::App app;
+    std::string error;
+    CHECK_FALSE(config::parse(
+        withSensors(R"({"type": "pir", "id": 720, "room": "corridor", "pin": {"pin": 8}},
+                       {"type": "pir", "id": 720, "room": "office",   "pin": {"pin": 9}})"),
+        app, error));
+    CHECK(error.find("pir/720") != std::string::npos);
+    CHECK(error.find("twice") != std::string::npos);
+
+    CHECK_FALSE(config::parse(R"({"schema_version": 2, "building": "x",
+      "devices": {"actuators": [
+        {"type": "light", "id": 29, "room": "a", "backend": {"kind": "gpio", "pin": 2}},
+        {"type": "light", "id": 29, "room": "b", "backend": {"kind": "gpio", "pin": 3}}]},
+      "bindings": []})",
+                              app, error));
+    CHECK(error.find("light/29") != std::string::npos);
+}
+
+TEST_CASE("two devices cannot claim the same pin") {
+    config::App app;
+    std::string error;
+    CHECK_FALSE(config::parse(R"({"schema_version": 2, "building": "x",
+      "devices": {
+        "actuators": [{"type": "light", "id": 29, "room": "a",
+                       "backend": {"kind": "gpio", "pin": 2}}],
+        "buttons": [{"id": 29, "room": "a", "kind": "momentary", "pin": {"pin": 2}}]},
+      "bindings": []})",
+                              app, error));
+    CHECK(error.find("GPIO 2") != std::string::npos);
+    CHECK(error.find("light/29") != std::string::npos);
+    CHECK(error.find("button/29") != std::string::npos);
+
+    // The two namespaces are separate: expander 0 pin 2 is not GPIO 2.
+    REQUIRE_MESSAGE(config::parse(R"({"schema_version": 2, "building": "x",
+      "devices": {
+        "expanders": [{"index": 0, "address": "0x20", "int_pin": 7}],
+        "actuators": [{"type": "light", "id": 29, "room": "a",
+                       "backend": {"kind": "gpio", "pin": 2}}],
+        "buttons": [{"id": 29, "room": "a", "kind": "momentary",
+                     "pin": {"expander": 0, "pin": 2}}]},
+      "bindings": []})",
+                                  app, error),
+                    error);
+}
+
+TEST_CASE("a cover's two relays are checked against everything else") {
+    config::App app;
+    std::string error;
+    CHECK_FALSE(config::parse(R"({"schema_version": 2, "building": "x",
+      "devices": {
+        "actuators": [
+          {"type": "blinds", "id": 500, "room": "a",
+           "backend": {"kind": "cover", "up": {"pin": 6}, "down": {"pin": 8}},
+           "options": {"travel_ms": 10000, "tilt_ms": 1500}},
+          {"type": "light", "id": 29, "room": "a", "backend": {"kind": "gpio", "pin": 8}}]},
+      "bindings": []})",
+                              app, error));
+    CHECK(error.find("blinds/500 (down)") != std::string::npos);
+}
+
+TEST_CASE("an expander's interrupt line is a claimed pin too") {
+    config::App app;
+    std::string error;
+    CHECK_FALSE(config::parse(R"({"schema_version": 2, "building": "x",
+      "devices": {
+        "expanders": [{"index": 0, "address": "0x20", "int_pin": 7}],
+        "actuators": [{"type": "light", "id": 29, "room": "a",
+                       "backend": {"kind": "gpio", "pin": 7}}]},
+      "bindings": []})",
+                              app, error));
+    CHECK(error.find("expander 0 INT") != std::string::npos);
+}
+
+TEST_CASE("two switches may share one button id — that is what a P-group is") {
+    config::App app;
+    std::string error;
+    REQUIRE_MESSAGE(config::parse(R"({"schema_version": 2, "building": "x",
+      "devices": {
+        "actuators": [{"type": "light", "id": 30, "room": "corridor",
+                       "backend": {"kind": "gpio", "pin": 2}}],
+        "buttons": [{"id": 30, "room": "corridor", "kind": "toggle", "pin": {"pin": 3}},
+                    {"id": 30, "room": "hall",     "kind": "toggle", "pin": {"pin": 4}}]},
+      "bindings": [{"rule": "toggle", "sources": [{"button": 30}],
+                    "targets": [{"type": "light", "id": 30}]}]})",
+                                  app, error),
+                    error);
+    CHECK(app.buttons.size() == 2);
 }
