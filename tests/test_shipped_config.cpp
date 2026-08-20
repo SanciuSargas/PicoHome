@@ -8,6 +8,7 @@
 #include "picohome/control/binding_set.h"
 #include "picohome/control/event_router.h"
 #include "picohome/core/device_registry.h"
+#include "picohome/devices/binary_sensor.h"
 #include "picohome/devices/button.h"
 #include "picohome/devices/cover.h"
 #include "picohome/devices/relay.h"
@@ -86,6 +87,14 @@ TEST_CASE("the shipped bench config parses and describes a buildable system") {
         }
         outputs.push_back(std::move(out));
     }
+    for (const auto& def : app.sensors) {
+        auto in = std::make_unique<test::FakeDigitalInput>();
+        auto sensor =
+            std::make_unique<BinarySensor>(def.type, def.id, def.room, *in, def.debounceMs);
+        sensor->attachRouter(&router);
+        registry.add(std::move(sensor));
+        inputs.push_back(std::move(in));
+    }
     for (const auto& def : app.buttons) {
         auto in = std::make_unique<test::FakeDigitalInput>();
         auto button = std::make_unique<Button>(def.id, def.room, *in, def.kind, def.gestures);
@@ -95,4 +104,19 @@ TEST_CASE("the shipped bench config parses and describes a buildable system") {
     }
     CHECK_MESSAGE(bindings.build(app, registry, router, remoteSources, error), error);
     CHECK(bindings.size() == app.bindings.size());
+}
+
+// The template users copy to make their own secrets.json. A typo in it would be
+// found on a panel otherwise, since the real file is never committed.
+TEST_CASE("the shipped secrets template parses") {
+    std::ifstream file(PICOHOME_SECRETS_EXAMPLE);
+    REQUIRE_MESSAGE(file.good(), "cannot open " PICOHOME_SECRETS_EXAMPLE);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    config::Network network;
+    std::string error;
+    REQUIRE_MESSAGE(config::parseSecrets(buffer.str(), network, error), error);
+    CHECK_FALSE(network.username.empty());
+    CHECK_FALSE(network.password.empty());
 }

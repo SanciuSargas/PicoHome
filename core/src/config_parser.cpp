@@ -174,6 +174,25 @@ bool parseSource(JsonObjectConst obj, RuleKind rule, SourceDef& source, std::str
     return fail(error, "binding source must have button, sensor or topic");
 }
 
+// Shared by both files that may set them, so a credential arriving from
+// secrets.json is held to the same rules as one written into config.json.
+bool checkCredentials(const Network& network, std::string& error) {
+    // MQTT 3.1.1 §3.1.2.9: the password flag must not be set without the user
+    // name flag. The packet would go out malformed and the broker would refuse
+    // it, which looks exactly like an unreachable broker.
+    if (network.username.empty() && !network.password.empty()) {
+        return fail(error, "network: a password needs a username — MQTT has no way to send "
+                           "one without the other");
+    }
+    if (network.username.size() > kMaxCredentialLen ||
+        network.password.size() > kMaxCredentialLen) {
+        return fail(error, "network: username and password are limited to " +
+                               std::to_string(kMaxCredentialLen) +
+                               " characters, so the CONNECT packet still fits the send buffer");
+    }
+    return true;
+}
+
 bool parseBinding(JsonObjectConst obj, BindingDef& binding, std::string& error) {
     binding.name = obj["name"] | "";
     if (!parseRule(obj["rule"] | "", binding.rule, error)) return false;
@@ -245,6 +264,25 @@ uint32_t defaultDebounceMs(DeviceType type) {
     }
 }
 
+bool parseSecrets(std::string_view json, Network& out, std::string& error) {
+    JsonDocument doc;
+    const DeserializationError err = deserializeJson(doc, json.data(), json.size());
+    if (err) return fail(error, err.c_str());
+
+    // Nested under "network" rather than flat, so each value says where it
+    // lands and the file has an obvious place to grow.
+    JsonObjectConst net = doc["network"].as<JsonObjectConst>();
+    if (net.isNull()) {
+        return fail(error, "secrets: expected a \"network\" object holding username/password");
+    }
+
+    // Only the keys actually present are replaced: this file overlays the
+    // config, it does not restate it.
+    if (!net["username"].isNull()) out.username = net["username"] | "";
+    if (!net["password"].isNull()) out.password = net["password"] | "";
+    return checkCredentials(out, error);
+}
+
 bool parse(std::string_view json, App& out, std::string& error) {
     JsonDocument doc;
     const DeserializationError err = deserializeJson(doc, json.data(), json.size());
@@ -274,6 +312,10 @@ bool parse(std::string_view json, App& out, std::string& error) {
         out.network.gateway = net["gateway"] | "";
         out.network.broker = net["broker"] | "";
         out.network.brokerPort = net["broker_port"] | static_cast<uint16_t>(1883);
+
+        out.network.username = net["username"] | "";
+        out.network.password = net["password"] | "";
+        if (!checkCredentials(out.network, error)) return false;
     }
 
     JsonObjectConst devices = doc["devices"].as<JsonObjectConst>();

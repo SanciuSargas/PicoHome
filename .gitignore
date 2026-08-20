@@ -2,3 +2,7 @@ build/
 cmake-build-*/
 .idea/
 .cache/
+
+# Broker credentials. The real file is copied to each SD card next to
+# config.json and never committed; config/secrets.example.json is the template.
+secrets.json

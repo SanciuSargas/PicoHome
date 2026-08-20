@@ -104,6 +104,24 @@ bool socketAlive() {
     return status == SOCK_ESTABLISHED || status == SOCK_CLOSE_WAIT;
 }
 
+// MQTTConnect returns the broker's CONNACK code, or FAILURE when no CONNACK
+// came back at all. Naming them matters: a refused login retries on the same
+// backoff as an unplugged cable and is indistinguishable from one otherwise,
+// and there is no way to report it over MQTT — we are not connected.
+constexpr int kConnackBadCredentials = 4;
+constexpr int kConnackNotAuthorized = 5;
+
+const char* connackReason(int code) {
+    switch (code) {
+        case 1: return "broker refused MQTT 3.1.1";
+        case 2: return "client id rejected";
+        case 3: return "broker unavailable";
+        case kConnackBadCredentials: return "bad username or password";
+        case kConnackNotAuthorized: return "not authorized (the user may not connect)";
+        default: return "no CONNACK — broker unreachable, or it closed the connection";
+    }
+}
+
 bool publishNow(const char* topic, const char* payload, bool retained, int qos) {
     MQTTMessage message;
     std::memset(&message, 0, sizeof(message));
@@ -154,7 +172,31 @@ bool connectSession(const config::Network& network) {
     data.will.retained = 1;
     data.will.qos = QOS1;
 
-    if (MQTTConnect(&gClient, &data) != SUCCESSS) {
+    // Broker login, when the config carries one. Leaving these pointers null is
+    // what makes the serializer omit the flags entirely, so an anonymous broker
+    // receives exactly the packet it always did. An *empty* string would not do
+    // that — a non-null pointer sets the flag and sends a zero-length user
+    // name, which brokers reject. The strings live in the boot config, so they
+    // outlive the packet without core 1 copying (or allocating) anything.
+    if (!network.username.empty()) {
+        data.username.cstring = const_cast<char*>(network.username.c_str());
+    }
+    if (!network.password.empty()) {
+        data.password.cstring = const_cast<char*>(network.password.c_str());
+    }
+
+    const int rc = MQTTConnect(&gClient, &data);
+    if (rc != SUCCESSS) {
+        // Never log the password, and log the username only so a typo in it is
+        // visible: this goes to a serial console, but it is still the one place
+        // credentials could leak into a log file.
+        std::printf("net: MQTT connect refused (%d): %s\n", rc, connackReason(rc));
+        if (rc == kConnackBadCredentials || rc == kConnackNotAuthorized) {
+            std::printf("net: check network.username / network.password in config.json "
+                        "(username sent: %s)\n",
+                        network.username.empty() ? "<none — the config carries no credentials>"
+                                                 : network.username.c_str());
+        }
         gNetwork.disconnect(&gNetwork);
         return false;
     }
@@ -177,7 +219,8 @@ bool connectSession(const config::Network& network) {
     const InboundMessage refresh = InboundMessage::publishAllStates();
     queue_try_add(&gInbound, &refresh);
 
-    std::printf("net: MQTT connected as '%s' (%u subscriptions)\n", gClientId.c_str(),
+    std::printf("net: MQTT connected as '%s', user %s (%u subscriptions)\n", gClientId.c_str(),
+                network.username.empty() ? "<anonymous>" : network.username.c_str(),
                 static_cast<unsigned>(gSubscriptions.size()));
     return true;
 }

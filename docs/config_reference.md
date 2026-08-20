@@ -39,6 +39,65 @@ another device.** A button does not know its light; the binding knows both.
 | `gateway` | `""` | |
 | `broker` | `""` | Broker IPv4 — **an address, not a hostname** (no DNS). |
 | `broker_port` | `1883` | |
+| `username` | `""` | Broker login. Empty = connect anonymously. Better placed in `secrets.json` — see below. |
+| `password` | `""` | Only meaningful alongside `username`. |
+
+### `secrets.json` — keeping the password out of git
+
+The valuable half of a config is the device inventory and the bindings: that is what you
+want in version control, diffed and reviewed. The password is the one thing you do not.
+So the controller reads a second, optional file from the card root:
+
+```jsonc
+// /secrets.json  (template: config/secrets.example.json, git-ignored as secrets.json)
+{
+  "network": {
+    "username": "utility_panel",
+    "password": "..."
+  }
+}
+```
+
+- **Optional.** No file → whatever `config.json` carries stands, which may be nothing
+  (anonymous). Present but malformed, or unreadable on a working card → **boot error**.
+  Degrading quietly to an anonymous connect because a password file had a stray comma is
+  the wrong failure.
+- **It overlays, it does not replace.** Only the keys it names are applied, so a username
+  may live in `config.json` and only the password in `secrets.json` if you prefer.
+- **It wins** where both files set the same key.
+- Same validation either way — a password without a username, or either over 128
+  characters, is refused at boot whichever file it came from.
+
+Deploy is two files instead of one:
+
+```bash
+cp config/secrets.example.json config/secrets.json   # once, then fill it in
+cp config/config.json config/secrets.json /run/media/$USER/<CARD>/
+```
+
+**Credentials are optional and omitted entirely when empty.** The CONNECT packet carries
+no user-name flag at all in that case, which is what a broker without
+`allow_anonymous false` expects. Two things are refused at boot rather than at the broker:
+
+- **a `password` with no `username`** — MQTT has no way to send one without the other
+  (3.1.1 §3.1.2.9), so the packet would go out malformed and the refusal would be
+  indistinguishable from an unreachable broker;
+- **either longer than 128 characters**, so the CONNECT still fits the send buffer next to
+  the client id and the will topic.
+
+A wrong password is otherwise an invisible failure: the controller retries on the same
+backoff as an unplugged cable, and it cannot report the problem over MQTT because it is
+not connected. So the serial log names the CONNACK code —
+`MQTT connect refused (4): bad username or password` — and echoes the username it sent,
+never the password.
+
+> **These are stored and sent in the clear.** Keeping the password out of git does not
+> make it secret: the SD card is FAT32 that anything can read, and MQTT over the W5100 has
+> no TLS, so it crosses the LAN in plaintext on every reconnect. That is the normal
+> trade-off for a wired home broker, but make it a decision: give each controller its own
+> broker account, restrict it to its own topic tree (mosquitto: `topic readwrite
+> utility/#`), and never reuse a password that matters anywhere else. A panel account that
+> leaks should cost you the panel, not the house.
 
 ---
 

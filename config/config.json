@@ -26,6 +26,14 @@
     "gateway": "192.168.5.1",
     "broker": "192.168.5.2",
     "broker_port": 1883
+
+    // The broker login is deliberately NOT here: it lives in secrets.json next
+    // to this file on the SD card, which is git-ignored, so this file can be
+    // committed. Copy config/secrets.example.json to config/secrets.json, fill
+    // it in, and put both on the card.
+    //
+    // "username"/"password" are still accepted here for a controller that will
+    // never be committed anywhere — secrets.json simply overrides them.
   },
 
   "devices": {

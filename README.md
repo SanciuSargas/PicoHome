@@ -66,12 +66,28 @@ The SD card must hold `config.json` in its root (start from
 [`config/testbench.json`](config/testbench.json)); a bad or missing config gives a fast
 blink plus the reason on serial every 2 s.
 
-## Checking MQTT from the command line
-
-Set `network.ip` / `network.broker` in `config.json` to suit your LAN first. Then, with
-`mosquitto-clients` installed:
+If the broker needs a login, put it in a second file `secrets.json` beside it — copy
+[`config/secrets.example.json`](config/secrets.example.json). It is git-ignored, so the
+config itself, which is the part worth version control, stays committable:
 
 ```bash
+cp config/secrets.example.json config/secrets.json   # once, then fill it in
+cp config/config.json config/secrets.json /run/media/$USER/<CARD>/
+```
+
+The file is optional, but a malformed one is a boot error rather than a quiet fall back to
+connecting anonymously.
+
+## Checking MQTT from the command line
+
+Set `network.ip` / `network.broker` in `config.json` to suit your LAN first, and put the
+broker login in `secrets.json` (above). Add `-u`/`-P` to the commands below to match.
+Then, with `mosquitto-clients` installed:
+
+```bash
+# If the broker authenticates, export these once and append "$AUTH" to each command
+AUTH="-u picohome -P your_password"
+
 # Watch everything this controller says (states are retained, so they show up at once)
 mosquitto_sub -h 192.168.1.200 -v -t 'testbench/#'
 
@@ -83,6 +99,11 @@ mosquitto_pub -h 192.168.1.200 -t testbench/kitchen/light/29/set_binary -m 0
 # controller picks the value up again after a reboot)
 mosquitto_pub -h 192.168.1.200 -r -t testbench/kitchen/light/29/set_night_mode -m 0
 ```
+
+A controller that cannot log in says so on the serial console and keeps retrying:
+`net: MQTT connect refused (4): bad username or password`, or `(5): not authorized`. It
+cannot report this over MQTT — it is not connected — so the serial log is the only place
+it appears.
 
 Expected traffic: `testbench/controller/status/0/alive` = `online` (and `offline` a few
 seconds after you unplug the board — the broker publishes that on the controller's
@@ -138,6 +159,16 @@ broker by themselves.
       register map needed for the Modbus master config)
 - [ ] Confirm MQTT broker details (old code used 192.168.1.200:1883) and that
       Home Assistant can reach it
+- [ ] Create **one broker account per controller** (the broker requires a login) and put
+      each in that card's `secrets.json` (copy `config/secrets.example.json`, which is
+      git-ignored as `secrets.json` so the config itself stays committable). Restrict each
+      with an ACL to its own topic tree, e.g. for mosquitto:
+      ```
+      user utility_panel
+      topic readwrite utility/#
+      ```
+      Credentials sit in the clear on the SD card and cross the LAN in the clear (no TLS
+      on the W5100), so use passwords that matter only inside this network
 - [ ] When HA is set up (M13): the entity driving each light's `set_night_mode` must
       publish with `retain: true`, so a rebooted controller picks up the current
       day/night value from the broker instead of defaulting to night

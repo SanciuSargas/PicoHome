@@ -41,3 +41,8 @@
 #define PICOHOME_HEARTBEAT_LED_GPIO 25  // YD-RP2040 user LED (WS2812 on GPIO23 later)
 
 #define PICOHOME_CONFIG_PATH "/config.json"
+
+// Optional second file holding only the broker login, so config.json — the
+// device inventory and bindings, the part worth version control — can be
+// committed without the password going with it.
+#define PICOHOME_SECRETS_PATH "/secrets.json"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <string_view>
@@ -35,6 +36,12 @@ struct PinRef {
     bool pullUp = true;      // inputs only
 };
 
+// Longest broker credentials accepted. Not an MQTT limit (the protocol allows
+// 65535) but a packet-size one: the CONNECT has to fit the controller's send
+// buffer alongside the client id and the will topic, and a config error at boot
+// is far easier to diagnose than a connect that mysteriously never completes.
+inline constexpr std::size_t kMaxCredentialLen = 128;
+
 struct Network {
     uint8_t mac[6] = {};
     std::string ip;
@@ -42,6 +49,13 @@ struct Network {
     std::string gateway;
     std::string broker;
     uint16_t brokerPort = 1883;
+
+    // Broker login. Both empty = connect anonymously, which is what a broker
+    // without `allow_anonymous false` expects. MQTT sends these in the clear
+    // and they sit in the clear on the SD card — see the note in
+    // docs/config_reference.md before deciding what account to use.
+    std::string username;
+    std::string password;
 };
 
 // One MCP23017 on the panel's I2C bus. `index` is what a PinRef.expander
@@ -159,5 +173,16 @@ struct App {
 // Parses JSON (comments allowed) into `out`. On failure returns false and
 // describes the problem in `error`.
 bool parse(std::string_view json, App& out, std::string& error);
+
+// Overlays broker credentials from a second, separate file:
+//
+//   {"network": {"username": "utility_panel", "password": "..."}}
+//
+// This exists so the interesting half of the config — the device inventory and
+// the bindings, which is what is worth version control and review — can be
+// committed, while the password stays out of the repository. The file is
+// optional and only the keys it names are replaced, so a controller with no
+// secrets file behaves exactly as before.
+bool parseSecrets(std::string_view json, Network& out, std::string& error);
 
 }  // namespace picohome::config

@@ -74,6 +74,7 @@ SdReadResult readFileFromSd(const char* path) {
     fr = f_open(&file, path, FA_READ);
     if (fr != FR_OK) {
         result.error = fresultError("f_open", fr);
+        result.notFound = (fr == FR_NO_FILE || fr == FR_NO_PATH);
         f_unmount("");
         return result;
     }

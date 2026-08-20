@@ -175,6 +175,144 @@ TEST_CASE("rejects invalid json") {
 
 namespace {
 
+// A config carrying only a network block, for the broker-session settings.
+std::string withNetwork(const char* networkJson) {
+    return std::string(R"({"schema_version": 2, "building": "x", "network": {)") + networkJson +
+           R"(}, "devices": {}, "bindings": []})";
+}
+
+}  // namespace
+
+TEST_CASE("broker credentials are optional — no keys means connect anonymously") {
+    config::App app;
+    std::string error;
+    REQUIRE_MESSAGE(config::parse(withNetwork(R"("broker": "192.168.1.200")"), app, error), error);
+    CHECK(app.network.username.empty());
+    CHECK(app.network.password.empty());
+}
+
+TEST_CASE("broker credentials are parsed when present") {
+    config::App app;
+    std::string error;
+    REQUIRE_MESSAGE(config::parse(withNetwork(R"("broker": "192.168.1.200",
+                                                 "username": "utility_panel",
+                                                 "password": "s3cret pass/word")"),
+                                  app, error),
+                    error);
+    CHECK(app.network.username == "utility_panel");
+    CHECK(app.network.password == "s3cret pass/word");
+}
+
+TEST_CASE("a password without a username is refused") {
+    // MQTT cannot send one without the other, so the packet would go out
+    // malformed and the refusal would look like an unreachable broker.
+    config::App app;
+    std::string error;
+    CHECK_FALSE(config::parse(withNetwork(R"("broker": "1.2.3.4", "password": "orphan")"), app,
+                              error));
+    CHECK(error.find("username") != std::string::npos);
+}
+
+TEST_CASE("a username with no password is allowed") {
+    // Legitimate: a broker may authenticate on the username alone.
+    config::App app;
+    std::string error;
+    REQUIRE_MESSAGE(
+        config::parse(withNetwork(R"("broker": "1.2.3.4", "username": "sensor_only")"), app, error),
+        error);
+    CHECK(app.network.username == "sensor_only");
+    CHECK(app.network.password.empty());
+}
+
+TEST_CASE("credentials longer than the CONNECT packet allows are refused at boot") {
+    config::App app;
+    std::string error;
+    const std::string tooLong(config::kMaxCredentialLen + 1, 'x');
+    CHECK_FALSE(config::parse(
+        withNetwork((R"("broker": "1.2.3.4", "username": "u", "password": ")" + tooLong + R"(")")
+                        .c_str()),
+        app, error));
+    CHECK(error.find("limited to") != std::string::npos);
+}
+
+TEST_CASE("secrets file supplies credentials a committed config.json omits") {
+    config::App app;
+    std::string error;
+    REQUIRE_MESSAGE(config::parse(withNetwork(R"("broker": "192.168.1.200")"), app, error), error);
+    REQUIRE(app.network.username.empty());
+
+    REQUIRE_MESSAGE(config::parseSecrets(R"({"network": {"username": "utility_panel",
+                                                         "password": "hunter2"}})",
+                                         app.network, error),
+                    error);
+    CHECK(app.network.username == "utility_panel");
+    CHECK(app.network.password == "hunter2");
+    CHECK(app.network.broker == "192.168.1.200");  // the rest of the config is untouched
+}
+
+TEST_CASE("secrets override what config.json carries") {
+    config::App app;
+    std::string error;
+    REQUIRE_MESSAGE(config::parse(withNetwork(R"("username": "placeholder",
+                                                 "password": "placeholder")"),
+                                  app, error),
+                    error);
+
+    REQUIRE_MESSAGE(
+        config::parseSecrets(R"({"network": {"username": "real", "password": "real_pw"}})",
+                             app.network, error),
+        error);
+    CHECK(app.network.username == "real");
+    CHECK(app.network.password == "real_pw");
+}
+
+TEST_CASE("secrets replace only the keys they name") {
+    config::App app;
+    std::string error;
+    REQUIRE_MESSAGE(
+        config::parse(withNetwork(R"("username": "from_config", "password": "from_config")"), app,
+                      error),
+        error);
+
+    REQUIRE_MESSAGE(config::parseSecrets(R"({"network": {"password": "from_secrets"}})",
+                                         app.network, error),
+                    error);
+    CHECK(app.network.username == "from_config");
+    CHECK(app.network.password == "from_secrets");
+}
+
+TEST_CASE("a secrets file is held to the same credential rules as the config") {
+    config::Network network;
+    std::string error;
+
+    // A password with no username anywhere is still unsendable.
+    CHECK_FALSE(config::parseSecrets(R"({"network": {"password": "orphan"}})", network, error));
+    CHECK(error.find("username") != std::string::npos);
+
+    // ...but it is fine when config.json already named the user.
+    config::Network withUser;
+    withUser.username = "from_config";
+    REQUIRE_MESSAGE(
+        config::parseSecrets(R"({"network": {"password": "orphan"}})", withUser, error), error);
+    CHECK(withUser.password == "orphan");
+}
+
+TEST_CASE("a malformed secrets file is an error, never a silent anonymous connect") {
+    config::Network network;
+    std::string error;
+
+    CHECK_FALSE(config::parseSecrets("{not json", network, error));
+    CHECK_FALSE(error.empty());
+
+    // A file that parses but says nothing useful is just as wrong: the likely
+    // cause is credentials pasted at the top level instead of under "network".
+    CHECK_FALSE(config::parseSecrets(R"({"username": "u", "password": "p"})", network, error));
+    CHECK(error.find("network") != std::string::npos);
+    CHECK(network.username.empty());
+}
+
+namespace {
+
 // A config with one declared sensor, so sensor rules can be exercised alone.
 std::string withSensors(const char* sensorsJson) {
     return std::string(R"({"schema_version": 2, "building": "x",

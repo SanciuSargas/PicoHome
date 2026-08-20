@@ -57,6 +57,16 @@ servers:
       and a Last Will registered on `<building>/controller/status/0/alive` so
       the broker announces a controller's death on its behalf.
 
+      Authentication is optional and comes from the SD-card config
+      (`network.username` / `network.password`). With both empty the CONNECT
+      carries no credential flags at all, so an anonymous broker sees the same
+      packet it always did. There is no TLS — the W5100 has no room for it —
+      so credentials cross the LAN in plaintext and each controller should
+      have its own broker account, restricted by ACL to its own building's
+      topic tree.
+    security:
+      - $ref: '#/components/securitySchemes/brokerLogin'
+
 channels:
   binaryActuatorCommand:
     address: '{building}/{room}/{binaryType}/{deviceId}/set_binary'
@@ -427,6 +437,24 @@ operations:
       - $ref: '#/channels/controllerError/messages/error'
 
 components:
+  securitySchemes:
+    brokerLogin:
+      type: userPassword
+      description: |
+        MQTT user name and password sent in the CONNECT packet, read from
+        `/secrets.json` on the controller's SD card (or from `network` in
+        `config.json`, which the secrets file overrides). The split exists so a
+        building's inventory and bindings can be committed to version control
+        while its password is not. Both keys are optional: omitted (or empty)
+        means the CONNECT carries no credential flags and the controller
+        connects anonymously.
+
+        A refusal is reported on the serial console with its CONNACK code — 4
+        `bad username or password`, 5 `not authorized` — because a controller
+        that cannot connect has no way to publish the fault. It keeps retrying
+        on the usual backoff rather than giving up, so fixing the broker side
+        is enough to bring a panel back without touching it.
+
   parameters:
     building:
       description: |

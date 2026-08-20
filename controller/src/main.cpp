@@ -213,6 +213,21 @@ int main() {
         errorLoop("config parse: " + error);
     }
 
+    // Broker credentials may live in their own file so config.json can be
+    // committed to git without them. Absent is fine — whatever config.json
+    // carries then stands, which may be nothing at all (anonymous). Present
+    // but unreadable or malformed is not: silently connecting anonymously
+    // because a password file failed to parse is the wrong failure.
+    const auto secrets = picohome::pico_hal::readFileFromSd(PICOHOME_SECRETS_PATH);
+    if (secrets.ok) {
+        if (!picohome::config::parseSecrets(secrets.content, gConfig.network, error)) {
+            errorLoop("secrets parse: " + error);
+        }
+        std::printf("secrets: broker login taken from %s\n", PICOHOME_SECRETS_PATH);
+    } else if (!secrets.notFound) {
+        errorLoop("secrets: " + secrets.error);
+    }
+
     picohome::DeviceRegistry registry;
     picohome::EventRouter router;
     picohome::BindingSet bindings;

@@ -26,6 +26,16 @@
     "gateway": "192.168.5.1",
     "broker": "192.168.5.2",
     "broker_port": 1883
+
+    // Broker login: put it in secrets.json beside this file on the card (see
+    // config/secrets.example.json), not here — that file is git-ignored, so
+    // this one stays committable. With neither, the controller connects
+    // anonymously, which is what a broker without "allow_anonymous false"
+    // expects.
+    //
+    // "username"/"password" are accepted here too and secrets.json overrides
+    // them. A password without a username is refused at boot either way: MQTT
+    // cannot send one without the other.
   },
 
   "devices": {
