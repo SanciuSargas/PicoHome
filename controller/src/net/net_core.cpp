@@ -13,6 +13,10 @@ extern "C" {
 #include "MQTTClient.h"
 #include "socket.h"
 #include "wizchip_conf.h"
+
+// Paho's keepalive step: not declared in MQTTClient.h, but not static either.
+// sessionLoop() calls it directly so that sending a ping never requires a read.
+int keepalive(MQTTClient* c);
 }
 
 #include "net/w5100_link.h"
@@ -99,10 +103,13 @@ void onMessage(MessageData* data) {
     queue_try_add(&gInbound, &message);
 }
 
-bool socketAlive() {
-    const uint8_t status = getSn_SR(kMqttSocket);
-    return status == SOCK_ESTABLISHED || status == SOCK_CLOSE_WAIT;
-}
+// Only ESTABLISHED is a live session. CLOSE_WAIT means the broker sent FIN — it
+// restarted, or dropped us — and nothing will arrive on this socket again. This
+// check is the only thing that notices: Paho's MQTTYield() reports a failed read
+// as success, and its keepalive cannot send here and says nothing. Counting
+// CLOSE_WAIT as alive left every broker restart cutting off inbound commands
+// until something happened to be published, or the controller was rebooted.
+bool socketAlive() { return getSn_SR(kMqttSocket) == SOCK_ESTABLISHED; }
 
 // MQTTConnect returns the broker's CONNACK code, or FAILURE when no CONNACK
 // came back at all. Naming them matters: a refused login retries on the same
@@ -226,8 +233,45 @@ bool connectSession(const config::Network& network) {
 }
 
 void sessionLoop() {
+    // Paho sends a PINGREQ once the link has been quiet for the keepalive
+    // interval but never gives up on one — an unanswered ping only stops it
+    // sending more. A broker that keeps TCP open but stops answering would
+    // leave the session dead with nothing noticing, so allow one more interval
+    // for the PINGRESP, as upstream Paho does, and then drop the session.
+    const uint32_t pingTimeoutMs = gClient.keepAliveInterval * 1000u;
+    bool pingPending = false;
+    uint32_t pingSeenMs = 0;
+
     while (true) {
-        if (MQTTYield(&gClient, 10) == FAILURE || !socketAlive()) return;
+        if (!socketAlive()) return;
+
+        // Hand the socket to Paho only once a packet has started to arrive, and
+        // then with the whole command timeout. Paho acknowledges an inbound QoS 1
+        // message on the timer it spent waiting for it, so a command landing at
+        // the end of a short poll window found the timer expired: the PUBACK was
+        // never sent, the yield failed and the session dropped — losing every
+        // command sent during the reconnect. Reading a command over SPI takes
+        // over a millisecond, so a 10 ms window lost roughly one in ten. The
+        // long timer also waits out a packet split across TCP segments.
+        if (getSn_RX_RSR(kMqttSocket) > 0) {
+            if (MQTTYield(&gClient, static_cast<int>(gClient.command_timeout_ms)) == FAILURE) {
+                return;
+            }
+        } else {
+            keepalive(&gClient);
+            sleep_us(200);
+        }
+
+        const uint32_t now = to_ms_since_boot(get_absolute_time());
+        if (!gClient.ping_outstanding) {
+            pingPending = false;
+        } else if (!pingPending) {
+            pingPending = true;
+            pingSeenMs = now;
+        } else if (now - pingSeenMs >= pingTimeoutMs) {
+            std::printf("net: broker stopped answering pings, dropping session\n");
+            return;
+        }
 
         // Bounded per iteration so inbound traffic and keepalives still get a turn.
         PublishMessage message;
